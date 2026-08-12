@@ -1,0 +1,118 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AccessHome Analyzer - Infraestrutura AWS (PICTA 2026)",
+  
+  "Parameters": {
+    "ProjectName": {
+      "Type": "String",
+      "Default": "accesshome-analyzer"
+    },
+    "Environment": {
+      "Type": "String",
+      "Default": "dev",
+      "AllowedValues": ["dev", "prod"]
+    }
+  },
+
+  "Resources": {
+    "ScansTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": { "Fn::Sub": "${ProjectName}-scans-${Environment}" },
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          { "AttributeName": "scan_id", "AttributeType": "S" },
+          { "AttributeName": "url", "AttributeType": "S" },
+          { "AttributeName": "timestamp", "AttributeType": "S" }
+        ],
+        "KeySchema": [
+          { "AttributeName": "scan_id", "KeyType": "HASH" }
+        ],
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "url-timestamp-index",
+            "KeySchema": [
+              { "AttributeName": "url", "KeyType": "HASH" },
+              { "AttributeName": "timestamp", "KeyType": "RANGE" }
+            ],
+            "Projection": { "ProjectionType": "ALL" }
+          }
+        ],
+        "Tags": [
+          { "Key": "Project", "Value": "AccessHome Analyzer" },
+          { "Key": "Author", "Value": "Yago Santos Silva" }
+        ]
+      }
+    },
+
+    "ReportsBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": { "Fn::Sub": "${ProjectName}-reports-${Environment}" },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "ExpireOldReports",
+              "Status": "Enabled",
+              "ExpirationInDays": 90
+            }
+          ]
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedOrigins": ["*"],
+              "AllowedMethods": ["GET"],
+              "AllowedHeaders": ["*"]
+            }
+          ]
+        }
+      }
+    },
+
+    "ScanFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": { "Fn::Sub": "${ProjectName}-scan-${Environment}" },
+        "Runtime": "python3.12",
+        "Handler": "lambda_handler.handler",
+        "Timeout": 120,
+        "MemorySize": 1024,
+        "Environment": {
+          "Variables": {
+            "SCANS_TABLE": { "Ref": "ScansTable" },
+            "REPORTS_BUCKET": { "Ref": "ReportsBucket" },
+            "ENVIRONMENT": { "Ref": "Environment" }
+          }
+        },
+        "Policies": [
+          "AmazonDynamoDBFullAccess",
+          "AmazonS3FullAccess"
+        ]
+      }
+    },
+
+    "ScanApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": { "Fn::Sub": "${ProjectName}-api-${Environment}" },
+        "Description": "AccessHome Analyzer REST API"
+      }
+    }
+  },
+
+  "Outputs": {
+    "ApiUrl": {
+      "Description": "URL da API",
+      "Value": { "Fn::Sub": "https://${ScanApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}" }
+    },
+    "ReportsBucketName": {
+      "Description": "Bucket dos relatórios",
+      "Value": { "Ref": "ReportsBucket" }
+    },
+    "ScansTableName": {
+      "Description": "Tabela DynamoDB",
+      "Value": { "Ref": "ScansTable" }
+    }
+  }
+}
