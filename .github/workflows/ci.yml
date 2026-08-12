@@ -3,6 +3,8 @@ name: AccessHome Analyzer CI/CD
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 12 * * 1'  # Toda segunda-feira às 9h (horário de Brasília / UTC-3)
   pull_request:
     branches: [main]
 
