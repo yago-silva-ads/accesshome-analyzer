@@ -48,25 +48,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install and run scan
-        run: |
-          pip install -r requirements.txt
-          playwright install chromium --with-deps
-          mkdir -p docs
-          python analyzer.py https://demo.home-assistant.io --full --output docs/index.html || true
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
