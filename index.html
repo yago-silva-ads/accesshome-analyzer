@@ -1,11 +1,207 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=reports/index.html">
-    <title>AccessHome Analyzer — Redirecionando...</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AccessHome Analyzer — Resultados</title>
+<script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/accessibility.js"></script>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --primary: #58a6ff;
+    --success: #3fb950; --error: #f85149; --warning: #d29922;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'SF Mono', Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); padding: 24px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 26px; margin-bottom: 4px; }
+h2 { font-size: 18px; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 15px; margin: 20px 0 8px; color: var(--primary); }
+.subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+.kpi-value { font-size: 26px; font-weight: 700; font-family: var(--mono); }
+.kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.card-title { font-weight: 600; margin-bottom: 10px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; }
+.badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.badge-critical { background: rgba(248,81,73,0.15); color: var(--error); }
+.badge-serious { background: rgba(210,153,34,0.15); color: var(--warning); }
+.conclusion { background: linear-gradient(135deg, rgba(248,81,73,0.06), rgba(210,153,34,0.06)); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 24px 0; }
+.conclusion strong { color: var(--error); }
+.platform { border-left: 3px solid var(--primary); padding-left: 16px; margin: 16px 0; }
+.score-badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-family: var(--mono); font-size: 14px; }
+.score-c { background: rgba(210,153,34,0.15); color: var(--warning); }
+footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+a { color: var(--primary); text-decoration: none; }
+@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } body { padding: 12px; } }
+</style>
 </head>
 <body>
-    <p>Redirecionando para <a href="reports/index.html">relatórios de acessibilidade</a>...</p>
+
+<h1>🏠 AccessHome Analyzer — Resultados da Pesquisa</h1>
+<p class="subtitle">
+    Análise de Ferramentas Automatizadas para Testes de Acessibilidade em Interfaces de Smart Home<br>
+    PICTA 2026 — Centro Universitário Senac | Yago Santos Silva | Orientadora: Profa. Claudia Bianchi Progetti
+</p>
+
+<div class="kpi-row">
+    <div class="kpi"><div class="kpi-value" style="color:var(--error)">3</div><div class="kpi-label">Plataformas Testadas</div></div>
+    <div class="kpi"><div class="kpi-value" style="color:var(--error)">0</div><div class="kpi-label">Conformes WCAG</div></div>
+    <div class="kpi"><div class="kpi-value" style="color:var(--warning)">51</div><div class="kpi-label">Elementos com Violação</div></div>
+    <div class="kpi"><div class="kpi-value" style="color:var(--success)">39</div><div class="kpi-label">Regras Aprovadas</div></div>
+    <div class="kpi"><div class="kpi-value" style="color:var(--warning)">72</div><div class="kpi-label">Score Médio</div></div>
+</div>
+
+<div class="conclusion">
+    <strong>⚠️ Conclusão:</strong> Nenhuma das 3 plataformas atinge conformidade WCAG 2.1 Nível A. 
+    Todas apresentam barreiras que impedem a operação autônoma por pessoas com deficiência visual.
+    A violação mais crítica: <strong>34 ícones de dispositivos sem texto alternativo</strong> no openHAB — 
+    a interface inteira de controle da casa fica invisível para leitores de tela.
+</div>
+
+<div class="grid">
+    <div class="card">
+        <div class="card-title">Violações por Plataforma</div>
+        <div id="chart-comparison" style="height:260px"></div>
+    </div>
+    <div class="card">
+        <div class="card-title">Elementos Afetados por Critério WCAG</div>
+        <div id="chart-wcag" style="height:260px"></div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:20px">
+    <div class="card-title">Score AccessHome (Base 100)</div>
+    <div id="chart-scores" style="height:200px"></div>
+    <p style="color:var(--muted); font-size:11px; margin-top:8px;">
+        Fórmula: 100 − (Críticas × 15) − (Sérias × 8) − (Moderadas × 3) | A (≥90) B (≥75) C (≥50) D (≥25) F (&lt;25)
+    </p>
+</div>
+
+<!-- ====== RESULTADOS POR PLATAFORMA ====== -->
+<h2>Resultados por Plataforma</h2>
+
+<div class="platform">
+<h3>🏠 Home Assistant — demo.home-assistant.io</h3>
+<p style="font-size:12px; color:var(--muted); margin-bottom:8px">SPA com Web Components (Lit/Shadow DOM) | Scan: 2.4s | Score: <span class="score-badge score-c">70 / C</span></p>
+<table>
+<thead><tr><th>Regra</th><th>Impacto</th><th>Descrição</th><th>Elementos</th><th>WCAG</th></tr></thead>
+<tbody>
+<tr><td><code>aria-command-name</code></td><td><span class="badge badge-critical">Crítica</span></td><td>Botões/links ARIA sem nome acessível</td><td>10</td><td>4.1.2</td></tr>
+<tr><td><code>color-contrast</code></td><td><span class="badge badge-critical">Crítica</span></td><td>Contraste insuficiente</td><td>1</td><td>1.4.3</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px; margin-top:8px">🔑 Teclado: 1 armadilha de foco detectada — <strong style="color:var(--error)">REPROVADO</strong></p>
+</div>
+
+<div class="platform">
+<h3>🔌 openHAB — demo.openhab.org/basicui</h3>
+<p style="font-size:12px; color:var(--muted); margin-bottom:8px">Interface server-rendered (BasicUI) | Scan: 1.8s | Score: <span class="score-badge score-c">77 / C</span></p>
+<table>
+<thead><tr><th>Regra</th><th>Impacto</th><th>Descrição</th><th>Elementos</th><th>WCAG</th></tr></thead>
+<tbody>
+<tr><td><code>image-alt</code></td><td><span class="badge badge-critical">Crítica</span></td><td>34 ícones de dispositivos sem alt-text</td><td>34</td><td>1.1.1</td></tr>
+<tr><td><code>html-has-lang</code></td><td><span class="badge badge-serious">Séria</span></td><td>HTML sem atributo lang</td><td>1</td><td>3.1.1</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px; margin-top:8px">🔑 Teclado: 16 elementos focáveis, 0 armadilhas — <strong style="color:var(--success)">APROVADO</strong></p>
+</div>
+
+<div class="platform">
+<h3>📱 SharpTools — app.sharptools.io</h3>
+<p style="font-size:12px; color:var(--muted); margin-bottom:8px">Dashboard SPA | Scan: 1.2s | Score: <span class="score-badge score-c">69 / C</span></p>
+<table>
+<thead><tr><th>Regra</th><th>Impacto</th><th>Descrição</th><th>Elementos</th><th>WCAG</th></tr></thead>
+<tbody>
+<tr><td><code>image-alt</code></td><td><span class="badge badge-critical">Crítica</span></td><td>Imagens sem texto alternativo</td><td>5</td><td>1.1.1</td></tr>
+<tr><td><code>frame-title</code></td><td><span class="badge badge-serious">Séria</span></td><td>Iframe sem nome acessível</td><td>1</td><td>4.1.2</td></tr>
+<tr><td><code>color-contrast</code></td><td><span class="badge badge-serious">Séria</span></td><td>Contraste insuficiente</td><td>1</td><td>1.4.3</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px; margin-top:8px">🔑 Teclado: 8 elementos focáveis, 0 armadilhas — <strong style="color:var(--success)">APROVADO</strong></p>
+</div>
+
+<!-- ====== METODOLOGIA ====== -->
+<h2>Metodologia</h2>
+<table>
+<tr><th style="width:200px">Parâmetro</th><th>Valor</th></tr>
+<tr><td>Ferramenta</td><td>axe-core v4.9.1 (Deque Systems) — injeção via Playwright</td></tr>
+<tr><td>Critérios</td><td>WCAG 2.0 A/AA + WCAG 2.1 A/AA</td></tr>
+<tr><td>Navegador</td><td>Chromium (Playwright headless)</td></tr>
+<tr><td>Teste de Teclado</td><td>Simulação Tab (50 iterações) com detecção de armadilhas de foco</td></tr>
+<tr><td>Score</td><td>AccessHome Score: Base 100 − (Críticas × 15) − (Sérias × 8) − (Moderadas × 3)</td></tr>
+<tr><td>Código-fonte</td><td><a href="https://github.com/yago-silva-ads/accesshome-analyzer">github.com/yago-silva-ads/accesshome-analyzer</a></td></tr>
+</table>
+
+<footer>
+    AccessHome Analyzer v1.0 — Yago Santos Silva | PICTA 2026 — Centro Universitário Senac<br>
+    Orientadora: Profa. Claudia Bianchi Progetti | axe-core (Deque Systems) + WCAG 2.1 (W3C)
+</footer>
+
+<script>
+Highcharts.setOptions({
+    chart: { backgroundColor: 'transparent' },
+    title: { style: { color: '#e6edf3' } },
+    legend: { itemStyle: { color: '#8b949e' } },
+    xAxis: { labels: { style: { color: '#8b949e' } }, gridLineColor: '#30363d' },
+    yAxis: { labels: { style: { color: '#8b949e' } }, gridLineColor: '#30363d' },
+    credits: { enabled: false }
+});
+
+Highcharts.chart('chart-comparison', {
+    chart: { type: 'column' },
+    title: { text: null },
+    xAxis: { categories: ['Home Assistant', 'openHAB', 'SharpTools'] },
+    yAxis: { title: { text: null } },
+    series: [
+        { name: 'Críticas', data: [2, 1, 1], color: '#f85149' },
+        { name: 'Sérias', data: [0, 1, 2], color: '#d29922' }
+    ],
+    plotOptions: { column: { borderRadius: 3, groupPadding: 0.2 } }
+});
+
+Highcharts.chart('chart-wcag', {
+    chart: { type: 'bar' },
+    title: { text: null },
+    xAxis: { categories: ['1.1.1 Texto Alt', '1.4.3 Contraste', '4.1.2 Nome/Função', '3.1.1 Idioma'] },
+    yAxis: { title: { text: null } },
+    series: [
+        { name: 'Home Assistant', data: [0, 1, 10, 0], color: '#58a6ff' },
+        { name: 'openHAB', data: [34, 0, 0, 1], color: '#3fb950' },
+        { name: 'SharpTools', data: [5, 1, 1, 0], color: '#d29922' }
+    ],
+    plotOptions: { bar: { borderRadius: 3 } }
+});
+
+Highcharts.chart('chart-scores', {
+    chart: { type: 'column' },
+    title: { text: null },
+    xAxis: { categories: ['Home Assistant', 'openHAB', 'SharpTools'] },
+    yAxis: { title: { text: null }, max: 100,
+        plotBands: [
+            { from: 90, to: 100, color: 'rgba(63,185,80,0.06)' },
+            { from: 75, to: 90, color: 'rgba(88,166,255,0.04)' },
+            { from: 50, to: 75, color: 'rgba(210,153,34,0.04)' },
+            { from: 0, to: 50, color: 'rgba(248,81,73,0.04)' }
+        ]
+    },
+    series: [{
+        name: 'Score', showInLegend: false,
+        data: [
+            { y: 70, color: '#d29922' },
+            { y: 77, color: '#d29922' },
+            { y: 69, color: '#d29922' }
+        ]
+    }],
+    plotOptions: { column: { borderRadius: 5, dataLabels: { enabled: true, format: '{y}/100', style: { color: '#e6edf3', fontSize: '13px' } } } }
+});
+</script>
 </body>
 </html>
