@@ -92,7 +92,7 @@ Relatório salvo: relatorio.html
 
 Os resultados consolidados da pesquisa estão disponíveis em um dashboard interativo:
 
-**https://yago-silva-ads.github.io/accesshome-analyzer/**
+**[🔗 Acessar Dashboard Interativo](https://yago-silva-ads.github.io/accesshome-analyzer/docs/)**
 
 O dashboard apresenta:
 - Distribuição de violações por severidade e plataforma
