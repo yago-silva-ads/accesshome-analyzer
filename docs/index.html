@@ -42,7 +42,7 @@
   --pass-bg: rgba(81,207,102,0.12);
   --text: #e8eaed;
   --text-secondary: #9aa0ab;
-  --text-muted: #5c6370;
+  --text-muted: #8b929e;
   --border: #2a2e38;
   --border-light: #1f232c;
   --surface-hover: rgba(255,255,255,0.04);
@@ -1200,7 +1200,7 @@ function renderDevices() {
       const stateClass = isOn ? 'on' : 'off';
       const stateText = isOn ? 'Ligado' : 'Desligado';
       html += '<div class="device-card ' + stateClass + ' fade-in" data-device="' + d.id + '">';
-      html += '<div class="severity-indicator ' + d.sevClass + '" title="Indicador de acessibilidade" aria-label="Severidade: ' + d.sevClass.replace('sev-','') + '"></div>';
+      html += '<div role="img" class="severity-indicator ' + d.sevClass + '" title="Indicador de acessibilidade" aria-label="Severidade: ' + d.sevClass.replace('sev-','') + '"></div>';
       html += '<div class="device-card-header">';
       html += '<div class="device-icon"><i class="fa-solid ' + d.icon + '" aria-hidden="true"></i></div>';
       html += '</div>';
