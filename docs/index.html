@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccessHome Analyzer — Dashboard de Pesquisa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts-more.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/solid-gauge.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/heatmap.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/accessibility.js"></script>
+  <style>
+    :root {
+      --bg: #0c0e12;
+      --bg-elevated: #13161c;
+      --bg-card: #181b22;
+      --bg-card-hover: #1e2129;
+      --surface: #22252e;
+      --border: #2a2d37;
+      --border-subtle: #1f2229;
+      --text: #e8eaed;
+      --text-secondary: #9aa0ad;
+      --text-muted: #5c6370;
+      --accent: #6c8cff;
+      --accent-dim: rgba(108, 140, 255, 0.12);
+      --accent-glow: rgba(108, 140, 255, 0.25);
+      --critical: #ff6b6b;
+      --critical-dim: rgba(255, 107, 107, 0.12);
+      --serious: #ffa94d;
+      --serious-dim: rgba(255, 169, 77, 0.12);
+      --moderate: #ffd43b;
+      --moderate-dim: rgba(255, 212, 59, 0.12);
+      --pass: #51cf66;
+      --pass-dim: rgba(81, 207, 102, 0.12);
+      --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .ambient {
+      position: fixed;
+      top: -40%;
+      left: -20%;
+      width: 80vw;
+      height: 80vh;
+      background: radial-gradient(ellipse, rgba(108,140,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    .header { margin-bottom: 56px; }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108,140,255,0.2);
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .header h1 span { color: var(--accent); }
+    .header p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 680px;
+      line-height: 1.65;
+    }
+    .header-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .header-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .header-meta-item i { font-size: 14px; color: var(--accent); }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .kpi-card.critical::after { background: var(--critical); }
+    .kpi-card.serious::after { background: var(--serious); }
+    .kpi-card.pass::after { background: var(--pass); }
+    .kpi-card.accent::after { background: var(--accent); }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .kpi-value.critical { color: var(--critical); }
+    .kpi-value.serious { color: var(--serious); }
+    .kpi-value.pass { color: var(--pass); }
+    .kpi-value.accent { color: var(--accent); }
+    .kpi-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .section { margin-bottom: 48px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      padding: 4px 10px;
+      background: var(--accent-dim);
+      border-radius: var(--radius-xs);
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .chart-card:hover { border-color: var(--border); }
+
+    .chart-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .chart-grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .tool-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .tool-table thead th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tool-table tbody td {
+      padding: 14px 16px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.15s;
+    }
+    .tool-table tbody tr:hover td {
+      background: var(--bg-card-hover);
+    }
+    .tool-table .tool-name {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge.high { background: var(--pass-dim); color: var(--pass); }
+    .badge.medium { background: var(--serious-dim); color: var(--serious); }
+    .badge.low { background: var(--critical-dim); color: var(--critical); }
+    .badge.na { background: var(--surface); color: var(--text-muted); }
+
+    .footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .footer-link {
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .footer-link:hover { opacity: 0.8; }
+    .footer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .footer-badge:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-up {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<div class="wrapper">
+
+  <header class="header fade-up">
+    <div class="header-badge">
+      <i class="fa-solid fa-universal-access"></i>
+      PICTA 2026 — Senac SP
+    </div>
+    <h1>AccessHome<span>Analyzer</span></h1>
+    <p>Dashboard interativo da pesquisa sobre acessibilidade em interfaces de Smart Home para usuários com deficiência visual. Auditoria automatizada + validação manual com NVDA em 3 plataformas.</p>
+    <div class="header-meta">
+      <div class="header-meta-item"><i class="fa-solid fa-user"></i> Yago Santos Silva</div>
+      <div class="header-meta-item"><i class="fa-solid fa-calendar"></i> Setembro 2026</div>
+      <div class="header-meta-item"><i class="fa-brands fa-github"></i> <a href="https://github.com/yago-silva-ads/accesshome-analyzer" class="footer-link">yago-silva-ads/accesshome-analyzer</a></div>
+    </div>
+  </header>
+
+  <div class="kpi-grid fade-up">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Plataformas testadas</div>
+      <div class="kpi-value accent" data-count="3">0</div>
+      <div class="kpi-sub">Home Assistant · openHAB · SharpTools</div>
+    </div>
+    <div class="kpi-card critical">
+      <div class="kpi-label">Violações críticas (Peso 3)</div>
+      <div class="kpi-value critical" data-count="24">0</div>
+      <div class="kpi-sub">Barreira total ao usuário</div>
+    </div>
+    <div class="kpi-card serious">
+      <div class="kpi-label">Violações sérias (Peso 2)</div>
+      <div class="kpi-value serious" data-count="9">0</div>
+      <div class="kpi-sub">Alto esforço cognitivo</div>
+    </div>
+    <div class="kpi-card pass">
+      <div class="kpi-label">Critérios aprovados</div>
+      <div class="kpi-value pass" data-count="6">0</div>
+      <div class="kpi-sub">Navegação por teclado funcional</div>
+    </div>
+  </div>
+
+  <div class="section fade-up">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Distribuição de severidade por plataforma</h2>
+    </div>
+    <div class="chart-card">
+      <div id="chart-severity" style="height: 420px;"></div>
+    </div>
+  </div>
+
+  <div class="section fade-up">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Efetividade das ferramentas de auditoria</h2>
+    </div>
+    <div class="chart-grid-2">
+      <div class="chart-card">
+        <div id="chart-tools" style="height: 380px;"></div>
+      </div>
+      <div class="chart-card">
+        <div id="chart-radar" style="height: 380px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section fade-up">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Mapa de calor — WCAG × Plataformas</h2>
+    </div>
+    <div class="chart-card">
+      <div id="chart-heatmap" style="height: 380px;"></div>
+    </div>
+  </div>
+
+  <div class="section fade-up">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Veredito das ferramentas</h2>
+    </div>
+    <div class="chart-card">
+      <table class="tool-table">
+        <thead>
+          <tr>
+            <th>Ferramenta</th>
+            <th>Tipo</th>
+            <th>Precisão</th>
+            <th>Shadow DOM</th>
+            <th>ARIA</th>
+            <th>Teclado</th>
+            <th>Veredito</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tool-name">Lighthouse</td>
+            <td>Automatizada</td>
+            <td><span class="badge medium">Média</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge na">N/A</span></td>
+            <td style="color:var(--serious)">Inconsistente — mascara erros com notas altas</td>
+          </tr>
+          <tr>
+            <td class="tool-name">Axe DevTools</td>
+            <td>Automatizada</td>
+            <td><span class="badge high">Alta</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge na">N/A</span></td>
+            <td style="color:var(--pass)">Diagnóstico técnico mais confiável</td>
+          </tr>
+          <tr>
+            <td class="tool-name">WAVE</td>
+            <td>Automatizada</td>
+            <td><span class="badge low">Baixa</span></td>
+            <td><span class="badge low">Não</span></td>
+            <td><span class="badge low">Parcial</span></td>
+            <td><span class="badge na">N/A</span></td>
+            <td style="color:var(--critical)">Obsoleto para arquiteturas dinâmicas</td>
+          </tr>
+          <tr>
+            <td class="tool-name">NVDA (Manual)</td>
+            <td>Manual</td>
+            <td><span class="badge high">Máxima</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td><span class="badge high">Sim</span></td>
+            <td style="color:var(--accent)">Indispensável — único a validar autonomia real</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section fade-up">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Pontuação Lighthouse por plataforma</h2>
+    </div>
+    <div class="chart-grid-2">
+      <div class="chart-card">
+        <div id="chart-lighthouse" style="height: 340px;"></div>
+      </div>
+      <div class="chart-card" style="display:flex;flex-direction:column;justify-content:center;padding:32px;">
+        <p style="font-size:15px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
+          O Lighthouse atribuiu as melhores notas ao <strong style="color:var(--text)">SharpTools</strong> (83/100), 
+          mas a validação manual com NVDA provou que nenhuma plataforma é genuinamente acessível — 
+          todas possuem barreiras semânticas de <strong style="color:var(--critical)">Severidade 3</strong> 
+          que impedem a operação autônoma por usuários cegos.
+        </p>
+        <p style="font-size:13px;color:var(--text-muted);font-style:italic;">
+          "Métricas quantitativas de acessibilidade nem sempre refletem a experiência efetiva dos usuários."
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer fade-up">
+    <div class="footer-text">
+      <strong style="color:var(--text)">PICTA 2026</strong> — Programa de Iniciação Científica e Tecnológica Aplicada<br>
+      Senac São Paulo · Orientação: Profa. Claudia
+    </div>
+    <a href="https://github.com/yago-silva-ads/accesshome-analyzer" target="_blank" class="footer-badge">
+      <i class="fa-brands fa-github"></i>
+      Ver repositório
+    </a>
+  </footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.fade-up').forEach(el => {
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) {
+      el.classList.add('visible');
+      observer.disconnect();
+    }
+  }, { threshold: 0.1 });
+  observer.observe(el);
+});
+
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = parseInt(el.dataset.count);
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) {
+      let current = 0;
+      const step = Math.max(1, Math.ceil(target / 30));
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(interval); }
+        el.textContent = current;
+      }, 30);
+      observer.disconnect();
+    }
+  }, { threshold: 0.5 });
+  observer.observe(el);
+});
+
+const chartFont = "'Outfit', sans-serif";
+const monoFont = "'JetBrains Mono', monospace";
+const colors = {
+  bg: '#181b22',
+  text: '#e8eaed',
+  textSec: '#9aa0ad',
+  textMuted: '#5c6370',
+  grid: '#2a2d37',
+  accent: '#6c8cff',
+  critical: '#ff6b6b',
+  serious: '#ffa94d',
+  moderate: '#ffd43b',
+  pass: '#51cf66',
+};
+
+Highcharts.chart('chart-severity', {
+  chart: { type: 'column', backgroundColor: 'transparent', style: { fontFamily: chartFont } },
+  title: { text: null },
+  xAxis: {
+    categories: ['Home Assistant', 'openHAB', 'SharpTools'],
+    labels: { style: { color: colors.textSec, fontSize: '13px' } },
+    lineColor: colors.grid,
+  },
+  yAxis: {
+    title: { text: 'Ocorrências por critério', style: { color: colors.textMuted, fontSize: '12px' } },
+    labels: { style: { color: colors.textSec } },
+    gridLineColor: colors.grid,
+    gridLineDashStyle: 'Dot',
+  },
+  plotOptions: {
+    column: {
+      borderRadius: 4,
+      borderWidth: 0,
+      groupPadding: 0.15,
+      pointPadding: 0.05,
+    }
+  },
+  legend: {
+    itemStyle: { color: colors.textSec, fontWeight: '500' },
+    itemHoverStyle: { color: colors.text },
+  },
+  tooltip: {
+    backgroundColor: '#22252e',
+    borderColor: colors.grid,
+    style: { color: colors.text, fontSize: '13px' },
+    borderRadius: 8,
+    shadow: false,
+  },
+  colors: [colors.critical, colors.serious, colors.moderate, colors.pass],
+  series: [
+    { name: 'Peso 3 (Crítico)', data: [8, 6, 6] },
+    { name: 'Peso 2 (Sério)', data: [2, 3, 2] },
+    { name: 'Peso 1 (Moderado)', data: [0, 0, 0] },
+    { name: 'Peso 0 (Aprovado)', data: [2, 2, 2] },
+  ],
+  credits: { enabled: false },
+});
+
+Highcharts.chart('chart-tools', {
+  chart: { type: 'bar', backgroundColor: 'transparent', style: { fontFamily: chartFont } },
+  title: { text: 'Violações detectadas', style: { color: colors.text, fontSize: '16px', fontWeight: '600' } },
+  xAxis: {
+    categories: ['Lighthouse', 'Axe DevTools', 'WAVE', 'NVDA (Manual)'],
+    labels: { style: { color: colors.textSec, fontSize: '13px' } },
+    lineWidth: 0,
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { color: colors.textSec } },
+    gridLineColor: colors.grid,
+    gridLineDashStyle: 'Dot',
+  },
+  plotOptions: {
+    bar: { borderRadius: 4, borderWidth: 0, pointWidth: 28 }
+  },
+  legend: { enabled: false },
+  tooltip: {
+    backgroundColor: '#22252e',
+    borderColor: colors.grid,
+    style: { color: colors.text },
+    borderRadius: 8,
+    shadow: false,
+  },
+  series: [{
+    name: 'Total de violações detectadas',
+    data: [
+      { y: 7, color: colors.serious },
+      { y: 11, color: colors.pass },
+      { y: 2, color: colors.critical },
+      { y: 12, color: colors.accent },
+    ],
+    dataLabels: {
+      enabled: true,
+      style: { color: colors.text, fontSize: '13px', fontFamily: monoFont, fontWeight: '600', textOutline: 'none' },
+    }
+  }],
+  credits: { enabled: false },
+});
+
+Highcharts.chart('chart-radar', {
+  chart: { polar: true, type: 'area', backgroundColor: 'transparent', style: { fontFamily: chartFont } },
+  title: { text: 'Cobertura diagnóstica', style: { color: colors.text, fontSize: '16px', fontWeight: '600' } },
+  xAxis: {
+    categories: ['Texto alt (1.1.1)', 'Contraste (1.4.3)', 'Teclado (2.1.1)', 'ARIA (4.1.2)', 'Semântica'],
+    lineColor: colors.grid,
+    labels: { style: { color: colors.textSec, fontSize: '11px' } },
+  },
+  yAxis: {
+    min: 0, max: 3,
+    gridLineColor: colors.grid,
+    gridLineDashStyle: 'Dot',
+    labels: { enabled: false },
+  },
+  plotOptions: {
+    area: { fillOpacity: 0.15, pointPlacement: 'on', marker: { radius: 3 } }
+  },
+  legend: {
+    itemStyle: { color: colors.textSec, fontSize: '12px' },
+    itemHoverStyle: { color: colors.text },
+  },
+  tooltip: {
+    backgroundColor: '#22252e',
+    borderColor: colors.grid,
+    style: { color: colors.text },
+    borderRadius: 8,
+    shadow: false,
+    shared: true,
+  },
+  colors: [colors.serious, colors.pass, colors.critical, colors.accent],
+  series: [
+    { name: 'Lighthouse', data: [3, 2, 0, 3, 1] },
+    { name: 'Axe DevTools', data: [3, 2, 0, 3, 2] },
+    { name: 'WAVE', data: [1, 1, 0, 0, 0] },
+    { name: 'NVDA', data: [3, 0, 3, 3, 3] },
+  ],
+  credits: { enabled: false },
+});
+
+Highcharts.chart('chart-heatmap', {
+  chart: { type: 'heatmap', backgroundColor: 'transparent', style: { fontFamily: chartFont }, marginTop: 40, marginBottom: 80 },
+  title: { text: null },
+  xAxis: {
+    categories: ['Home Assistant', 'openHAB', 'SharpTools'],
+    labels: { style: { color: colors.textSec, fontSize: '13px' } },
+    lineWidth: 0,
+  },
+  yAxis: {
+    categories: ['1.1.1 — Texto alt', '1.4.3 — Contraste', '2.1.1 — Teclado', '4.1.2 — ARIA'],
+    labels: { style: { color: colors.textSec, fontSize: '13px' } },
+    title: null,
+    reversed: true,
+  },
+  colorAxis: {
+    min: 0, max: 3,
+    stops: [
+      [0, colors.pass],
+      [0.33, '#78d68e'],
+      [0.66, colors.serious],
+      [1, colors.critical],
+    ],
+    labels: { style: { color: colors.textMuted } },
+  },
+  tooltip: {
+    backgroundColor: '#22252e',
+    borderColor: colors.grid,
+    style: { color: colors.text },
+    borderRadius: 8,
+    shadow: false,
+    formatter: function() {
+      const labels = ['Aprovado', 'Baixo', 'Médio', 'Crítico'];
+      return '<b>' + this.series.xAxis.categories[this.point.x] + '</b><br>' +
+             this.series.yAxis.categories[this.point.y] + ': <b>Severidade ' + this.point.value + '</b> (' + labels[this.point.value] + ')';
+    }
+  },
+  series: [{
+    borderWidth: 3,
+    borderColor: '#181b22',
+    borderRadius: 4,
+    data: [
+      [0, 0, 3], [0, 1, 2], [0, 2, 0], [0, 3, 3],
+      [1, 0, 3], [1, 1, 2], [1, 2, 0], [1, 3, 3],
+      [2, 0, 3], [2, 1, 1], [2, 2, 0], [2, 3, 3],
+    ],
+    dataLabels: {
+      enabled: true,
+      format: '{point.value}',
+      style: { color: '#fff', fontSize: '14px', fontFamily: monoFont, fontWeight: '700', textOutline: '2px #00000066' },
+    }
+  }],
+  legend: {
+    align: 'center',
+    verticalAlign: 'bottom',
+    layout: 'horizontal',
+    symbolWidth: 240,
+    itemStyle: { color: colors.textMuted, fontSize: '12px' },
+  },
+  credits: { enabled: false },
+});
+
+Highcharts.chart('chart-lighthouse', {
+  chart: { type: 'column', backgroundColor: 'transparent', style: { fontFamily: chartFont } },
+  title: { text: 'Nota Lighthouse (Acessibilidade)', style: { color: colors.text, fontSize: '16px', fontWeight: '600' } },
+  xAxis: {
+    categories: ['Home Assistant', 'openHAB', 'SharpTools'],
+    labels: { style: { color: colors.textSec, fontSize: '13px' } },
+    lineColor: colors.grid,
+  },
+  yAxis: {
+    min: 0, max: 100,
+    title: { text: null },
+    labels: { style: { color: colors.textSec } },
+    gridLineColor: colors.grid,
+    gridLineDashStyle: 'Dot',
+    plotBands: [
+      { from: 0, to: 49, color: 'rgba(255,107,107,0.06)' },
+      { from: 50, to: 89, color: 'rgba(255,169,77,0.06)' },
+      { from: 90, to: 100, color: 'rgba(81,207,102,0.06)' },
+    ],
+  },
+  plotOptions: {
+    column: { borderRadius: 6, borderWidth: 0, pointWidth: 52 }
+  },
+  legend: { enabled: false },
+  tooltip: {
+    backgroundColor: '#22252e',
+    borderColor: colors.grid,
+    style: { color: colors.text },
+    borderRadius: 8,
+    shadow: false,
+    valueSuffix: '/100',
+  },
+  series: [{
+    name: 'Nota',
+    data: [
+      { y: 75, color: colors.serious },
+      { y: 70, color: colors.serious },
+      { y: 83, color: colors.serious },
+    ],
+    dataLabels: {
+      enabled: true,
+      format: '{y}',
+      style: { color: colors.text, fontSize: '18px', fontFamily: monoFont, fontWeight: '700', textOutline: 'none' },
+    }
+  }],
+  credits: { enabled: false },
+});
+</script>
+
+</body>
+</html>
