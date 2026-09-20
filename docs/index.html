@@ -1334,7 +1334,7 @@ tabs.forEach(tab => {
 
 // ========== NLP COMMAND PROCESSOR ==========
 function processCommand(text) {
-  const t = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const t = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[.,;:!?\u00bf\u00a1]/g, ' ').replace(/\s+/g, ' ').trim();
 
   // Help
   if (/^ajuda$|^help$|^comandos$/.test(t)) {
@@ -1354,7 +1354,12 @@ function processCommand(text) {
   }
 
   // Toggle: acender/apagar/ligar/desligar
-  const toggleMatch = t.match(/(acender|apagar|ligar|desligar|ativar|desativar)\s+(.+)/);
+  const verbs = 'acender|apagar|ligar|desligar|ativar|desativar';
+  let toggleMatch = t.match(new RegExp('(' + verbs + ')\\s+(.+)'));
+  if (!toggleMatch) {
+    const inv = t.match(new RegExp('(.+?)\\s+(' + verbs + ')\\s*$'));
+    if (inv) toggleMatch = [inv[0], inv[2], inv[1]];
+  }
   if (toggleMatch) {
     const action = toggleMatch[1];
     const target = toggleMatch[2];
