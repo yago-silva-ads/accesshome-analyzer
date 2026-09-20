@@ -1363,7 +1363,7 @@ function processCommand(text) {
   if (toggleMatch) {
     const action = toggleMatch[1];
     const target = toggleMatch[2];
-    const turnOn = /acender|ligar|ativar/.test(action);
+    const turnOn = /^(acender|ligar|ativar)$/.test(action);
 
     const device = DEVICE_DEFS.find(d => {
       const dn = d.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
