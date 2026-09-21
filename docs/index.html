@@ -792,6 +792,40 @@ renderDevices();
 renderAuditTable();
 renderStats();
 
+// ========== AUTO WELCOME FOR BLIND USERS ==========
+setTimeout(function() {
+  // Announce via aria-live (screen readers like NVDA pick this up)
+  var liveRegion = document.getElementById('aria-live');
+  if (liveRegion) {
+    liveRegion.textContent = 'Bem-vindo ao AccessHome Voice. Eu sou o Jarvis, seu assistente de casa inteligente. Diga Jarvis para comecar a me usar. Ou pressione o botao do microfone.';
+  }
+  
+  // Also speak via TTS for users without screen readers
+  if ('speechSynthesis' in window) {
+    var utter = new SpeechSynthesisUtterance('Bem-vindo ao AccessHome. Eu sou o Jarvis, seu assistente de casa inteligente. Diga Jarvis para comecar a me usar.');
+    utter.lang = 'pt-BR';
+    utter.rate = 1.0;
+    utter.pitch = 0.9;
+    // Find a Portuguese voice
+    var voices = speechSynthesis.getVoices();
+    var ptVoice = voices.find(function(v) { return v.lang.startsWith('pt'); });
+    if (ptVoice) utter.voice = ptVoice;
+    speechSynthesis.speak(utter);
+  }
+  
+  // Update status bar
+  var statusText = document.getElementById('jarvis-status-text');
+  if (statusText) statusText.textContent = 'Diga "Jarvis" para ativar';
+}, 1500);
+
+// Voices load async - retry TTS if voices weren't ready
+if ('speechSynthesis' in window) {
+  speechSynthesis.onvoiceschanged = function() {
+    // Only fire once
+    speechSynthesis.onvoiceschanged = null;
+  };
+}
+
 // Start passive listening for wake word (if supported)
 try {
   recognition = initRecognition();
