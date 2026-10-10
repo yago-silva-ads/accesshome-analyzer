@@ -191,7 +191,17 @@ O dashboard apresenta:
 - comparação da efetividade entre Lighthouse, Axe DevTools, WAVE e NVDA;
 - radar por plataforma e mapa de calor dos critérios WCAG;
 - tabela detalhada de violações;
-- assistente de voz para consultar os resultados sem usar a tela.
+- **AccessHome Voz**, um assistente de voz neutro (palavra de ativação **“Ok Casa”**) para controlar uma casa simulada e consultar os resultados sem usar a tela.
+
+### 🎙️ AccessHome Voz — recursos de acessibilidade
+
+- **Comandos falados ou digitados**: “Ok Casa, ligar a luz da sala”, “apagar todas as luzes”, “trancar a porta”, “qual o estado da casa”, “ajuda”, “repetir”.
+- **Voz neutra**: usa a melhor voz pt-BR disponível (prioriza Google e vozes naturais da Microsoft); voz e velocidade ajustáveis em *Ajustes*.
+- **Sem repetição para quem usa leitor de tela**: desligue “Falar as respostas em voz alta” e as respostas vão só para o leitor (NVDA, JAWS, VoiceOver, TalkBack).
+- **Segurança**: destrancar a porta pede confirmação; “desligar tudo” nunca mexe em fechadura nem câmera.
+- **Teclado**: `Alt+M` fala, `Alt+R` repete a última resposta, `Esc` cancela; abas com setas, foco visível e alvos de toque ≥ 44 px.
+- **Visual**: alto contraste, texto grande/muito grande, zoom liberado, respeita `prefers-reduced-motion`.
+- **Resiliente**: funciona sem os gráficos (CDN offline) e sem reconhecimento de voz (campo de texto).
 
 ---
 
@@ -214,7 +224,7 @@ accesshome-analyzer/
 ├── analyzer.py            # CLI principal: varredura, teclado, classificação e relatório
 ├── requirements.txt       # playwright, jinja2, rich
 ├── docs/
-│   └── index.html         # Dashboard interativo (GitHub Pages)
+│   └── index.html         # AccessHome Voz: assistente de voz + dashboard (GitHub Pages)
 ├── aws/                   # Versão serverless (AWS Lambda) — ver aws/ARCHITECTURE.md
 │   ├── lambda_handler.py
 │   ├── deploy.py

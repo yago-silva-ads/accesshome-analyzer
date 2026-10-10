@@ -28,8 +28,8 @@ REPORTS_BUCKET = os.environ.get("REPORTS_BUCKET", "accesshome-analyzer-reports-d
 
 SEVERITY_WEIGHTS = {
     "critical": 3,
-    "serious": 3,
-    "moderate": 2,
+    "serious": 2,
+    "moderate": 1,
     "minor": 1,
 }
 

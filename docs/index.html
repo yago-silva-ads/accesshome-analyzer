@@ -1,276 +1,301 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-contrast="normal" data-size="normal">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="description" content="AccessHome Voice — Assistente de voz acessivel para controle de casa inteligente. Pesquisa PICTA 2026.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AccessHome Voz — assistente de voz acessível para controle de casa inteligente, com teclado, leitor de tela e comandos falados. Pesquisa PICTA 2026.">
 <meta name="theme-color" content="#0a0e1a">
-<title>AccessHome Voice — JARVIS Smart Home</title>
+<title>AccessHome Voz — Assistente de casa inteligente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts-more.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/heatmap.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/accessibility.js"></script>
 <style>
-/* ========== CSS RESET & VARIABLES ========== */
+/* ========== VARIÁVEIS (contraste mínimo 4.5:1 em todos os textos) ========== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg-primary:#0a0e1a;--bg-secondary:#111827;--bg-card:#1a1f2e;--bg-card-hover:#222840;
-  --accent:#3b82f6;--accent-glow:rgba(59,130,246,.25);--accent-dim:#1e3a5f;
-  --green:#22c55e;--red:#ef4444;--orange:#f97316;--yellow:#eab308;
-  --text:#f1f5f9;--text-muted:#94a3b8;--text-dim:#475569;
-  --border:#1e293b;--radius:16px;--radius-sm:10px;
-  --font:'Inter',system-ui,-apple-system,sans-serif;--mono:'JetBrains Mono',monospace;
+  --accent:#60a5fa;            /* texto/links sobre fundo escuro */
+  --accent-bg:#2563eb;         /* fundo de botões com texto branco (5,2:1) */
+  --accent-glow:rgba(96,165,250,.3);--accent-dim:#1e3a5f;
+  --green:#4ade80;--red:#f87171;--orange:#fb923c;--yellow:#facc15;
+  --text:#f1f5f9;--text-muted:#b4bfd0;--text-dim:#9aa7bb;
+  --border:#334155;--radius:16px;--radius-sm:10px;--focus:#fbbf24;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-html{font-size:16px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+/* Alto contraste (preferência do usuário) */
+:root[data-contrast="high"]{
+  --bg-primary:#000;--bg-secondary:#000;--bg-card:#000;--bg-card-hover:#111;
+  --accent:#7dd3fc;--accent-bg:#0050c8;--accent-dim:#00264d;
+  --text:#fff;--text-muted:#fff;--text-dim:#e5e7eb;--border:#fff;--focus:#ffff00;
+}
+html{font-size:100%;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+:root[data-size="large"]{font-size:125%}
+:root[data-size="xlarge"]{font-size:150%}
 body{font-family:var(--font);background:var(--bg-primary);color:var(--text);
-  min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration:none}
-button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
-input{font-family:var(--font);color:var(--text);background:transparent;border:none;outline:none}
+  min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:var(--accent);text-decoration:underline}
+button,select,input{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ========== SKIP LINK ========== */
 .skip-link{position:absolute;top:-100%;left:50%;transform:translateX(-50%);
-  background:var(--accent);color:#fff;padding:12px 24px;border-radius:0 0 12px 12px;
-  z-index:9999;font-weight:600;transition:top .2s}
+  background:var(--accent-bg);color:#fff;padding:12px 24px;border-radius:0 0 12px 12px;
+  z-index:9999;font-weight:600;text-decoration:none}
 .skip-link:focus{top:0}
 
 /* ========== HEADER ========== */
-.app-header{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+.app-header{position:sticky;top:0;z-index:100;background:var(--bg-primary);
   border-bottom:1px solid var(--border);padding:12px 16px;
-  display:flex;align-items:center;justify-content:space-between}
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
 .app-logo{display:flex;align-items:center;gap:10px}
-.app-logo .jarvis-icon{width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),#8b5cf6);
-  display:flex;align-items:center;justify-content:center;font-size:16px;
-  box-shadow:0 0 20px var(--accent-glow)}
-.app-logo h1{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.app-logo .logo-icon{width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-bg),#7c3aed);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.app-logo h1{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .app-logo h1 span{color:var(--accent)}
+.header-tag{font-size:.8rem;color:var(--text-dim)}
 
-/* ========== TAB NAV ========== */
-.tab-nav{display:flex;gap:2px;background:var(--bg-secondary);border-radius:12px;padding:3px;
-  margin:12px 16px 0}
-.tab-btn{flex:1;padding:10px 8px;border-radius:10px;font-size:.8rem;font-weight:600;
-  color:var(--text-muted);transition:all .25s;text-align:center;
-  min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px}
-.tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 15px var(--accent-glow)}
-.tab-btn i{font-size:1rem}
+/* ========== TABS ========== */
+.tab-nav{display:flex;gap:4px;background:var(--bg-secondary);border-radius:12px;padding:4px;margin:12px 16px 0;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:10px 8px;border-radius:10px;font-size:.9rem;font-weight:600;
+  color:var(--text-muted);text-align:center;min-height:48px;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.tab-btn[aria-selected="true"]{background:var(--accent-bg);color:#fff}
+.tab-panel{padding:16px;padding-bottom:24px}
+.tab-panel h2{font-size:1.05rem;margin-bottom:12px}
 
-/* ========== TAB PANELS ========== */
-.tab-panels{position:relative;overflow:hidden}
-.tab-panel{display:none;padding:16px;padding-bottom:calc(160px + var(--safe-bottom));
-  animation:fadeIn .3s ease}
-.tab-panel.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* ========== JARVIS STATUS BAR ========== */
-.jarvis-status{margin:0 16px 12px;padding:14px 16px;background:var(--bg-card);
+/* ========== STATUS ========== */
+.assist-status{margin:12px 16px 0;padding:14px 16px;background:var(--bg-card);
   border-radius:var(--radius-sm);border:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;font-size:.85rem}
-.jarvis-status .pulse{width:10px;height:10px;border-radius:50%;background:var(--green);
-  animation:pulse 2s infinite}
-.jarvis-status.listening .pulse{background:var(--accent);animation:pulse .6s infinite}
-.jarvis-status.listening{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
+  display:flex;align-items:center;gap:12px;font-size:.95rem}
+.assist-status .pulse{width:12px;height:12px;border-radius:50%;background:var(--text-dim);flex-shrink:0}
+.assist-status[data-mode="passive"] .pulse{background:var(--green)}
+.assist-status[data-mode="awaiting"]{border-color:var(--accent);border-width:2px}
+.assist-status[data-mode="awaiting"] .pulse{background:var(--accent);animation:pulse .7s infinite}
+.assist-status[data-mode="error"]{border-color:var(--red)}
+.assist-status[data-mode="error"] .pulse{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 
-/* ========== DEVICE CARDS ========== */
-.room-section{margin-bottom:20px}
-.room-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.room-label i{color:var(--accent);font-size:.8rem}
-.device-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-@media(min-width:480px){.device-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:768px){.device-grid{grid-template-columns:repeat(4,1fr)}}
+/* ========== AJUSTES ========== */
+.settings{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);margin-bottom:16px}
+.settings summary{padding:14px 16px;font-weight:600;cursor:pointer;min-height:48px;display:flex;align-items:center}
+.settings-body{padding:4px 16px 16px;display:grid;gap:14px}
+.field{display:grid;gap:6px}
+.field label,.field .lbl{font-weight:600;font-size:.9rem}
+.check{display:flex;align-items:center;gap:12px;min-height:44px;font-size:.95rem}
+.check input{width:24px;height:24px;accent-color:var(--accent-bg);flex-shrink:0}
+.field select,.field input[type=range]{width:100%;min-height:44px}
+.field select{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 12px}
+.field input[type=range]{accent-color:var(--accent-bg)}
+.btn{min-height:44px;padding:0 18px;border-radius:var(--radius-sm);background:var(--accent-bg);color:#fff;font-weight:600}
+.btn.secondary{background:var(--bg-secondary);border:1px solid var(--border);color:var(--text)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.hint{font-size:.85rem;color:var(--text-dim)}
 
+/* ========== DISPOSITIVOS ========== */
+.room-section{margin-bottom:20px}
+.room-label{font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;list-style:none}
 .device-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:16px 14px;position:relative;transition:all .3s;overflow:hidden;
-  display:flex;flex-direction:column;gap:8px;min-height:130px}
-.device-card.on{border-color:rgba(59,130,246,.4);background:linear-gradient(135deg,var(--bg-card),var(--accent-dim))}
-.device-card .sev-dot{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%}
-.sev-dot.critical{background:var(--red)}.sev-dot.serious{background:var(--orange)}
-.sev-dot.moderate{background:var(--yellow)}.sev-dot.pass{background:var(--green)}
-.device-icon{font-size:1.5rem;color:var(--text-muted);transition:color .3s}
+  padding:16px 14px;display:flex;flex-direction:column;gap:8px;min-height:150px}
+.device-card.on{border-color:var(--accent);background:linear-gradient(135deg,var(--bg-card),var(--accent-dim))}
+.device-icon{font-size:1.5rem;color:var(--text-muted)}
 .device-card.on .device-icon{color:var(--accent)}
-.device-name{font-size:.8rem;font-weight:600;line-height:1.2}
-.device-room-tag{font-size:.65rem;color:var(--text-muted)}
-.device-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
-.device-state{font-size:.7rem;font-weight:500;color:var(--text-muted)}
+.device-name{font-size:.95rem;font-weight:600;line-height:1.25}
+.sev-tag{font-size:.75rem;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.sev-tag.critical{color:var(--red)}.sev-tag.serious{color:var(--orange)}
+.sev-tag.moderate{color:var(--yellow)}.sev-tag.pass{color:var(--green)}
+.device-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.device-state{font-size:.9rem;font-weight:600;color:var(--text-muted)}
 .device-card.on .device-state{color:var(--green)}
 
-/* Toggle Switch */
-.toggle-sw{width:44px;height:26px;border-radius:13px;background:var(--bg-secondary);
-  border:2px solid var(--border);position:relative;transition:all .3s;flex-shrink:0;
-  min-width:44px;min-height:26px}
-.toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;
-  border-radius:50%;background:var(--text-muted);transition:all .3s}
-.toggle-sw.on{background:var(--accent);border-color:var(--accent)}
-.toggle-sw.on::after{transform:translateX(18px);background:#fff}
+.toggle-sw{width:56px;height:44px;border-radius:22px;background:var(--bg-secondary);
+  border:2px solid var(--text-dim);position:relative;flex-shrink:0}
+.toggle-sw::after{content:'';position:absolute;top:50%;left:5px;width:26px;height:26px;margin-top:-13px;
+  border-radius:50%;background:var(--text-muted);transition:transform .2s}
+.toggle-sw[aria-checked="true"]{background:var(--accent-bg);border-color:var(--accent-bg)}
+.toggle-sw[aria-checked="true"]::after{transform:translateX(18px);background:#fff}
 
-/* ========== MIC DOCK (Bottom) ========== */
-.mic-dock{position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(10,14,26,.96);backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);
-  padding:12px 16px calc(12px + var(--safe-bottom));
-  display:flex;flex-direction:column;align-items:center;gap:10px}
-.mic-row{display:flex;align-items:center;gap:10px;width:100%;max-width:500px}
-.mic-input{flex:1;height:44px;background:var(--bg-card);border:1px solid var(--border);
-  border-radius:22px;padding:0 16px;font-size:.9rem;color:var(--text);transition:border .2s}
-.mic-input:focus{border-color:var(--accent)}
-.mic-input::placeholder{color:var(--text-dim)}
-.send-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:1rem;
-  transition:transform .15s;flex-shrink:0}
-.send-btn:active{transform:scale(.9)}
-
-.mic-btn{width:64px;height:64px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
-  box-shadow:0 4px 25px var(--accent-glow);transition:all .3s;position:relative}
-.mic-btn:active{transform:scale(.9)}
-.mic-btn.listening{animation:micPulse 1.2s infinite;box-shadow:0 0 40px var(--accent-glow)}
-@keyframes micPulse{0%,100%{box-shadow:0 0 20px var(--accent-glow)}50%{box-shadow:0 0 50px rgba(59,130,246,.5)}}
-.mic-btn.listening::before{content:'';position:absolute;inset:-8px;border-radius:50%;
-  border:2px solid var(--accent);animation:micRing 1.2s infinite;opacity:0}
-@keyframes micRing{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.4);opacity:0}}
-
-.mic-hint{font-size:.7rem;color:var(--text-dim);text-align:center}
-
-/* ========== CHAT LOG ========== */
-.chat-log{margin:0 0 12px;max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;
-  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.chat-msg{padding:10px 14px;border-radius:var(--radius-sm);font-size:.82rem;line-height:1.4;
-  max-width:90%;animation:msgIn .3s ease}
+/* ========== CONVERSA ========== */
+.chat-log{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding:4px;margin-bottom:16px}
+.chat-msg{padding:10px 14px;border-radius:var(--radius-sm);font-size:.95rem;max-width:92%}
 .chat-msg.user{background:var(--accent-dim);align-self:flex-end;border-bottom-right-radius:4px}
-.chat-msg.jarvis{background:var(--bg-card);border:1px solid var(--border);align-self:flex-start;
-  border-bottom-left-radius:4px}
-.chat-msg .sender{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
-  color:var(--text-muted);margin-bottom:3px}
-@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.chat-msg.assistant{background:var(--bg-card);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg .sender{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);margin-bottom:2px}
 
-/* ========== DASHBOARD CHARTS ========== */
+/* ========== DOCK DO MICROFONE ========== */
+.mic-dock{position:sticky;bottom:0;z-index:200;background:var(--bg-primary);
+  border-top:1px solid var(--border);padding:12px 16px calc(12px + var(--safe-bottom));
+  display:flex;flex-direction:column;align-items:center;gap:10px}
+.mic-row{display:flex;align-items:center;gap:10px;width:100%;max-width:560px}
+.mic-input{flex:1;min-width:0;height:48px;background:var(--bg-card);border:1px solid var(--text-dim);
+  border-radius:24px;padding:0 18px;color:var(--text)}
+.mic-input::placeholder{color:var(--text-dim)}
+.send-btn{width:48px;height:48px;border-radius:50%;background:var(--accent-bg);color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mic-btn{min-width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-bg),#7c3aed);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;position:relative}
+.mic-btn[aria-pressed="true"]{box-shadow:0 0 0 4px var(--bg-primary),0 0 0 7px var(--accent);animation:micPulse 1.2s infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 4px var(--bg-primary),0 0 0 7px var(--accent)}50%{box-shadow:0 0 0 4px var(--bg-primary),0 0 0 12px var(--accent-glow)}}
+.mic-hint{font-size:.85rem;color:var(--text-dim);text-align:center}
+kbd{font-family:inherit;border:1px solid var(--text-dim);border-radius:4px;padding:0 5px;font-size:.85em}
+@media (max-height:480px){.mic-dock{position:static}}
+
+/* ========== DASHBOARD ========== */
 .chart-grid{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:600px){.chart-grid{grid-template-columns:repeat(2,1fr)}}
-.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;overflow:hidden}
-.chart-card h3{font-size:.8rem;font-weight:600;margin-bottom:10px;color:var(--text-muted)}
-.chart-container{width:100%;height:250px}
-
-/* ========== AUDIT TABLE ========== */
-.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.filter-btn{padding:8px 14px;border-radius:20px;font-size:.75rem;font-weight:600;
-  background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);
-  min-height:36px;transition:all .2s}
-.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-.audit-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);
-  border:1px solid var(--border)}
-.audit-table{width:100%;min-width:600px;border-collapse:collapse;font-size:.78rem}
-.audit-table th{background:var(--bg-secondary);padding:12px 10px;text-align:left;
-  font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;
-  color:var(--text-muted);position:sticky;top:0}
-.audit-table td{padding:10px;border-top:1px solid var(--border);vertical-align:top}
-.audit-table tr:hover td{background:var(--bg-card-hover)}
-
-.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
-  font-size:.7rem;font-weight:600;white-space:nowrap}
-.badge.critical{background:rgba(239,68,68,.15);color:#f87171}
-.badge.serious{background:rgba(249,115,22,.15);color:#fb923c}
-.badge.moderate{background:rgba(234,179,8,.15);color:#facc15}
-.badge.pass{background:rgba(34,197,94,.15);color:#4ade80}
-
-/* ========== STATS ROW ========== */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:14px 10px;text-align:center}
-.stat-card .num{font-size:1.5rem;font-weight:700;line-height:1}
+@media(min-width:700px){.chart-grid{grid-template-columns:repeat(2,1fr)}}
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;overflow:hidden}
+.chart-card h3{font-size:.95rem;font-weight:600;margin-bottom:10px;color:var(--text-muted)}
+.chart-container{width:100%;height:260px}
+.chart-fallback{color:var(--text-muted);font-size:.9rem;padding:12px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:16px;list-style:none}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 10px;text-align:center}
+.stat-card .num{font-size:1.6rem;font-weight:700;line-height:1}
 .stat-card .num.critical{color:var(--red)}.stat-card .num.serious{color:var(--orange)}
 .stat-card .num.moderate{color:var(--yellow)}.stat-card .num.pass{color:var(--green)}
-.stat-card .label{font-size:.65rem;color:var(--text-muted);margin-top:4px;font-weight:500}
+.stat-card .label{font-size:.85rem;color:var(--text-muted);margin-top:4px;font-weight:500}
 
-/* ========== LIVE REGION ========== */
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);
-  white-space:nowrap;border:0}
+/* ========== AUDITORIA ========== */
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:8px 16px;border-radius:22px;font-size:.9rem;font-weight:600;
+  background:var(--bg-card);border:1px solid var(--text-dim);color:var(--text);min-height:44px}
+.filter-btn[aria-pressed="true"]{background:var(--accent-bg);color:#fff;border-color:var(--accent-bg)}
+.audit-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);border:1px solid var(--border)}
+.audit-table{width:100%;min-width:640px;border-collapse:collapse;font-size:.9rem}
+.audit-table caption{text-align:left;padding:12px 10px;font-weight:600}
+.audit-table th{background:var(--bg-secondary);padding:12px 10px;text-align:left;font-weight:600;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted)}
+.audit-table td{padding:10px;border-top:1px solid var(--border);vertical-align:top}
+.audit-table small{color:var(--text-dim)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.badge.critical{background:rgba(239,68,68,.18);color:var(--red)}
+.badge.serious{background:rgba(249,115,22,.18);color:var(--orange)}
+.badge.moderate{background:rgba(234,179,8,.18);color:var(--yellow)}
+.badge.pass{background:rgba(34,197,94,.18);color:var(--green)}
 
-/* ========== FOOTER ========== */
-.app-footer{text-align:center;padding:20px 16px 80px;font-size:.7rem;color:var(--text-dim);
-  border-top:1px solid var(--border);margin-top:30px}
-.app-footer a{color:var(--accent)}
+.app-footer{text-align:center;padding:20px 16px;font-size:.85rem;color:var(--text-dim);border-top:1px solid var(--border);margin-top:20px}
 </style>
 </head>
 <body>
 
-<!-- Skip Link -->
-<a href="#main-content" class="skip-link">Pular para o conteudo principal</a>
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
-<!-- Live region for screen readers -->
+<!-- Região ao vivo: usada para leitores de tela (e para respostas quando a voz do assistente está desligada) -->
 <div id="aria-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<!-- Header -->
 <header class="app-header">
   <div class="app-logo">
-    <div class="jarvis-icon" aria-hidden="true"><i class="fa-solid fa-microphone"></i></div>
-    <h1><span>JARVIS</span> Home</h1>
+    <div class="logo-icon" aria-hidden="true"><i class="fa-solid fa-house-signal"></i></div>
+    <h1>AccessHome <span>Voz</span></h1>
   </div>
-  <span style="font-size:.7rem;color:var(--text-dim)">PICTA 2026</span>
+  <span class="header-tag">PICTA 2026 · simulação</span>
 </header>
 
-<!-- Tab Navigation -->
-<nav class="tab-nav" role="tablist" aria-label="Secoes do aplicativo">
-  <button class="tab-btn active" role="tab" id="tab-assistant" aria-selected="true" aria-controls="panel-assistant">
+<main id="main-content" tabindex="-1">
+<nav class="tab-nav" role="tablist" aria-label="Seções do aplicativo">
+  <button class="tab-btn" role="tab" id="tab-assistant" aria-selected="true" aria-controls="panel-assistant" tabindex="0">
     <i class="fa-solid fa-microphone" aria-hidden="true"></i> Assistente
   </button>
-  <button class="tab-btn" role="tab" id="tab-dashboard" aria-selected="false" aria-controls="panel-dashboard">
-    <i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Dashboard
+  <button class="tab-btn" role="tab" id="tab-dashboard" aria-selected="false" aria-controls="panel-dashboard" tabindex="-1">
+    <i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Painel
   </button>
-  <button class="tab-btn" role="tab" id="tab-audit" aria-selected="false" aria-controls="panel-audit">
+  <button class="tab-btn" role="tab" id="tab-audit" aria-selected="false" aria-controls="panel-audit" tabindex="-1">
     <i class="fa-solid fa-table" aria-hidden="true"></i> Auditoria
   </button>
 </nav>
 
-<!-- JARVIS Status -->
-<div class="jarvis-status" id="jarvisStatus">
-  <div class="pulse"></div>
-  <span id="jarvisStatusText">Diga <strong>"Jarvis"</strong> ou toque no microfone</span>
+<div class="assist-status" id="assistStatus" data-mode="idle">
+  <div class="pulse" aria-hidden="true"></div>
+  <span id="assistStatusText">Carregando…</span>
 </div>
 
-<!-- Main Content -->
-<main id="main-content">
 
-<!-- ===== PANEL 1: ASSISTANT ===== -->
-<section class="tab-panel active" id="panel-assistant" role="tabpanel" aria-labelledby="tab-assistant">
-  <div class="chat-log" id="chatLog" aria-label="Historico de comandos">
-    <div class="chat-msg jarvis"><div class="sender">Jarvis</div>Ola, senhor. Estou pronto para ajudar. Diga <strong>"Jarvis"</strong> para me ativar, ou toque no microfone.</div>
-  </div>
-  <div id="deviceGrid" aria-label="Dispositivos da casa"></div>
+<!-- ===== PAINEL 1: ASSISTENTE ===== -->
+<section class="tab-panel" id="panel-assistant" role="tabpanel" aria-labelledby="tab-assistant" tabindex="0">
+  <h2>Assistente de casa</h2>
+
+  <details class="settings" id="settings">
+    <summary>Ajustes de voz e acessibilidade</summary>
+    <div class="settings-body">
+      <label class="check"><input type="checkbox" id="optVoice"> Falar as respostas em voz alta</label>
+      <p class="hint" style="margin-top:-8px">Se você usa leitor de tela (NVDA, JAWS, VoiceOver, TalkBack), desligue esta opção: as respostas serão lidas pelo seu leitor, sem repetição.</p>
+      <label class="check"><input type="checkbox" id="optWake"> Escutar “Ok Casa” continuamente</label>
+      <div class="field">
+        <label for="optVoiceName">Voz</label>
+        <select id="optVoiceName"><option value="">Automática (recomendada)</option></select>
+      </div>
+      <div class="field">
+        <label for="optRate">Velocidade da fala: <span id="optRateOut">1,0×</span></label>
+        <input type="range" id="optRate" min="0.6" max="1.6" step="0.1" value="1">
+      </div>
+      <div class="btn-row"><button type="button" class="btn secondary" id="btnTestVoice">Testar voz</button></div>
+      <div class="field">
+        <label for="optContrast">Contraste</label>
+        <select id="optContrast">
+          <option value="normal">Normal</option>
+          <option value="high">Alto contraste</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="optSize">Tamanho do texto</label>
+        <select id="optSize">
+          <option value="normal">Normal</option>
+          <option value="large">Grande</option>
+          <option value="xlarge">Muito grande</option>
+        </select>
+      </div>
+    </div>
+  </details>
+
+  <div class="chat-log" id="chatLog" role="region" aria-label="Histórico da conversa" tabindex="0"></div>
+
+  <h2>Dispositivos</h2>
+  <div id="deviceGrid"></div>
 </section>
 
-<!-- ===== PANEL 2: DASHBOARD ===== -->
-<section class="tab-panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
-  <div class="stats-row">
-    <div class="stat-card"><div class="num critical" id="statCritical">0</div><div class="label">Critico</div></div>
-    <div class="stat-card"><div class="num serious" id="statSerious">0</div><div class="label">Serio</div></div>
-    <div class="stat-card"><div class="num moderate" id="statModerate">0</div><div class="label">Moderado</div></div>
-    <div class="stat-card"><div class="num pass" id="statPass">0</div><div class="label">Aprovado</div></div>
-  </div>
+<!-- ===== PAINEL 2: PAINEL ===== -->
+<section class="tab-panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" tabindex="0" hidden>
+  <h2>Resumo da pesquisa</h2>
+  <ul class="stats-row" aria-label="Contagem de resultados por severidade">
+    <li class="stat-card"><div class="num critical" id="statCritical">0</div><div class="label">Crítico</div></li>
+    <li class="stat-card"><div class="num serious" id="statSerious">0</div><div class="label">Sério</div></li>
+    <li class="stat-card"><div class="num moderate" id="statModerate">0</div><div class="label">Moderado</div></li>
+    <li class="stat-card"><div class="num pass" id="statPass">0</div><div class="label">Aprovado</div></li>
+  </ul>
   <div class="chart-grid">
-    <div class="chart-card"><h3><i class="fa-solid fa-chart-bar" aria-hidden="true"></i> Distribuicao de Severidade</h3><div class="chart-container" id="chartSeverity"></div></div>
-    <div class="chart-card"><h3><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i> Comparacao de Ferramentas</h3><div class="chart-container" id="chartTools"></div></div>
-    <div class="chart-card"><h3><i class="fa-solid fa-spider" aria-hidden="true"></i> Radar por Plataforma</h3><div class="chart-container" id="chartRadar"></div></div>
-    <div class="chart-card"><h3><i class="fa-solid fa-fire" aria-hidden="true"></i> Heatmap WCAG</h3><div class="chart-container" id="chartHeatmap"></div></div>
+    <div class="chart-card"><h3>Distribuição de severidade</h3><div class="chart-container" id="chartSeverity"></div></div>
+    <div class="chart-card"><h3>Registros por ferramenta</h3><div class="chart-container" id="chartTools"></div></div>
+    <div class="chart-card"><h3>Radar por plataforma</h3><div class="chart-container" id="chartRadar"></div></div>
+    <div class="chart-card"><h3>Mapa de calor WCAG</h3><div class="chart-container" id="chartHeatmap"></div></div>
   </div>
+  <p class="hint" style="margin-top:12px">Todos os dados dos gráficos também estão na tabela da aba Auditoria.</p>
 </section>
 
-<!-- ===== PANEL 3: AUDIT TABLE ===== -->
-<section class="tab-panel" id="panel-audit" role="tabpanel" aria-labelledby="tab-audit">
-  <div class="filter-bar" id="filterBar" role="toolbar" aria-label="Filtros de plataforma"></div>
-  <div class="audit-table-wrap">
-    <table class="audit-table" aria-label="Resultados da auditoria PICTA">
-      <thead><tr><th>Plataforma</th><th>Ferramenta</th><th>Criterio</th><th>Severidade</th><th>Descricao</th></tr></thead>
+<!-- ===== PAINEL 3: AUDITORIA ===== -->
+<section class="tab-panel" id="panel-audit" role="tabpanel" aria-labelledby="tab-audit" tabindex="0" hidden>
+  <h2>Resultados da auditoria</h2>
+  <div class="filter-bar" id="filterBar" role="group" aria-label="Filtrar por plataforma"></div>
+  <div class="audit-table-wrap" role="region" aria-label="Tabela de resultados (role para os lados se necessário)" tabindex="0">
+    <table class="audit-table">
+      <caption id="auditCaption">Resultados da auditoria PICTA</caption>
+      <thead><tr><th scope="col">Plataforma</th><th scope="col">Ferramenta</th><th scope="col">Critério</th><th scope="col">Severidade</th><th scope="col">Descrição</th></tr></thead>
       <tbody id="auditTableBody"></tbody>
     </table>
   </div>
@@ -278,563 +303,808 @@ input{font-family:var(--font);color:var(--text);background:transparent;border:no
 
 </main>
 
-<!-- MIC DOCK (Bottom) -->
-<div class="mic-dock" role="region" aria-label="Controles de voz">
-  <div class="mic-row">
-    <input type="text" class="mic-input" id="textInput" placeholder="Digite um comando..." aria-label="Campo de texto para comandos">
-    <button class="send-btn" id="sendBtn" aria-label="Enviar comando de texto"><i class="fa-solid fa-paper-plane"></i></button>
-  </div>
-  <button class="mic-btn" id="micBtn" aria-label="Ativar microfone. Diga Jarvis como atalho.">
-    <i class="fa-solid fa-microphone" id="micIcon"></i>
+<!-- DOCK: texto + microfone -->
+<div class="mic-dock" role="region" aria-label="Controles de comando">
+  <form class="mic-row" id="cmdForm" autocomplete="off">
+    <label for="textInput" class="sr-only">Digite um comando</label>
+    <input type="text" class="mic-input" id="textInput" placeholder="Ex.: ligar a luz da sala" enterkeyhint="send" autocapitalize="none" spellcheck="false">
+    <button type="submit" class="send-btn" id="sendBtn" aria-label="Enviar comando"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+  </form>
+  <button type="button" class="mic-btn" id="micBtn" aria-pressed="false" aria-keyshortcuts="Alt+M" aria-label="Falar um comando">
+    <i class="fa-solid fa-microphone" aria-hidden="true"></i>
   </button>
-  <div class="mic-hint">Diga <strong>"Jarvis"</strong> para ativar &middot; Espaco como atalho</div>
+  <p class="mic-hint">Diga <strong>“Ok Casa”</strong> e o comando · <kbd>Alt</kbd>+<kbd>M</kbd> fala · <kbd>Esc</kbd> cancela · <kbd>Alt</kbd>+<kbd>R</kbd> repete · diga <strong>“ajuda”</strong></p>
 </div>
 
-<!-- Footer -->
-<footer class="app-footer" role="contentinfo">
-  PICTA 2026 &mdash; Senac SP | Yago Santos Silva | MIT License |
-  <a href="https://github.com/yago-silva-ads/accesshome-analyzer" target="_blank" rel="noopener">GitHub</a>
+<footer class="app-footer">
+  PICTA 2026 — Senac SP | Yago Santos Silva | Licença MIT |
+  <a href="https://github.com/yago-silva-ads/accesshome-analyzer" target="_blank" rel="noopener">GitHub<span class="sr-only"> (abre em nova aba)</span></a>
+  <br>Os dispositivos desta página são simulados para demonstração.
 </footer>
 
 <script>
 /* ================================================================
-   ACCESSHOME VOICE v2 — JARVIS Smart Home Assistant
-   Mobile-first, wake word, bulletproof NLP
+   ACCESSHOME VOZ v3 — assistente neutro (palavra de ativação “Ok Casa”)
+   - Reconhecimento e síntese de voz do navegador (pt-BR)
+   - Funciona sem voz: campo de texto, teclado e leitor de tela
    ================================================================ */
+'use strict';
 
-// ========== AUDIT DATA (PICTA Research) ==========
+// ========== DADOS DA AUDITORIA (PICTA) ==========
 const AUDIT_DATA = [
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:3,desc:'Imagens sem texto alternativo adequado'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste minimo',severity:2,desc:'Razao de contraste insuficiente em textos'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegacao por teclado funcional'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, funcao, valor',severity:3,desc:'Componentes interativos sem roles ARIA'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:3,desc:'Icones sem aria-label ou alt text'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.4.3',criterionName:'Contraste minimo',severity:2,desc:'Contraste abaixo de 4.5:1 em labels'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'4.1.2',criterionName:'Nome, funcao, valor',severity:3,desc:'Botoes sem nome acessivel'},
-  {platform:'Home Assistant',tool:'WAVE',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:0,desc:'Nenhum erro detectado (falso negativo)',note:'Falso negativo'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:3,desc:'Leitor de tela nao consegue identificar icones'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegacao por teclado funcional com NVDA'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'4.1.2',criterionName:'Nome, funcao, valor',severity:3,desc:'Controles lidos como genericos pelo NVDA'},
-  {platform:'openHAB',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:3,desc:'Widgets sem texto alternativo'},
-  {platform:'openHAB',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste minimo',severity:2,desc:'Cores de status com baixo contraste'},
-  {platform:'openHAB',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, funcao, valor',severity:3,desc:'Componentes customizados sem ARIA'},
-  {platform:'openHAB',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegacao basica por teclado funcional'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteudo nao textual',severity:3,desc:'Tiles sem texto alternativo'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste minimo',severity:1,desc:'Contraste levemente abaixo do recomendado'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, funcao, valor',severity:3,desc:'Dashboards tiles sem roles semanticos'},
-  {platform:'SharpTools',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegacao por teclado parcialmente funcional'},
+  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:3,desc:'Imagens sem texto alternativo adequado'},
+  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste mínimo',severity:2,desc:'Razão de contraste insuficiente em textos'},
+  {platform:'Home Assistant',tool:'Lighthouse',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegação por teclado funcional'},
+  {platform:'Home Assistant',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, função, valor',severity:3,desc:'Componentes interativos sem roles ARIA'},
+  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:3,desc:'Ícones sem aria-label ou alt text'},
+  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.4.3',criterionName:'Contraste mínimo',severity:2,desc:'Contraste abaixo de 4.5:1 em labels'},
+  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'4.1.2',criterionName:'Nome, função, valor',severity:3,desc:'Botões sem nome acessível'},
+  {platform:'Home Assistant',tool:'WAVE',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:0,desc:'Nenhum erro detectado (falso negativo)'},
+  {platform:'Home Assistant',tool:'NVDA',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:3,desc:'Leitor de tela não consegue identificar ícones'},
+  {platform:'Home Assistant',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegação por teclado funcional com NVDA'},
+  {platform:'Home Assistant',tool:'NVDA',criterion:'4.1.2',criterionName:'Nome, função, valor',severity:3,desc:'Controles lidos como genéricos pelo NVDA'},
+  {platform:'openHAB',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:3,desc:'Widgets sem texto alternativo'},
+  {platform:'openHAB',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste mínimo',severity:2,desc:'Cores de status com baixo contraste'},
+  {platform:'openHAB',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, função, valor',severity:3,desc:'Componentes customizados sem ARIA'},
+  {platform:'openHAB',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegação básica por teclado funcional'},
+  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.1.1',criterionName:'Conteúdo não textual',severity:3,desc:'Tiles sem texto alternativo'},
+  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.4.3',criterionName:'Contraste mínimo',severity:1,desc:'Contraste levemente abaixo do recomendado'},
+  {platform:'SharpTools',tool:'Lighthouse',criterion:'4.1.2',criterionName:'Nome, função, valor',severity:3,desc:'Dashboards tiles sem roles semânticos'},
+  {platform:'SharpTools',tool:'NVDA',criterion:'2.1.1',criterionName:'Teclado',severity:0,desc:'Navegação por teclado parcialmente funcional'},
 ];
 
 const SEV = {
   0:{label:'Aprovado',cls:'pass',icon:'fa-circle-check'},
   1:{label:'Moderado',cls:'moderate',icon:'fa-triangle-exclamation'},
-  2:{label:'Serio',cls:'serious',icon:'fa-exclamation-circle'},
-  3:{label:'Critico',cls:'critical',icon:'fa-circle-xmark'},
+  2:{label:'Sério',cls:'serious',icon:'fa-circle-exclamation'},
+  3:{label:'Crítico',cls:'critical',icon:'fa-circle-xmark'},
 };
+const SEV_BY_CLASS = {critical:3,serious:2,moderate:1,pass:0};
 
-// ========== DEVICE DATA ==========
+// ========== DISPOSITIVOS (simulados) ==========
+// on=true significa: ligado (luz/tomada/câmera) ou trancado (fechadura)
 const DEVICE_DEFS = [
-  {id:'luz-sala',name:'Luz da Sala',room:'Sala',type:'light',icon:'fa-lightbulb',sev:'critical'},
-  {id:'luz-quarto',name:'Luz do Quarto',room:'Quarto',type:'light',icon:'fa-lightbulb',sev:'serious'},
-  {id:'luz-cozinha',name:'Luz da Cozinha',room:'Cozinha',type:'light',icon:'fa-lightbulb',sev:'moderate'},
-  {id:'fechadura',name:'Fechadura da Porta',room:'Entrada',type:'lock',icon:'fa-lock',sev:'critical'},
-  {id:'tomada',name:'Tomada Inteligente',room:'Sala',type:'outlet',icon:'fa-plug',sev:'serious'},
-  {id:'sensor-temp',name:'Sensor de Temperatura',room:'Quarto',type:'sensor',icon:'fa-temperature-half',sev:'pass'},
-  {id:'camera',name:'Camera de Seguranca',room:'Entrada',type:'camera',icon:'fa-video',sev:'critical'},
+  {id:'luz-sala',name:'Luz da Sala',room:'Sala',type:'light',icon:'fa-lightbulb',sev:'critical',on:'ligada',off:'desligada',words:['luz','lampada','iluminacao']},
+  {id:'luz-quarto',name:'Luz do Quarto',room:'Quarto',type:'light',icon:'fa-lightbulb',sev:'serious',on:'ligada',off:'desligada',words:['luz','lampada','iluminacao']},
+  {id:'luz-cozinha',name:'Luz da Cozinha',room:'Cozinha',type:'light',icon:'fa-lightbulb',sev:'moderate',on:'ligada',off:'desligada',words:['luz','lampada','iluminacao']},
+  {id:'fechadura',name:'Fechadura da Porta',room:'Entrada',type:'lock',icon:'fa-lock',sev:'critical',on:'trancada',off:'destrancada',words:['fechadura','porta','tranca']},
+  {id:'tomada',name:'Tomada Inteligente',room:'Sala',type:'outlet',icon:'fa-plug',sev:'serious',on:'ligada',off:'desligada',words:['tomada','plug']},
+  {id:'sensor-temp',name:'Sensor de Temperatura',room:'Quarto',type:'sensor',icon:'fa-temperature-half',sev:'pass',words:['sensor','temperatura'],value:'24 graus (simulado)'},
+  {id:'camera',name:'Câmera de Segurança',room:'Entrada',type:'camera',icon:'fa-video',sev:'critical',on:'ligada',off:'desligada',words:['camera','cam','seguranca']},
 ];
+const ROOMS = ['sala','quarto','cozinha','entrada'];
+const SEV_LABEL_TEXT = {critical:'Barreira crítica',serious:'Barreira séria',moderate:'Barreira moderada',pass:'Sem barreiras'};
 
-// ========== STATE ==========
+// ========== UTILITÁRIOS ==========
+function norm(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function $(id){ return document.getElementById(id); }
+function lsGet(k,def){ try{ const v=localStorage.getItem(k); return v===null?def:v; }catch(e){ return def; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+// ========== CONFIGURAÇÕES ==========
+const settings = {
+  voice: lsGet('ah_voice','1') === '1',
+  wake: lsGet('ah_wake','1') === '1',
+  voiceName: lsGet('ah_voicename',''),
+  rate: parseFloat(lsGet('ah_rate','1')) || 1,
+  contrast: lsGet('ah_contrast','normal'),
+  size: lsGet('ah_size','normal'),
+};
+function saveSettings(){
+  lsSet('ah_voice',settings.voice?'1':'0'); lsSet('ah_wake',settings.wake?'1':'0');
+  lsSet('ah_voicename',settings.voiceName); lsSet('ah_rate',String(settings.rate));
+  lsSet('ah_contrast',settings.contrast); lsSet('ah_size',settings.size);
+}
+function applyDisplaySettings(){
+  document.documentElement.dataset.contrast = settings.contrast;
+  document.documentElement.dataset.size = settings.size;
+}
+
+// ========== ESTADO DOS DISPOSITIVOS ==========
 let deviceState = {};
-try { const s = localStorage.getItem('ah_devices'); if(s) deviceState = JSON.parse(s); } catch(e){}
-DEVICE_DEFS.forEach(d => { if(deviceState[d.id] === undefined) deviceState[d.id] = false; });
-function saveState(){ try{localStorage.setItem('ah_devices',JSON.stringify(deviceState));}catch(e){} }
+try { const s = lsGet('ah_devices',null); if(s) deviceState = JSON.parse(s) || {}; } catch(e){ deviceState = {}; }
+DEVICE_DEFS.forEach(d => { if(typeof deviceState[d.id] !== 'boolean') deviceState[d.id] = false; });
+function saveState(){ lsSet('ah_devices',JSON.stringify(deviceState)); }
+const CONTROLLABLE = DEVICE_DEFS.filter(d => d.type!=='sensor');
 
-// ========== JARVIS VOICE ENGINE ==========
-const JARVIS_GREETINGS = [
-  'Estou ouvindo, senhor.',
-  'As suas ordens, senhor.',
-  'Pois nao, senhor. Em que posso ajudar?',
-  'Presente, senhor.',
-];
-const JARVIS_CONFIRM = [
-  'Prontamente.',
-  'Sim, senhor.',
-  'Feito, senhor.',
-  'Imediatamente.',
-];
-const JARVIS_BYE = [
-  'Ate logo, senhor.',
-  'Estarei aqui se precisar.',
-  'Fico no aguardo, senhor.',
-];
+// ========== SAÍDA: VOZ, TELA E LEITOR DE TELA ==========
+const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+let voices = [];
+let isSpeaking = false;
+let lastReply = '';
+let speakGuard = null;
 
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-let jarvisState = 'idle'; // idle | wake | listening | processing
-let listenTimeout = null;
-let recognition = null;
-let synth = window.speechSynthesis;
-
-function speak(text, cb){
-  if(!synth) { if(cb) cb(); return; }
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'pt-BR'; u.rate = 1.05; u.pitch = 1;
-  if(cb) u.onend = cb;
-  synth.speak(u);
-}
-
-function setJarvisState(state, statusText){
-  jarvisState = state;
-  const el = document.getElementById('jarvisStatus');
-  const txt = document.getElementById('jarvisStatusText');
-  const mic = document.getElementById('micBtn');
-  el.className = 'jarvis-status' + (state === 'listening' || state === 'wake' ? ' listening' : '');
-  txt.innerHTML = statusText || '';
-  mic.classList.toggle('listening', state === 'listening' || state === 'wake');
-}
-
-// ========== SPEECH RECOGNITION ==========
-function initRecognition(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR) return null;
-  const r = new SR();
-  r.lang = 'pt-BR'; r.continuous = true; r.interimResults = false; r.maxAlternatives = 3;
-  r.onresult = handleSpeechResult;
-  r.onerror = (e) => {
-    if(e.error !== 'no-speech' && e.error !== 'aborted') console.warn('Speech error:',e.error);
-    if(jarvisState === 'wake') { setJarvisState('idle','Diga <strong>"Jarvis"</strong> ou toque no microfone'); }
-  };
-  r.onend = () => {
-    if(jarvisState === 'listening' || jarvisState === 'wake'){
-      try{ r.start(); }catch(e){}
-    }
-  };
-  return r;
-}
-
-function handleSpeechResult(e){
-  const last = e.results[e.results.length - 1];
-  if(!last.isFinal) return;
-  const raw = last[0].transcript.trim();
-  if(!raw) return;
-
-  const normalized = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-
-  // WAKE WORD detection
-  if(jarvisState === 'idle' || jarvisState === 'wake'){
-    if(/jarvis|jarves|chavis|jarvi/i.test(normalized)){
-      clearTimeout(listenTimeout);
-      setJarvisState('listening','<strong>Ouvindo...</strong> Diga seu comando');
-      const greeting = pick(JARVIS_GREETINGS);
-      addChat('jarvis', greeting);
-      speak(greeting);
-      announceToSR(greeting);
-      listenTimeout = setTimeout(() => {
-        if(jarvisState === 'listening'){
-          const bye = pick(JARVIS_BYE);
-          addChat('jarvis', bye);
-          speak(bye);
-          setJarvisState('idle','Diga <strong>"Jarvis"</strong> ou toque no microfone');
-        }
-      }, 12000);
-      return;
-    }
-    if(jarvisState === 'idle') return; // ignore non-wake words when idle
-  }
-
-  // COMMAND MODE
-  if(jarvisState === 'listening'){
-    clearTimeout(listenTimeout);
-    addChat('user', raw);
-    setJarvisState('processing','Processando...');
-    const result = processCommand(raw);
-    const prefix = pick(JARVIS_CONFIRM);
-    const fullReply = prefix + ' ' + result.speech;
-    addChat('jarvis', fullReply);
-    speak(fullReply, () => {
-      setJarvisState('idle','Diga <strong>"Jarvis"</strong> ou toque no microfone');
-    });
-    announceToSR(fullReply);
-  }
-}
-
-function startListening(){
-  if(!recognition) recognition = initRecognition();
-  if(!recognition){ addChat('jarvis','Desculpe, seu navegador nao suporta reconhecimento de voz.'); return; }
-  try{ recognition.start(); }catch(e){}
-}
-function stopListening(){
-  if(recognition) try{ recognition.abort(); }catch(e){}
-  clearTimeout(listenTimeout);
-  setJarvisState('idle','Diga <strong>"Jarvis"</strong> ou toque no microfone');
-}
-
-// ========== BULLETPROOF NLP COMMAND PROCESSOR ==========
-function processCommand(raw){
-  // 1. Normalize: lowercase, strip accents, strip punctuation, strip articles
-  let t = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[.,;:!?\u00bf\u00a1"'()\[\]{}]/g,' ')
-    .replace(/\b(a|o|as|os|da|do|das|dos|um|uma|uns|umas|na|no|nas|nos|pra|para|pro|pelo|pela|de|e|que)\b/g,' ')
-    .replace(/\s+/g,' ').trim();
-
-  // 2. Help
-  if(/^(ajuda|help|comandos)$/.test(t)){
-    return {speech:'Comandos disponiveis: ligar ou desligar dispositivo, estado da casa, listar dispositivos, barreiras de acessibilidade.',
-      text:'ajuda'};
-  }
-
-  // 3. List devices
-  if(/listar|quais dispositivos|mostrar dispositivos/.test(t)){
-    const list = DEVICE_DEFS.map(d => d.name+' ('+d.room+')').join(', ');
-    return {speech:'Dispositivos: '+list, text:list};
-  }
-
-  // 4. Toggle device — BULLETPROOF
-  const ON_VERBS = ['acender','ligar','ativar','abrir','destrancar'];
-  const OFF_VERBS = ['apagar','desligar','desativar','fechar','trancar'];
-  const ALL_VERBS = [...ON_VERBS, ...OFF_VERBS];
-
-  let action = null, target = null;
-  const words = t.split(' ');
-
-  // Try: verb first (e.g. "ligar luz sala")
-  for(let i=0; i<words.length; i++){
-    if(ALL_VERBS.includes(words[i])){
-      action = words[i];
-      target = words.filter((_,idx) => idx !== i).join(' ').trim();
-      break;
-    }
-  }
-
-  if(action && target){
-    // CRITICAL FIX: exact match for turnOn
-    const turnOn = ON_VERBS.includes(action);
-
-    const device = findDevice(target);
-    if(device){
-      deviceState[device.id] = turnOn;
-      saveState(); renderDevices();
-      const stateWord = turnOn ? 'ligado' : 'desligado';
-      return {speech:device.name+' '+stateWord+'.', text:device.name+': '+stateWord};
-    }
-    return {speech:'Dispositivo nao encontrado. Diga listar dispositivos.', text:'Nao encontrado'};
-  }
-
-  // 5. State query
-  if(/estado|status|como esta/.test(t)){
-    let devs = DEVICE_DEFS; let ctx = 'da casa';
-    if(/sala/.test(t)){devs=devs.filter(d=>d.room==='Sala');ctx='da Sala';}
-    else if(/quarto/.test(t)){devs=devs.filter(d=>d.room==='Quarto');ctx='do Quarto';}
-    else if(/cozinha/.test(t)){devs=devs.filter(d=>d.room==='Cozinha');ctx='da Cozinha';}
-    else if(/entrada/.test(t)){devs=devs.filter(d=>d.room==='Entrada');ctx='da Entrada';}
-    const sum = devs.map(d=>d.name+' esta '+(deviceState[d.id]?'ligado':'desligado')).join('. ');
-    return {speech:'Estado '+ctx+': '+sum, text:sum};
-  }
-
-  // 6. Barriers
-  if(/barreir|problemas|audit/.test(t)){
-    const crit = AUDIT_DATA.filter(a=>a.severity===3).length;
-    return {speech:'A pesquisa PICTA encontrou '+crit+' barreiras criticas de acessibilidade.', text:crit+' barreiras criticas'};
-  }
-
-  return {speech:'Nao entendi. Diga ajuda para ver os comandos disponiveis.', text:'Nao entendi'};
-}
-
-// Fuzzy device finder — super tolerant
-function findDevice(target){
-  if(!target) return null;
-  let best = null, bestScore = 0;
-  const tw = target.split(' ').filter(w=>w.length>=2);
-
-  DEVICE_DEFS.forEach(d => {
-    let dn = d.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/\b(a|o|as|os|da|do|das|dos)\b/g,' ').replace(/\s+/g,' ').trim();
-    let score = 0;
-
-    // Exact containment
-    if(dn.includes(target) || target.includes(dn)) score += 20;
-
-    // Word match
-    tw.forEach(w => { if(dn.includes(w)) score += w.length * 2; });
-
-    // Room match
-    const room = d.room.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    if(target.includes(room)) score += 5;
-
-    // Type keywords
-    if(d.type==='light' && /luz|lamp|lumin/.test(target)) score += 8;
-    if(d.type==='lock' && /porta|fechadura|tranc/.test(target)) score += 8;
-    if(d.type==='outlet' && /tomada|plug/.test(target)) score += 8;
-    if(d.type==='sensor' && /sensor|temp/.test(target)) score += 8;
-    if(d.type==='camera' && /camera|cam|segur/.test(target)) score += 8;
-
-    if(score > bestScore){ bestScore = score; best = d; }
+function loadVoices(){
+  if(!synth) return;
+  voices = synth.getVoices().filter(v => /^pt/i.test(v.lang));
+  const sel = $('optVoiceName');
+  if(!sel) return;
+  const current = settings.voiceName;
+  sel.innerHTML = '';
+  const auto = document.createElement('option');
+  auto.value = ''; auto.textContent = voices.length ? 'Automática (recomendada)' : 'Automática (nenhuma voz em português encontrada)';
+  sel.appendChild(auto);
+  voices.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v.voiceURI; o.textContent = v.name + ' (' + v.lang + ')';
+    sel.appendChild(o);
   });
-
-  return bestScore >= 4 ? best : null;
+  sel.value = voices.some(v=>v.voiceURI===current) ? current : '';
 }
 
-// ========== UI FUNCTIONS ==========
+// Preferência por vozes neutras e naturais: Google > Microsoft “Natural/Online” > qualquer pt-BR > qualquer pt
+function pickVoice(){
+  if(!voices.length) return null;
+  if(settings.voiceName){
+    const chosen = voices.find(v=>v.voiceURI===settings.voiceName);
+    if(chosen) return chosen;
+  }
+  const score = v => {
+    let s = 0;
+    if(/^pt[-_]BR$/i.test(v.lang)) s += 100;
+    if(/google/i.test(v.name)) s += 50;
+    if(/natural|online/i.test(v.name)) s += 40;
+    if(/francisca|maria|luciana|vitoria|thalita/i.test(v.name)) s += 10;
+    if(v.localService === false) s += 1;
+    return s;
+  };
+  return voices.slice().sort((a,b)=>score(b)-score(a))[0];
+}
+
+function stopSpeaking(){
+  if(synth) try{ synth.cancel(); }catch(e){}
+  clearTimeout(speakGuard);
+  isSpeaking = false;
+}
+
+function speak(text, done){
+  let finished = false;
+  const finish = () => {
+    if(finished) return; finished = true;
+    clearTimeout(speakGuard);
+    // pequena folga para o microfone não captar o final da própria fala
+    setTimeout(() => { isSpeaking = false; if(done) done(); }, 350);
+  };
+  if(!synth || !settings.voice){ isSpeaking = false; if(done) done(); return; }
+  try{
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'pt-BR'; u.rate = settings.rate; u.pitch = 1; u.volume = 1;
+    const v = pickVoice(); if(v){ u.voice = v; u.lang = v.lang; }
+    u.onend = finish; u.onerror = finish;
+    isSpeaking = true;
+    synth.speak(u);
+    // Alguns navegadores não disparam onend: garante a liberação
+    speakGuard = setTimeout(finish, Math.max(4000, text.length * 120 / settings.rate));
+  }catch(e){ finish(); }
+}
+
+function announce(msg){
+  const el = $('aria-live');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 60);
+}
+
 function addChat(who, text){
-  const log = document.getElementById('chatLog');
+  const log = $('chatLog');
   const div = document.createElement('div');
   div.className = 'chat-msg ' + who;
-  div.innerHTML = '<div class="sender">'+(who==='jarvis'?'Jarvis':'Voce')+'</div>'+text;
+  const sender = document.createElement('div');
+  sender.className = 'sender';
+  sender.textContent = who === 'assistant' ? 'Assistente' : 'Você';
+  const body = document.createElement('div');
+  body.textContent = text;
+  div.appendChild(sender); div.appendChild(body);
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
-  // Keep only last 20 messages
-  while(log.children.length > 20) log.removeChild(log.firstChild);
+  while(log.children.length > 30) log.removeChild(log.firstChild);
 }
 
-function announceToSR(msg){
-  const el = document.getElementById('aria-live');
-  el.textContent = msg;
-  setTimeout(()=>el.textContent='',2000);
+// Resposta do assistente: texto na tela + (voz OU leitor de tela, nunca os dois)
+function reply(text, done){
+  lastReply = text;
+  addChat('assistant', text);
+  if(settings.voice && synth){ speak(text, done); }
+  else { announce(text); if(done) done(); }
 }
 
-function renderDevices(){
-  const grid = document.getElementById('deviceGrid');
+// Sinal sonoro curto (earcon) para indicar que o assistente está ouvindo
+let audioCtx = null;
+function beep(freq, ms){
+  if(!settings.voice) return;
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    audioCtx = audioCtx || new AC();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; g.gain.value = 0.08;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + ms/1000);
+  }catch(e){}
+}
+
+// ========== STATUS ==========
+let mode = 'idle'; // idle | passive | awaiting
+let micProblem = '';
+function renderStatus(){
+  const box = $('assistStatus'), txt = $('assistStatusText'), mic = $('micBtn');
+  let m = mode, html;
+  if(micProblem){ m = 'error'; html = micProblem; }
+  else if(!SR){ m = 'error'; html = 'Este navegador não reconhece voz. Use o campo de texto ou o Chrome/Edge.'; }
+  else if(mode === 'awaiting'){ html = '<strong>Ouvindo…</strong> diga seu comando'; }
+  else if(mode === 'passive'){ html = 'Diga <strong>“Ok Casa”</strong> e o comando, ou toque no microfone'; }
+  else { html = 'Toque no microfone ou digite um comando'; }
+  box.dataset.mode = m;
+  txt.innerHTML = html;
+  mic.setAttribute('aria-pressed', mode === 'awaiting' ? 'true' : 'false');
+}
+
+// ========== RECONHECIMENTO DE VOZ ==========
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let recog = null, recogRunning = false, wantRecog = false, failCount = 0, restartTimer = null;
+let awaitTimer = null;
+const AWAIT_MS = 10000;
+
+function ensureRecog(){
+  if(recog || !SR) return recog;
+  const r = new SR();
+  r.lang = 'pt-BR'; r.continuous = true; r.interimResults = false; r.maxAlternatives = 3;
+  r.onstart = () => { recogRunning = true; };
+  r.onresult = e => {
+    failCount = 0;
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      if(!e.results[i].isFinal) continue;
+      const alts = [];
+      for(let j = 0; j < e.results[i].length; j++) alts.push(e.results[i][j].transcript);
+      onHeard(alts);
+    }
+  };
+  r.onerror = e => {
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+      wantRecog = false; micProblem = 'Microfone bloqueado. Permita o acesso no navegador ou use o campo de texto.';
+      setMode('idle');
+    } else if(e.error === 'audio-capture'){
+      wantRecog = false; micProblem = 'Nenhum microfone encontrado. Use o campo de texto.';
+      setMode('idle');
+    } else if(e.error === 'network'){
+      micProblem = 'Sem conexão com o serviço de voz. Você ainda pode digitar comandos.';
+      renderStatus();
+    }
+  };
+  r.onend = () => {
+    recogRunning = false;
+    if(!wantRecog) return;
+    failCount++;
+    const delay = Math.min(250 * Math.pow(2, Math.min(failCount, 5)), 5000);
+    clearTimeout(restartTimer);
+    restartTimer = setTimeout(startRecog, failCount > 1 ? delay : 150);
+  };
+  recog = r;
+  return r;
+}
+function startRecog(){
+  if(!ensureRecog()) return;
+  wantRecog = true;
+  if(recogRunning) return;
+  try{ recog.start(); }catch(e){}
+}
+function stopRecog(){
+  wantRecog = false;
+  clearTimeout(restartTimer);
+  if(recog) try{ recog.abort(); }catch(e){}
+}
+function setMode(m){
+  mode = m;
+  if(m !== 'awaiting') clearTimeout(awaitTimer);
+  renderStatus();
+}
+
+// Volta ao estado de repouso: escuta passiva (se habilitada) ou desliga o microfone
+function goIdle(){
+  if(settings.wake && SR && !micProblem){ setMode('passive'); startRecog(); }
+  else { setMode('idle'); stopRecog(); }
+}
+
+function enterAwaiting(){
+  if(!SR){ renderStatus(); return; }
+  micProblem = micProblem && /bloqueado|encontrado/.test(micProblem) ? micProblem : '';
+  startRecog();
+  setMode('awaiting');
+  beep(880, 120);
+  announce('Ouvindo');
+  clearTimeout(awaitTimer);
+  awaitTimer = setTimeout(() => {
+    if(mode !== 'awaiting') return;
+    pending = null;
+    beep(440, 150);
+    goIdle();
+    announce('Não ouvi nada.');
+  }, AWAIT_MS);
+}
+
+// Detecta a palavra de ativação: “ok casa”, “oi casa”, “assistente”…
+const WAKE_RE = /\b(?:(?:ok|okay|oquei|oi|ola|ei|hey|e ai)\s+(?:assistente\s+)?casa|(?:ok|okay|oi|ola|ei|hey)\s+assistente|assistente(?:\s+casa)?)\b/;
+function splitWake(normalized){
+  const m = WAKE_RE.exec(normalized);
+  if(!m) return null;
+  return { rest: normalized.slice(m.index + m[0].length).trim() };
+}
+
+function onHeard(alts){
+  if(isSpeaking) return;                       // ignora a própria voz do assistente
+  const normAlts = alts.map(norm);
+  if(!normAlts[0]) return;
+
+  if(mode === 'passive'){
+    for(let i = 0; i < normAlts.length; i++){
+      const w = splitWake(normAlts[i]);
+      if(!w) continue;
+      if(w.rest.length >= 3){ addChat('user', alts[i].trim()); runCommand(w.rest); }
+      else enterAwaiting();
+      return;
+    }
+    return;
+  }
+  if(mode === 'awaiting'){
+    let text = normAlts[0];
+    const w = splitWake(text);
+    if(w){ if(w.rest.length < 3) return; text = w.rest; }
+    clearTimeout(awaitTimer);
+    addChat('user', alts[0].trim());
+    runCommand(text);
+  }
+}
+
+// ========== PROCESSAMENTO DE COMANDOS ==========
+let pending = null; // {kind:'confirm', run, label} | {kind:'choose', intent, candidates}
+
+const VERBS = {
+  on:    ['ligar','liga','ligue','acender','acende','acenda','ativar','ativa','ative'],
+  off:   ['desligar','desliga','desligue','apagar','apaga','apague','desativar','desativa','desative'],
+  open:  ['abrir','abre','abra','destrancar','destranca','destranque'],
+  close: ['fechar','fecha','feche','trancar','tranca','tranque'],
+};
+const STOP = /\b(a|o|as|os|da|do|das|dos|de|um|uma|na|no|nas|nos|pra|para|pro|por|favor|que|e|me|minha|meu|agora)\b/g;
+
+function findIntent(words){
+  for(const w of words){
+    for(const k of Object.keys(VERBS)) if(VERBS[k].includes(w)) return {intent:k, verb:w};
+  }
+  return null;
+}
+// Converte a intenção em estado desejado (true = ligado/trancado)
+function wantedState(d, intent){
+  if(d.type === 'lock') return intent === 'on' || intent === 'close';
+  return intent === 'on' || intent === 'open';
+}
+
+function scoreDevices(core, pool){
+  const mentioned = ROOMS.filter(r => new RegExp('\\b'+r+'\\b').test(core));
+  return pool.map(d => {
+    let s = 0;
+    if(d.words.some(w => new RegExp('\\b'+w+'\\b').test(core))) s += 10;
+    const room = norm(d.room);
+    if(mentioned.includes(room)) s += 6;
+    else if(mentioned.length) s -= 8;
+    return {d, s};
+  }).filter(x => x.s >= 10).sort((a,b) => b.s - a.s);
+}
+
+function applyState(d, on){
+  deviceState[d.id] = on; saveState(); updateDeviceUI(d.id);
+}
+function describe(list){
+  const names = list.map(d => d.name);
+  if(names.length <= 1) return names.join('');
+  return names.slice(0,-1).join(', ') + ' ou ' + names[names.length-1];
+}
+
+function actOn(d, intent){
+  if(d.type === 'sensor'){
+    return {speech: d.name + ' não pode ser ligado nem desligado. Temperatura: ' + d.value + '.'};
+  }
+  const want = wantedState(d, intent);
+  if(deviceState[d.id] === want) return {speech: d.name + ' já está ' + (want ? d.on : d.off) + '.'};
+  if(d.type === 'lock' && !want){
+    pending = {kind:'confirm', label:d.name, run: () => { applyState(d,false); return d.name + ' ' + d.off + '.'; }};
+    return {speech:'Por segurança: deseja mesmo destrancar a ' + d.name + '? Diga sim ou não.', keepOpen:true};
+  }
+  applyState(d, want);
+  return {speech:'Ok, ' + d.name + ' ' + (want ? d.on : d.off) + '.'};
+}
+
+function runCommand(raw){
+  const result = processCommand(raw);
+  const finish = () => {
+    if(result.keepOpen) enterAwaiting(); else goIdle();
+  };
+  if(mode === 'awaiting') setMode('passive');   // evita captar comandos durante a resposta
+  reply(result.speech, finish);
+}
+
+function processCommand(raw){
+  const t = norm(raw);
+  const core = t.replace(STOP,' ').replace(/\s+/g,' ').trim();
+  const words = core.split(' ').filter(Boolean);
+
+  // 0. Resposta a uma pergunta pendente
+  if(pending){
+    const p = pending; pending = null;
+    if(p.kind === 'confirm'){
+      if(/^(sim|confirmo|confirmar|claro|pode|positivo|isso|ok)\b/.test(t)) return {speech:p.run()};
+      if(/^(nao|cancelar|cancela|negativo|deixa|esquece)\b/.test(t)) return {speech:'Certo, cancelado.'};
+    } else if(p.kind === 'choose'){
+      if(/\b(todas|todos|tudo)\b/.test(t)){
+        return groupAction(p.intent, p.candidates);
+      }
+      const hit = p.candidates.map(d => {
+        const toks = norm(d.name).replace(STOP,' ').split(' ').filter(w => w.length > 2);
+        let s = toks.filter(w => words.includes(w)).length;
+        if(words.includes(norm(d.room))) s += 2;
+        return {d, s};
+      }).filter(x => x.s > 0).sort((a,b) => b.s - a.s);
+      if(hit.length && (hit.length === 1 || hit[0].s > hit[1].s)) return actOn(hit[0].d, p.intent);
+      if(/^(nao|cancelar|cancela|deixa|esquece)\b/.test(t)) return {speech:'Certo, cancelado.'};
+    }
+    // não era resposta: trata como comando novo
+  }
+
+  // 1. Parar / cancelar
+  if(/^(parar|para|pare|cancelar|cancela|silencio|chega|esquece)$/.test(t)){
+    stopSpeaking(); return {speech:'Ok.'};
+  }
+  // 2. Repetir
+  if(/^(repetir|repete|repita|de novo|nao ouvi|nao entendi)$/.test(t)){
+    return {speech: lastReply || 'Ainda não falei nada.'};
+  }
+  // 3. Ajuda
+  if(/^(ajuda|ajudar|socorro|comandos|o que voce faz|o que posso dizer)$/.test(t)){
+    return {speech:'Você pode dizer: ligar ou desligar a luz da sala; apagar todas as luzes; trancar ou destrancar a porta; qual o estado da casa; qual a temperatura; listar dispositivos; falar mais devagar; ou repetir.'};
+  }
+  // 4. Velocidade da fala
+  if(/\b(devagar|lento|lenta)\b/.test(t) && /\b(falar|fale|fala|mais|voz)\b/.test(t)){
+    setRate(settings.rate - 0.2); return {speech:'Ok, vou falar mais devagar.'};
+  }
+  if(/\b(rapido|rapida|depressa|acelerar)\b/.test(t) && /\b(falar|fale|fala|mais|voz)\b/.test(t)){
+    setRate(settings.rate + 0.2); return {speech:'Ok, vou falar mais rápido.'};
+  }
+  // 5. Listar
+  if(/\b(listar|lista|quais dispositivos|mostrar dispositivos|que dispositivos)\b/.test(t)){
+    return {speech:'Dispositivos: ' + DEVICE_DEFS.map(d => d.name + ', ' + d.room).join('; ') + '.'};
+  }
+  // 6. Horas
+  if(/\bhoras?\b/.test(t)){
+    return {speech:'São ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '.'};
+  }
+
+  // 7. Ações em dispositivos
+  const found = findIntent(words);
+  if(found){
+    const target = words.filter(w => w !== found.verb).join(' ');
+    const plural = /\b(todas|todos|tudo|luzes|tomadas)\b/.test(target);
+    if(!target) return {speech:'Qual dispositivo? Diga, por exemplo, ligar a luz da sala.'};
+
+    if(plural){
+      let pool = CONTROLLABLE.filter(d => d.type==='light' || d.type==='outlet'); // “tudo” nunca mexe em fechadura nem câmera
+      if(/\bluz|luzes/.test(target)) pool = CONTROLLABLE.filter(d => d.type==='light');
+      else if(/\btomadas?\b/.test(target)) pool = CONTROLLABLE.filter(d => d.type==='outlet');
+      const room = ROOMS.find(r => new RegExp('\\b'+r+'\\b').test(target));
+      if(room) pool = pool.filter(d => norm(d.room) === room);
+      if(!pool.length) return {speech:'Não encontrei dispositivos para isso.'};
+      return groupAction(found.intent, pool);
+    }
+
+    const hits = scoreDevices(target, DEVICE_DEFS);
+    if(!hits.length) return {speech:'Não encontrei esse dispositivo. Diga “listar dispositivos” para ouvir as opções.'};
+    const top = hits.filter(h => h.s === hits[0].s);
+    if(top.length > 1){
+      const cands = top.map(h => h.d);
+      pending = {kind:'choose', intent:found.intent, candidates:cands};
+      return {speech:'Qual deles: ' + describe(cands) + '? Ou diga todas.', keepOpen:true};
+    }
+    return actOn(hits[0].d, found.intent);
+  }
+
+  // 8. Temperatura
+  if(/temperatura|graus|calor|frio/.test(t)){
+    const s = DEVICE_DEFS.find(d => d.type==='sensor');
+    return {speech:'A temperatura do quarto é ' + s.value + '.'};
+  }
+
+  // 9. Estado
+  if(/\b(estado|status|situacao|como esta|esta ligad|esta acesa|esta apagad)/.test(t)){
+    let devs = DEVICE_DEFS, ctx = 'da casa';
+    const room = ROOMS.find(r => new RegExp('\\b'+r+'\\b').test(t));
+    if(room){ devs = devs.filter(d => norm(d.room)===room); ctx = ({sala:'da sala',quarto:'do quarto',cozinha:'da cozinha',entrada:'da entrada'})[room]; }
+    else if(/\bluz|luzes/.test(t)){ devs = devs.filter(d => d.type==='light'); ctx = 'das luzes'; }
+    const act = devs.filter(d => d.type!=='sensor');
+    const on = act.filter(d => deviceState[d.id]).map(d => d.name + ' ' + d.on);
+    const off = act.filter(d => !deviceState[d.id]).map(d => d.name + ' ' + d.off);
+    const parts = [];
+    if(on.length) parts.push(on.join(', '));
+    if(off.length) parts.push(off.join(', '));
+    return {speech:'Estado ' + ctx + ': ' + (parts.join('. ') || 'nenhum dispositivo') + '.'};
+  }
+
+  // 10. Barreiras da pesquisa
+  if(/barreir|problema|auditoria|acessibilidade/.test(t)){
+    const c = n => AUDIT_DATA.filter(a => a.severity===n).length;
+    return {speech:'A pesquisa PICTA registrou ' + c(3) + ' barreiras críticas, ' + c(2) + ' sérias e ' + c(1) + ' moderada.'};
+  }
+
+  return {speech:'Não entendi. Diga “ajuda” para ouvir os comandos.'};
+}
+
+function groupAction(intent, pool){
+  const changed = [];
+  pool.forEach(d => {
+    if(d.type === 'lock' && !wantedState(d,intent)) return;      // nunca destranca em grupo
+    const want = wantedState(d, intent);
+    if(deviceState[d.id] !== want){ applyState(d, want); changed.push(d); }
+  });
+  const lights = pool.every(d => d.type==='light');
+  const subject = lights ? 'luzes' : 'dispositivos';
+  const word = wantedState(pool[0], intent) ? 'ligad' : 'desligad';
+  const end = lights ? 'as' : 'os';
+  if(!changed.length) return {speech: (lights ? 'As luzes' : 'Os dispositivos') + ' já estavam ' + word + end + '.'};
+  return {speech:'Ok, ' + subject + ' ' + word + end + '.'};
+}
+
+function setRate(r){
+  settings.rate = Math.round(Math.max(0.6, Math.min(1.6, r)) * 10) / 10;
+  $('optRate').value = settings.rate;
+  $('optRateOut').textContent = settings.rate.toFixed(1).replace('.',',') + '×';
+  saveSettings();
+}
+
+// ========== INTERFACE: DISPOSITIVOS (atualização no lugar, sem perder o foco) ==========
+function buildDevices(){
+  const grid = $('deviceGrid');
   const rooms = {};
-  DEVICE_DEFS.forEach(d => { if(!rooms[d.room]) rooms[d.room]=[]; rooms[d.room].push(d); });
-
+  DEVICE_DEFS.forEach(d => { (rooms[d.room] = rooms[d.room] || []).push(d); });
   let html = '';
   for(const [room, devs] of Object.entries(rooms)){
-    html += '<div class="room-section" role="group" aria-label="Sala: '+room+'">';
-    html += '<div class="room-label"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> '+room+'</div>';
-    html += '<div class="device-grid">';
+    html += '<section class="room-section" aria-label="' + esc(room) + '">';
+    html += '<h3 class="room-label"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> ' + esc(room) + '</h3>';
+    html += '<ul class="device-grid">';
     devs.forEach(d => {
-      const on = deviceState[d.id];
-      const st = on ? 'Ligado' : 'Desligado';
-      html += '<div class="device-card '+(on?'on':'')+'" data-device="'+d.id+'">';
-      html += '<div class="sev-dot '+d.sev+'" title="Severidade: '+d.sev+'"></div>';
-      html += '<div class="device-icon"><i class="fa-solid '+d.icon+'" aria-hidden="true"></i></div>';
-      html += '<div class="device-name">'+d.name+'</div>';
-      html += '<div class="device-room-tag">'+d.room+'</div>';
-      html += '<div class="device-bottom">';
-      html += '<span class="device-state">'+st+'</span>';
-      html += '<button class="toggle-sw '+(on?'on':'')+'" data-toggle="'+d.id+'" role="switch" aria-checked="'+on+'" aria-label="Alternar '+d.name+'. Estado atual: '+st+'"></button>';
-      html += '</div></div>';
+      const sev = SEV_BY_CLASS[d.sev];
+      html += '<li class="device-card" id="card-' + d.id + '">';
+      html += '<div class="device-icon"><i class="fa-solid ' + d.icon + '" aria-hidden="true"></i></div>';
+      html += '<div class="device-name" id="name-' + d.id + '">' + esc(d.name) + '</div>';
+      html += '<div class="sev-tag ' + d.sev + '"><i class="fa-solid ' + SEV[sev].icon + '" aria-hidden="true"></i> ' + SEV_LABEL_TEXT[d.sev] + '</div>';
+      html += '<div class="device-bottom"><span class="device-state" id="state-' + d.id + '"></span>';
+      if(d.type !== 'sensor'){
+        html += '<button type="button" class="toggle-sw" role="switch" data-toggle="' + d.id + '" aria-labelledby="name-' + d.id + '" aria-describedby="state-' + d.id + '"></button>';
+      }
+      html += '</div></li>';
     });
-    html += '</div></div>';
+    html += '</ul></section>';
   }
   grid.innerHTML = html;
-  grid.querySelectorAll('.toggle-sw').forEach(btn => {
+  grid.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.dataset.toggle;
-      deviceState[id] = !deviceState[id]; saveState(); renderDevices();
-      const dev = DEVICE_DEFS.find(d=>d.id===id);
-      const ns = deviceState[id] ? 'ligado' : 'desligado';
-      announceToSR(dev.name+' '+ns);
+      const d = DEVICE_DEFS.find(x => x.id === btn.dataset.toggle);
+      // o interruptor muda o estado e o leitor de tela anuncia o novo valor sozinho
+      applyState(d, !deviceState[d.id]);
+    });
+  });
+  DEVICE_DEFS.forEach(d => updateDeviceUI(d.id));
+}
+function updateDeviceUI(id){
+  const d = DEVICE_DEFS.find(x => x.id === id);
+  const on = !!deviceState[id] && d.type !== 'sensor';
+  const card = $('card-' + id); if(!card) return;
+  card.classList.toggle('on', on);
+  $('state-' + id).textContent = d.type==='sensor' ? d.value : (on ? d.on : d.off);
+  const sw = card.querySelector('[data-toggle]');
+  if(sw) sw.setAttribute('aria-checked', String(on));
+}
+
+// ========== ABAS (setas, Home/End) ==========
+const TABS = ['tab-assistant','tab-dashboard','tab-audit'];
+function switchTab(tabId, focus){
+  TABS.forEach(id => {
+    const b = $(id), sel = id === tabId;
+    b.setAttribute('aria-selected', String(sel));
+    b.tabIndex = sel ? 0 : -1;
+    $(b.getAttribute('aria-controls')).hidden = !sel;
+  });
+  if(focus) $(tabId).focus();
+  if(tabId === 'tab-dashboard') setTimeout(renderCharts, 50);
+}
+TABS.forEach((id, i) => {
+  const b = $(id);
+  b.addEventListener('click', () => switchTab(id));
+  b.addEventListener('keydown', e => {
+    let n = null;
+    if(e.key === 'ArrowRight') n = (i + 1) % TABS.length;
+    else if(e.key === 'ArrowLeft') n = (i + TABS.length - 1) % TABS.length;
+    else if(e.key === 'Home') n = 0;
+    else if(e.key === 'End') n = TABS.length - 1;
+    if(n !== null){ e.preventDefault(); switchTab(TABS[n], true); }
+  });
+});
+
+// ========== TABELA DE AUDITORIA ==========
+let auditFilter = 'all';
+function buildFilterBar(){
+  const bar = $('filterBar');
+  const platforms = ['all', ...new Set(AUDIT_DATA.map(r => r.platform))];
+  bar.innerHTML = platforms.map(p =>
+    '<button type="button" class="filter-btn" aria-pressed="' + (auditFilter===p) + '" data-filter="' + esc(p) + '">' + (p==='all' ? 'Todas' : esc(p)) + '</button>').join('');
+  bar.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      auditFilter = btn.dataset.filter;
+      bar.querySelectorAll('.filter-btn').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      renderAuditTable();
+      announce(document.querySelectorAll('#auditTableBody tr').length + ' resultados');
     });
   });
 }
-
-// ========== TABS ==========
-function switchTab(tabId){
-  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  const btn = document.getElementById(tabId);
-  btn.classList.add('active'); btn.setAttribute('aria-selected','true');
-  const panelId = btn.getAttribute('aria-controls');
-  document.getElementById(panelId).classList.add('active');
-  if(panelId === 'panel-dashboard') setTimeout(renderCharts, 100);
-}
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.id));
-});
-
-// ========== AUDIT TABLE ==========
-let auditFilter = 'all';
 function renderAuditTable(){
-  const tbody = document.getElementById('auditTableBody');
-  const filtered = auditFilter==='all' ? AUDIT_DATA : AUDIT_DATA.filter(r=>r.platform===auditFilter);
-  tbody.innerHTML = filtered.map(r => {
+  const filtered = auditFilter === 'all' ? AUDIT_DATA : AUDIT_DATA.filter(r => r.platform === auditFilter);
+  $('auditTableBody').innerHTML = filtered.map(r => {
     const s = SEV[r.severity];
-    return '<tr><td>'+r.platform+'</td><td>'+r.tool+'</td><td><strong>'+r.criterion+'</strong><br><small style="color:var(--text-dim)">'+r.criterionName+'</small></td><td><span class="badge '+s.cls+'"><i class="fa-solid '+s.icon+'" aria-hidden="true"></i> '+s.label+'</span></td><td>'+r.desc+'</td></tr>';
+    return '<tr><td>' + esc(r.platform) + '</td><td>' + esc(r.tool) + '</td><td><strong>' + esc(r.criterion) + '</strong><br><small>' + esc(r.criterionName) +
+      '</small></td><td><span class="badge ' + s.cls + '"><i class="fa-solid ' + s.icon + '" aria-hidden="true"></i> ' + s.label + '</span></td><td>' + esc(r.desc) + '</td></tr>';
   }).join('');
-
-  // Filter bar
-  const bar = document.getElementById('filterBar');
-  const platforms = ['all',...new Set(AUDIT_DATA.map(r=>r.platform))];
-  bar.innerHTML = platforms.map(p => '<button class="filter-btn '+(auditFilter===p?'active':'')+'" data-filter="'+p+'">'+(p==='all'?'Todas':p)+'</button>').join('');
-  bar.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => { auditFilter = btn.dataset.filter; renderAuditTable(); });
-  });
+  $('auditCaption').textContent = 'Resultados da auditoria PICTA — ' + (auditFilter==='all' ? 'todas as plataformas' : auditFilter) + ' (' + filtered.length + ' registros)';
 }
-
-// ========== STATS ==========
 function renderStats(){
   const counts = {0:0,1:0,2:0,3:0};
   AUDIT_DATA.forEach(r => counts[r.severity]++);
-  document.getElementById('statCritical').textContent = counts[3];
-  document.getElementById('statSerious').textContent = counts[2];
-  document.getElementById('statModerate').textContent = counts[1];
-  document.getElementById('statPass').textContent = counts[0];
+  $('statCritical').textContent = counts[3]; $('statSerious').textContent = counts[2];
+  $('statModerate').textContent = counts[1]; $('statPass').textContent = counts[0];
 }
 
-// ========== HIGHCHARTS ==========
-const HC_THEME = {colors:['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6'],
-  chart:{backgroundColor:'transparent',style:{fontFamily:'Inter,sans-serif'}},
-  title:{style:{color:'#f1f5f9',fontSize:'13px',fontWeight:'600'}},
-  legend:{itemStyle:{color:'#94a3b8',fontSize:'11px'},itemHoverStyle:{color:'#f1f5f9'}},
-  xAxis:{labels:{style:{color:'#94a3b8',fontSize:'10px'}},gridLineColor:'#1e293b',lineColor:'#1e293b'},
-  yAxis:{labels:{style:{color:'#94a3b8',fontSize:'10px'}},gridLineColor:'#1e293b'},
-  tooltip:{backgroundColor:'#1a1f2e',borderColor:'#1e293b',style:{color:'#f1f5f9',fontSize:'12px'}}};
-Highcharts.setOptions(HC_THEME);
-
+// ========== GRÁFICOS (opcionais: a página funciona sem a biblioteca) ==========
 let chartsRendered = false;
 function renderCharts(){
-  if(chartsRendered) return; chartsRendered = true;
+  if(chartsRendered) return;
+  if(!window.Highcharts){
+    ['chartSeverity','chartTools','chartRadar','chartHeatmap'].forEach(id => {
+      $(id).innerHTML = '<p class="chart-fallback">Gráfico indisponível (sem conexão). Veja os mesmos dados na aba Auditoria.</p>';
+    });
+    chartsRendered = true; return;
+  }
+  chartsRendered = true;
+  const LIGHT = '#e2e8f0', GRID = '#334155';
+  Highcharts.setOptions({colors:['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'],
+    chart:{backgroundColor:'transparent',style:{fontFamily:'Inter,sans-serif'}},
+    title:{style:{color:LIGHT}},
+    legend:{itemStyle:{color:LIGHT,fontSize:'12px'},itemHoverStyle:{color:'#fff'}},
+    xAxis:{labels:{style:{color:LIGHT,fontSize:'12px'}},gridLineColor:GRID,lineColor:GRID},
+    yAxis:{labels:{style:{color:LIGHT,fontSize:'12px'}},gridLineColor:GRID},
+    tooltip:{backgroundColor:'#1a1f2e',borderColor:GRID,style:{color:'#f1f5f9',fontSize:'13px'}},
+    credits:{enabled:false}});
 
-  // 1. Severity Distribution
   const sevCounts = {0:0,1:0,2:0,3:0};
   AUDIT_DATA.forEach(r => sevCounts[r.severity]++);
   Highcharts.chart('chartSeverity',{chart:{type:'column'},title:{text:null},
-    xAxis:{categories:['Critico','Serio','Moderado','Aprovado']},
-    yAxis:{title:{text:null}},legend:{enabled:false},
-    series:[{data:[
-      {y:sevCounts[3],color:'#ef4444'},{y:sevCounts[2],color:'#f97316'},
-      {y:sevCounts[1],color:'#eab308'},{y:sevCounts[0],color:'#22c55e'}
-    ],borderRadius:6}],credits:{enabled:false}});
+    xAxis:{categories:['Crítico','Sério','Moderado','Aprovado']},yAxis:{title:{text:null},allowDecimals:false},legend:{enabled:false},
+    accessibility:{description:'Número de registros por severidade'},
+    series:[{name:'Registros',data:[
+      {y:sevCounts[3],color:'#f87171'},{y:sevCounts[2],color:'#fb923c'},{y:sevCounts[1],color:'#facc15'},{y:sevCounts[0],color:'#4ade80'}
+    ],borderRadius:6,dataLabels:{enabled:true,style:{color:LIGHT,textOutline:'none'}}}]});
 
-  // 2. Tools Comparison
   const tools = {};
-  AUDIT_DATA.forEach(r => { if(!tools[r.tool]) tools[r.tool]=0; tools[r.tool]++; });
+  AUDIT_DATA.forEach(r => { tools[r.tool] = (tools[r.tool]||0) + 1; });
   Highcharts.chart('chartTools',{chart:{type:'bar'},title:{text:null},
-    xAxis:{categories:Object.keys(tools)},yAxis:{title:{text:null}},legend:{enabled:false},
-    series:[{data:Object.values(tools).map((v,i)=>({y:v,color:HC_THEME.colors[i]})),borderRadius:6}],
-    credits:{enabled:false}});
+    xAxis:{categories:Object.keys(tools)},yAxis:{title:{text:null},allowDecimals:false},legend:{enabled:false},
+    series:[{name:'Registros',data:Object.values(tools),colorByPoint:true,borderRadius:6,dataLabels:{enabled:true,style:{color:LIGHT,textOutline:'none'}}}]});
 
-  // 3. Radar
   const platforms = ['Home Assistant','openHAB','SharpTools'];
   const criteria = ['1.1.1','1.4.3','2.1.1','4.1.2'];
-  const radarSeries = platforms.map(p => ({
-    name:p, data:criteria.map(c => {
-      const matches = AUDIT_DATA.filter(r=>r.platform===p&&r.criterion===c);
-      return matches.length ? 3 - Math.max(...matches.map(m=>m.severity)) : 3;
-    }), pointPlacement:'on'
-  }));
   Highcharts.chart('chartRadar',{chart:{polar:true,type:'line'},title:{text:null},
     xAxis:{categories:criteria,tickmarkPlacement:'on',lineWidth:0},
     yAxis:{gridLineInterpolation:'polygon',min:0,max:3,labels:{enabled:false}},
-    series:radarSeries,credits:{enabled:false}});
+    series:platforms.map(p => ({name:p,pointPlacement:'on',data:criteria.map(c => {
+      const m = AUDIT_DATA.filter(r => r.platform===p && r.criterion===c);
+      return m.length ? 3 - Math.max(...m.map(x => x.severity)) : 3;
+    })}))});
 
-  // 4. Heatmap
-  const heatData = [];
-  platforms.forEach((p,pi) => {
-    criteria.forEach((c,ci) => {
-      const matches = AUDIT_DATA.filter(r=>r.platform===p&&r.criterion===c);
-      const maxSev = matches.length ? Math.max(...matches.map(m=>m.severity)) : -1;
-      if(maxSev >= 0) heatData.push([ci,pi,maxSev]);
-    });
-  });
+  const heat = [];
+  platforms.forEach((p,pi) => criteria.forEach((c,ci) => {
+    const m = AUDIT_DATA.filter(r => r.platform===p && r.criterion===c);
+    if(m.length) heat.push([ci,pi,Math.max(...m.map(x => x.severity))]);
+  }));
   Highcharts.chart('chartHeatmap',{chart:{type:'heatmap'},title:{text:null},
-    xAxis:{categories:criteria},yAxis:{categories:platforms,reversed:true},
-    colorAxis:{min:0,max:3,stops:[[0,'#22c55e'],[.33,'#eab308'],[.66,'#f97316'],[1,'#ef4444']]},
-    series:[{data:heatData,borderWidth:2,borderColor:'#0a0e1a',
-      dataLabels:{enabled:true,color:'#fff',style:{fontSize:'11px',fontWeight:'600',textOutline:'none'},
-        formatter:function(){return ['OK','Mod','Ser','Crit'][this.point.value]||'';}}}],
-    legend:{enabled:false},credits:{enabled:false}});
+    xAxis:{categories:criteria},yAxis:{categories:platforms,reversed:true,title:{text:null}},
+    colorAxis:{min:0,max:3,stops:[[0,'#166534'],[.33,'#854d0e'],[.66,'#9a3412'],[1,'#991b1b']],labels:{enabled:false}},
+    series:[{name:'Severidade',data:heat,borderWidth:2,borderColor:'#0a0e1a',
+      dataLabels:{enabled:true,color:'#fff',style:{fontSize:'12px',fontWeight:'700',textOutline:'none'},
+        formatter:function(){ return ['OK','Moderado','Sério','Crítico'][this.point.value] || ''; }}}],
+    legend:{enabled:false}});
 }
 
-// ========== EVENT LISTENERS ==========
-// Mic button
-document.getElementById('micBtn').addEventListener('click', () => {
-  if(jarvisState === 'idle'){
-    setJarvisState('wake','<strong>Ouvindo...</strong> Aguardando comando');
-    const greeting = pick(JARVIS_GREETINGS);
-    addChat('jarvis', greeting);
-    speak(greeting);
-    startListening();
-    jarvisState = 'listening';
-    listenTimeout = setTimeout(() => {
-      if(jarvisState === 'listening'){
-        const bye = pick(JARVIS_BYE);
-        addChat('jarvis', bye);
-        speak(bye);
-        stopListening();
-      }
-    }, 15000);
-  } else {
-    stopListening();
-  }
-});
+// ========== EVENTOS ==========
+$('micBtn').addEventListener('click', toggleMic);
+function toggleMic(){
+  if(!SR){ renderStatus(); reply('Este navegador não reconhece voz. Digite o comando no campo de texto.'); return; }
+  if(mode === 'awaiting'){ pending = null; stopSpeaking(); goIdle(); announce('Microfone desativado'); }
+  else { micProblem = ''; stopSpeaking(); enterAwaiting(); }
+}
 
-// Text input
-function handleTextCommand(){
-  const input = document.getElementById('textInput');
+$('cmdForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = $('textInput');
   const text = input.value.trim();
   if(!text) return;
   input.value = '';
   addChat('user', text);
-  const result = processCommand(text);
-  const prefix = pick(JARVIS_CONFIRM);
-  const reply = prefix + ' ' + result.speech;
-  addChat('jarvis', reply);
-  speak(reply);
-  announceToSR(reply);
-}
-document.getElementById('sendBtn').addEventListener('click', handleTextCommand);
-document.getElementById('textInput').addEventListener('keydown', e => { if(e.key==='Enter') handleTextCommand(); });
-
-// Space bar shortcut
-document.addEventListener('keydown', e => {
-  if(e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA'){
-    e.preventDefault();
-    document.getElementById('micBtn').click();
-  }
-  if(e.code === 'Escape') stopListening();
+  stopSpeaking();
+  const wasAwaiting = mode === 'awaiting';
+  const w = splitWake(norm(text));
+  runCommand(w && w.rest ? w.rest : text);
+  if(wasAwaiting) clearTimeout(awaitTimer);
 });
 
-// ========== INIT ==========
-renderDevices();
-renderAuditTable();
-renderStats();
-
-// ========== AUTO WELCOME FOR BLIND USERS ==========
-setTimeout(function() {
-  // Announce via aria-live (screen readers like NVDA pick this up)
-  var liveRegion = document.getElementById('aria-live');
-  if (liveRegion) {
-    liveRegion.textContent = 'Bem-vindo ao AccessHome Voice. Eu sou o Jarvis, seu assistente de casa inteligente. Diga Jarvis para comecar a me usar. Ou pressione o botao do microfone.';
+document.addEventListener('keydown', e => {
+  // Alt+M: falar | Alt+R: repetir última resposta | Esc: cancelar / calar
+  if(e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM'){ e.preventDefault(); toggleMic(); }
+  else if(e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyR'){
+    e.preventDefault();
+    if(lastReply){ stopSpeaking(); if(settings.voice) speak(lastReply); else announce(lastReply); }
   }
-  
-  // Also speak via TTS for users without screen readers
-  if ('speechSynthesis' in window) {
-    var utter = new SpeechSynthesisUtterance('Bem-vindo ao AccessHome. Eu sou o Jarvis, seu assistente de casa inteligente. Diga Jarvis para comecar a me usar.');
-    utter.lang = 'pt-BR';
-    utter.rate = 1.0;
-    utter.pitch = 0.9;
-    // Find a Portuguese voice
-    var voices = speechSynthesis.getVoices();
-    var ptVoice = voices.find(function(v) { return v.lang.startsWith('pt'); });
-    if (ptVoice) utter.voice = ptVoice;
-    speechSynthesis.speak(utter);
+  else if(e.key === 'Escape'){
+    stopSpeaking(); pending = null;
+    if(mode === 'awaiting') goIdle();
   }
-  
-  // Update status bar
-  var statusText = document.getElementById('jarvis-status-text');
-  if (statusText) statusText.textContent = 'Diga "Jarvis" para ativar';
-}, 1500);
+});
 
-// Voices load async - retry TTS if voices weren't ready
-if ('speechSynthesis' in window) {
-  speechSynthesis.onvoiceschanged = function() {
-    // Only fire once
-    speechSynthesis.onvoiceschanged = null;
-  };
+// Ajustes
+function initSettings(){
+  $('optVoice').checked = settings.voice;
+  $('optWake').checked = settings.wake;
+  $('optContrast').value = settings.contrast;
+  $('optSize').value = settings.size;
+  setRate(settings.rate);
+  $('optVoice').addEventListener('change', e => { settings.voice = e.target.checked; if(!settings.voice) stopSpeaking(); saveSettings(); });
+  $('optWake').addEventListener('change', e => {
+    settings.wake = e.target.checked; saveSettings();
+    if(mode !== 'awaiting') goIdle();
+  });
+  $('optVoiceName').addEventListener('change', e => { settings.voiceName = e.target.value; saveSettings(); });
+  $('optRate').addEventListener('input', e => setRate(parseFloat(e.target.value)));
+  $('optContrast').addEventListener('change', e => { settings.contrast = e.target.value; applyDisplaySettings(); saveSettings(); });
+  $('optSize').addEventListener('change', e => { settings.size = e.target.value; applyDisplaySettings(); saveSettings(); });
+  $('btnTestVoice').addEventListener('click', () => {
+    const was = settings.voice; settings.voice = true;
+    speak('Olá! Esta é a voz do assistente. Diga Ok Casa para começar.', () => { settings.voice = was; });
+  });
+  applyDisplaySettings();
+  if(synth){
+    loadVoices();
+    if(typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', loadVoices);
+    else synth.onvoiceschanged = loadVoices;
+  } else {
+    $('optVoiceName').disabled = true; $('btnTestVoice').disabled = true;
+  }
 }
 
-// Start passive listening for wake word (if supported)
-try {
-  recognition = initRecognition();
-  if(recognition){
-    jarvisState = 'idle';
-    recognition.start();
-  }
-} catch(e){}
+// ========== INICIALIZAÇÃO ==========
+initSettings();
+buildDevices();
+buildFilterBar();
+renderAuditTable();
+renderStats();
+addChat('assistant', 'Olá! Diga “Ok Casa” seguido de um comando, como “ligar a luz da sala”. Você também pode digitar no campo abaixo ou dizer “ajuda”.');
+announce('AccessHome Voz carregado. Diga Ok Casa e um comando, use Alt mais M para falar, ou digite no campo de comando.');
 
+// Escuta passiva: só funciona se o navegador já tiver permissão; senão, o primeiro toque no microfone pede.
+if(SR && settings.wake){
+  setMode('passive');
+  startRecog();
+} else {
+  renderStatus();
+}
 </script>
 </body>
 </html>

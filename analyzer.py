@@ -8,9 +8,11 @@ Pesquisa: PICTA 2026 — Senac SP
 
 import argparse
 import asyncio
+import html as htmllib
 import json
 import os
 import sys
+import time
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
@@ -48,8 +50,8 @@ WCAG_CRITERIA_MAP = {
 # Matriz de Severidade (baseada na pesquisa)
 SEVERITY_WEIGHTS = {
     "critical": 3,
-    "serious": 3,
-    "moderate": 2,
+    "serious": 2,
+    "moderate": 1,
     "minor": 1,
 }
 
@@ -171,9 +173,17 @@ async def run_keyboard_test(page) -> KeyboardResult:
                     ariaLabel: el.getAttribute('aria-label') || '',
                     hasVisibleFocus: (() => {
                         const style = getComputedStyle(el);
-                        return style.outlineStyle !== 'none' || 
-                               style.boxShadow !== 'none' ||
-                               el.matches(':focus-visible');
+                        const outline = style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0;
+                        return outline || style.boxShadow !== 'none';
+                    })(),
+                    key: (() => {
+                        let n = el, path = [];
+                        while (n && n.nodeType === 1 && n !== document.body) {
+                            const i = n.parentElement ? Array.from(n.parentElement.children).indexOf(n) : 0;
+                            path.push(n.tagName.toLowerCase() + ':' + i);
+                            n = n.parentElement;
+                        }
+                        return path.join('>');
                     })()
                 };
             }
@@ -182,7 +192,7 @@ async def run_keyboard_test(page) -> KeyboardResult:
         if not focused:
             break
 
-        element_id = f"{focused['tag']}#{focused['id']}.{focused['className']}"
+        element_id = f"{focused['tag']}#{focused['id']}.{focused['className']}@{focused['key']}"
         visited_elements.append(element_id)
 
         if not focused.get('hasVisibleFocus', True):
@@ -269,6 +279,9 @@ def generate_html_report(report: AuditReport, output_path: str):
         key = WCAG_CRITERIA_MAP.get(v.wcag_criterion, v.wcag_criterion or "Outro")
         violations_by_wcag[key] = violations_by_wcag.get(key, 0) + 1
 
+    wcag_labels_json = json.dumps(list(violations_by_wcag.keys())).replace("<", chr(92) + "u003c")
+    wcag_values_json = json.dumps(list(violations_by_wcag.values()))
+
     # Dados do teste de teclado
     kb_data = ""
     if report.keyboard_result:
@@ -331,7 +344,7 @@ footer {{ text-align: center; color: var(--color-text-secondary); font-size: 12p
 <body>
 
 <h1>🏠 AccessHome Analyzer — Relatório de Auditoria</h1>
-<p class="subtitle">URL: {report.url} | {report.timestamp} | Tempo de scan: {report.scan_time:.1f}s</p>
+<p class="subtitle">URL: {htmllib.escape(report.url)} | {report.timestamp} | Tempo de scan: {report.scan_time:.1f}s</p>
 
 <div class="kpi-row">
     <div class="kpi"><div class="kpi-value" style="color:var(--color-error)">{report.critical_count}</div><div class="kpi-label">Críticas (Peso 3)</div></div>
@@ -364,12 +377,12 @@ footer {{ text-align: center; color: var(--color-text-secondary); font-size: 12p
         badge_class = "badge-critical" if v.severity_weight == 3 else "badge-serious" if v.severity_weight == 2 else "badge-moderate"
         impact_label = "Crítica" if v.severity_weight == 3 else "Séria" if v.severity_weight == 2 else "Moderada"
         html += f"""<tr>
-            <td><code>{v.id}</code></td>
+            <td><code>{htmllib.escape(v.id)}</code></td>
             <td><span class="badge {badge_class}">{impact_label}</span></td>
             <td>{v.severity_weight}</td>
-            <td>{v.help}</td>
+            <td>{htmllib.escape(v.help)}</td>
             <td>{v.nodes_count}</td>
-            <td>{v.wcag_criterion or '—'}</td>
+            <td>{htmllib.escape(v.wcag_criterion) or '—'}</td>
         </tr>"""
 
     html += f"""
@@ -409,9 +422,9 @@ Highcharts.chart('chart-severity', {{
 Highcharts.chart('chart-wcag', {{
     chart: {{ type: 'bar' }},
     title: {{ text: null }},
-    xAxis: {{ categories: {json.dumps(list(violations_by_wcag.keys()))} }},
+    xAxis: {{ categories: {wcag_labels_json} }},
     yAxis: {{ title: {{ text: 'Violações' }} }},
-    series: [{{ name: 'Violações', data: {json.dumps(list(violations_by_wcag.values()))}, color: '#58a6ff' }}],
+    series: [{{ name: 'Violações', data: {wcag_values_json}, color: '#58a6ff' }}],
     legend: {{ enabled: false }},
     plotOptions: {{ bar: {{ borderRadius: 3, dataLabels: {{ enabled: true, style: {{ color: '#e6edf3' }} }} }} }}
 }});
@@ -490,7 +503,6 @@ Exemplos:
 
             progress.update(task, description="Executando auditoria axe-core...")
 
-            import time
             start = time.time()
 
             # Auditoria axe-core
