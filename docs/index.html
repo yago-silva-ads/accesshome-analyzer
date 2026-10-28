@@ -126,6 +126,7 @@ p{margin-bottom:10px}p:last-child{margin-bottom:0}
       <span class="logo-txt">Access<span>Home</span> Analyzer</span>
     </div>
     <div class="hdr-right">
+      <button type="button" class="blind-btn" id="listenBtn" aria-pressed="false" onclick="toggleListen()"><span data-ic="mic"></span><span id="listenLbl">Ok Casa: desligado</span></button>
       <button type="button" class="blind-btn" id="blindBtn" aria-pressed="false" onclick="toggleBlind()"><span id="blindIc" data-ic="eyeoff"></span><span id="blindLbl">Simular olhos fechados</span></button>
       <span class="badge-picta">CICTA 2026 · Senac SP</span>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Alternar entre tema claro e escuro" title="Alternar tema">
@@ -366,6 +367,8 @@ body.blind #blindVeil{display:flex}
 .b,.lab-tab,.sugg,.filter-btn,.eye,.badge-picta,.kbd{font-family:var(--fb);text-transform:none;letter-spacing:0}
 .b{font-size:.8rem;font-weight:700}
 h1:focus,h2:focus{outline:none;box-shadow:none}
+.hdr-right{flex-wrap:wrap;justify-content:flex-end}
+#listenBtn[aria-pressed="true"]{background:var(--ok-g);border-color:var(--ok);color:var(--ok)}
 </style>
 
 <main class="main" id="mainContent" tabindex="-1">
@@ -383,7 +386,7 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
     <div class="spec">
       <div><b>3</b><span>plataformas auditadas</span></div>
       <div><b>4</b><span>ferramentas comparadas</span></div>
-      <div><b>26</b><span>registros de auditoria</span></div>
+      <div><b>12</b><span>avaliações plataforma x critério</span></div>
       <div><b>3 de 3</b><span>falharam no critério 4.1.2</span></div>
     </div>
     <div class="author-strip">
@@ -433,7 +436,7 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
       <div class="jnum">5</div>
       <div class="jbody">
         <div class="jtitle">Explore os Dados e a Solução</div>
-        <div class="jdesc">26 registros de auditoria real, gráficos comparativos, e como isso se aplica ao mercado de Smart Home.</div>
+        <div class="jdesc">12 avaliações plataforma por critério, o comparativo das quatro ferramentas e gráficos.</div>
       </div>
       <div class="jcheck" data-ic="check"></div>
     </div>
@@ -451,7 +454,7 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
       <button class="mic-big" id="micBig" onclick="toggleMic()" aria-label="Pressione para falar com o Ok Casa">
         <span id="micBigIcon" data-ic="mic"></span>
       </button>
-      <div class="mic-hint" id="micHint">Pressione e diga "Ok Casa" seguido de um comando</div>
+      <div class="mic-hint" id="micHint">Toque para ativar a escuta. Depois diga "Ok Casa" e um comando.</div>
     </div>
 
     <div class="chat-log" id="chatLog">
@@ -558,20 +561,16 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
     <div class="card"><h3>Por que acontece?</h3>
       <p style="font-size:.88rem">SharpTools tem HTML <strong>sintaticamente correto</strong> (Lighthouse dá 83), mas <strong>semanticamente vazio</strong>: sem <code>aria-label</code>, sem <code>role</code>, sem <code>aria-live</code>. O NVDA precisa do <em>significado</em>, não da sintaxe.</p></div>
     <div class="card"><h3>WAVE é obsoleta</h3>
-      <p style="font-size:.88rem">WAVE injeta ícones em HTML estático. openHAB usa Vue.js — a SPA re-renderiza e apaga os ícones. Resultado: <strong>falso negativo total</strong>.</p></div>
+      <p style="font-size:.88rem">WAVE injeta ícones em HTML estático. openHAB usa Vue.js — a SPA re-renderiza e apaga os ícones. Resultado: <strong>falha completa na análise</strong>.</p></div>
   </div>
 
   <div class="card">
-    <h3>Matriz WCAG — Severidade por Plataforma × Critério</h3>
+    <h3>Matriz de severidade por plataforma e critério WCAG (0 a 3)</h3>
     <div class="tw"><table class="tbl">
       <thead><tr><th>Plataforma</th><th>1.1.1</th><th>1.4.3</th><th>2.1.1</th><th>4.1.2</th><th>Média</th></tr></thead>
-      <tbody>
-        <tr><td style="font-family:var(--fd);font-weight:700">Home Assistant</td><td><span class="b b-dn">3</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-ok">0</span></td><td><span class="b b-dn">3</span></td><td style="font-family:var(--fm);font-weight:700">2,25</td></tr>
-        <tr><td style="font-family:var(--fd);font-weight:700">openHAB</td><td><span class="b b-dn">3</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-ok">0</span></td><td><span class="b b-dn">3</span></td><td style="font-family:var(--fm);font-weight:700">2,50</td></tr>
-        <tr><td style="font-family:var(--fd);font-weight:700">SharpTools</td><td><span class="b b-dn">3</span></td><td><span class="b b-ok">0</span></td><td><span class="b b-ok">0</span></td><td><span class="b b-dn">3</span></td><td style="font-family:var(--fm);font-weight:700">1,50*</td></tr>
-      </tbody>
+      <tbody><tr><td style="font-weight:700">Home Assistant</td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,25</td></tr><tr><td style="font-weight:700">openHAB</td><td><span class="b b-dn">3</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,50</td></tr><tr><td style="font-weight:700">SharpTools</td><td><span class="b b-wn">2</span></td><td><span class="b b-mod">1</span></td><td><span class="b b-dn">3</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,25</td></tr></tbody>
     </table></div>
-    <p style="font-size:.78rem;margin-top:10px" class="t-m">*Score numérico baixo, mas NVDA = inutilizável. É a prova viva do paradoxo: a média não captura a experiência real.</p>
+    <p style="font-size:.9rem;margin-top:10px" class="t-m">Média = soma dos quatro critérios dividida por quatro. SharpTools e Home Assistant empatam em 2,25, mas só o teste com NVDA mostra a diferença na experiência real: o SharpTools foi inutilizável.</p>
   </div>
 </section>
 
@@ -609,7 +608,7 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
     <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.4</span><span class="cola-title">Resultados</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <div class="cola-banner-txt">"Pontuação automatizada não significa acessibilidade efetiva."</div>
-      <ul class="cola-pts"><li>4.1.2 falhou em <strong>100%</strong> das plataformas</li><li>SharpTools: maior nota, pior NVDA</li><li>WAVE gerou falsos negativos em HA e openHAB</li></ul>
+      <ul class="cola-pts"><li>4.1.2 falhou em <strong>100%</strong> das plataformas</li><li>SharpTools: maior nota, pior NVDA</li><li>WAVE falhou no openHAB e ficou limitado no Home Assistant</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
@@ -643,21 +642,21 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
 <section class="sec" id="dados">
   <div class="eye">Dados completos da pesquisa</div>
   <h2>Auditoria WCAG 2.1 — 3 Plataformas</h2>
-  <p class="lead">26 registros com Lighthouse, Axe DevTools, WAVE e NVDA.</p>
+  <p class="lead">12 avaliações (3 plataformas x 4 critérios WCAG) com os resultados de Lighthouse, Axe DevTools, WAVE e NVDA.</p>
 
   <div class="grid3" id="statsGrid"></div>
 
   <div class="charts-grid">
-    <div class="chart-box"><div class="chart-ttl">Distribuição de Severidade</div><div class="chart-area" id="cSev"></div></div>
-    <div class="chart-box"><div class="chart-ttl">Registros por Ferramenta</div><div class="chart-area" id="cTools"></div></div>
-    <div class="chart-box"><div class="chart-ttl">Radar por Plataforma</div><div class="chart-area" id="cRadar"></div></div>
+    <div class="chart-box"><div class="chart-ttl">Severidade das 12 avaliações</div><div class="chart-area" id="cSev"></div></div>
+    <div class="chart-box"><div class="chart-ttl">Erros do Axe DevTools por severidade</div><div class="chart-area" id="cTools"></div></div>
+    <div class="chart-box"><div class="chart-ttl">Severidade por critério (0 a 3)</div><div class="chart-area" id="cRadar"></div></div>
     <div class="chart-box"><div class="chart-ttl">Mapa de Calor WCAG</div><div class="chart-area" id="cHeat"></div></div>
   </div>
 
   <div class="card" style="margin-top:14px">
     <div class="filter-bar" id="filterBar"></div>
     <div class="tw"><table class="tbl" id="auditTbl">
-      <thead><tr><th>Plataforma</th><th>Ferramenta</th><th>Critério</th><th>Severidade</th><th>Descrição</th></tr></thead>
+      <thead><tr><th>Plataforma</th><th>Critério</th><th>Lighthouse</th><th>Axe DevTools</th><th>WAVE</th><th>NVDA</th><th>Severidade</th></tr></thead>
       <tbody id="auditBody"></tbody>
     </table></div>
   </div>
@@ -670,7 +669,7 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
   <p class="lead">Por que esta pesquisa importa para o mercado de IoT.</p>
 
   <div class="grid2">
-    <div class="market-card"><div class="market-num">1,5B</div><div class="market-lbl">Pessoas com deficiência visual no mundo (OMS)</div></div>
+    <div class="market-card"><div class="market-num">Lei 13.146</div><div class="market-lbl">Art. 63 da Lei Brasileira de Inclusão exige acessibilidade em sítios da internet</div></div>
     <div class="market-card"><div class="market-num">3/3</div><div class="market-lbl">Plataformas falharam no critério 4.1.2</div></div>
     <div class="market-card"><div class="market-num">83</div><div class="market-lbl">Score da plataforma com PIOR experiência real</div></div>
     <div class="market-card"><div class="market-num">30-40%</div><div class="market-lbl">Máx. de barreiras detectadas automaticamente</div></div>
@@ -777,7 +776,7 @@ document.querySelectorAll('.tab').forEach(t=>{
     if(s){s.classList.add('on');
       const h=s.querySelector('h2,h1');
       if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:false});}
-      announce('Seção '+t.textContent.replace(/[^\p{L}\p{N} ]/gu,'').trim()+'. '+(h?h.textContent.trim():''),true);
+      announce(SUMMARY[t.dataset.sec]||'',true);
     }
     if(t.dataset.sec==='dados')setTimeout(renderCharts,60);
   });
@@ -872,16 +871,16 @@ function appendMsg(txt,cls){
   const log=document.getElementById('chatLog');
   const d=document.createElement('div');
   d.className='msg '+cls;
-  d.innerHTML=cls==='msg-bot'?`<strong>Ok Casa:</strong> ${txt}`:txt;
+  if(cls==='msg-bot'){const st=document.createElement('strong');st.textContent='Ok Casa: ';d.appendChild(st);d.appendChild(document.createTextNode(txt));}else{d.textContent=txt;}
   log.appendChild(d);
   log.scrollTop=log.scrollHeight;
 }
 function matchCommand(txt){
-  const t=txt.toLowerCase().replace(/ok casa/gi,'').trim();
+  const t=norm(txt.replace(/ok casa/gi,''));
   let best=null,bestScore=0;
   COMMANDS.forEach(c=>{
     c.p.forEach(phrase=>{
-      if(t.includes(phrase)&&phrase.length>bestScore){best=c;bestScore=phrase.length;}
+      const np=norm(phrase);if(t.includes(np)&&np.length>bestScore){best=c;bestScore=np.length;}
     });
   });
   return best;
@@ -891,16 +890,9 @@ function runCmd(raw){
   const inp=document.getElementById('cmdInput');
   appendMsg(raw,'msg-user');
   if(inp)inp.value='';
-  const cmd=matchCommand(raw);
   let resp;
-  if(cmd){
-    if(cmd.fn)cmd.fn();
-    resp=cmd.r();
-  } else {
-    resp='Não entendi. Diga: "ligar luz da sala", "trancar porta", "temperatura" ou "ajuda".';
-  }
-  setTimeout(()=>appendMsg(resp,'msg-bot'),280);
-  speak(resp);
+  try{resp=route(raw);}catch(err){resp='Não consegui executar esse comando.';}
+  if(resp){setTimeout(()=>appendMsg(resp,'msg-bot'),200);speak(resp);}
 }
 document.getElementById('cmdInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')runCmd(e.target.value);});
 
@@ -914,12 +906,13 @@ if(window.speechSynthesis){pickVoice();speechSynthesis.onvoiceschanged=pickVoice
 let lastSpoken='';
 function speak(text,rate){
   lastSpoken=text;
+  Listen.speakingUntil=Date.now()+Math.max(1500,text.length*72);
   const cap=document.getElementById('blindCaption');if(cap)cap.textContent=text;
   const live=document.getElementById('live');
   if(live){live.textContent='';setTimeout(()=>{live.textContent=text;},30);}
   if(!window.speechSynthesis)return;
   const u=new SpeechSynthesisUtterance(text);
-  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;
+  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onend=u.onerror=()=>{Listen.speakingUntil=Date.now()+400;};
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
 function announce(text,onlyBlind){if(!onlyBlind||document.body.classList.contains('blind'))speak(text);}
@@ -931,7 +924,9 @@ function toggleBlind(force){
   const b=document.getElementById('blindBtn');
   b.setAttribute('aria-pressed',on);
   document.getElementById('blindLbl').textContent=on?'Abrir os olhos (Esc)':'Simular olhos fechados';document.getElementById('blindIc').innerHTML=ic(on?'eye':'eyeoff');
-  speak(on?'Modo olhos fechados ativado. Use Tab para avançar, Shift Tab para voltar, Enter para ativar, e Escape para sair. Para falar com a casa, vá até a seção Ok Casa.':'Olhos abertos. Modo olhos fechados desativado.');
+  speak(on?'Modo olhos fechados ativado. Fale Ok Casa e um comando, por exemplo: Ok Casa, ajuda. Ou: Ok Casa, ler a página. Você também pode usar Tab, Shift Tab, Enter e Escape.':'Olhos abertos. Modo olhos fechados desativado.');
+  if(on&&SRClass&&!Listen.on)startListening(false);
+  setListenUI();
   if(on){document.getElementById('mainContent').focus();}
 }
 function describe(el){
@@ -959,26 +954,300 @@ document.addEventListener('focusin',e=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&document.body.classList.contains('blind')){toggleBlind(false);}
-  if(e.altKey&&e.key.toLowerCase()==='m'){e.preventDefault();goTab('voz');setTimeout(toggleMic,150);}
+  if(e.altKey&&e.key.toLowerCase()==='m'){e.preventDefault();toggleListen();}
   if(e.altKey&&e.key.toLowerCase()==='r'){e.preventDefault();speak(lastSpoken||'Nada para repetir.');}
 });
 
-let recogRunning=false,SR=null;
-function toggleMic(){
-  const btn=document.getElementById('micBig');
-  const icon=document.getElementById('micBigIcon');
-  const hint=document.getElementById('micHint');
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    appendMsg('Reconhecimento de voz não suportado neste navegador — use o campo de texto.','msg-bot');return;
+/* ═══ BASE DE CONHECIMENTO DA PESQUISA (offline, sem chave de API) ═══ */
+function norm(t){
+  return (' '+String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()+' ');
+}
+const KB=[
+ {k:['quem e yago','quem fez','autor','quem desenvolveu','aluno','pesquisador','quem criou','quem e o yago','yago santos silva'],
+  a:'A pesquisa é de Yago Santos Silva, aluno do Centro Universitário Senac, Campus Santo Amaro, com orientação da professora doutora Claudia Bianchi Progetti. Foi apresentada no XXI CICTA 2026.'},
+ {k:['titulo','tema da pesquisa','sobre o que e a pesquisa','do que trata','resumo da pesquisa','o que e a pesquisa','resumo'],
+  a:'O título é: Análise de ferramentas automatizadas para testes de acessibilidade em interfaces de Smart Home para usuários com deficiência visual. A pesquisa compara três plataformas de casa inteligente com Lighthouse, Axe DevTools, WAVE e o leitor de tela NVDA.'},
+ {k:['objetivo','pergunta de pesquisa','o que queriam descobrir','o que queria descobrir'],
+  a:'O objetivo foi investigar a eficácia de ferramentas automatizadas de auditoria e de testes manuais na detecção de barreiras de acessibilidade em interfaces de Smart Home voltadas a pessoas com deficiência visual.'},
+ {k:['problema','por que importa','relevancia','importancia','justificativa','autonomia','por que fez'],
+  a:'Painéis de casa inteligente prometem autonomia, mas quando não são acessíveis, tarefas simples como acender uma luz ou trancar uma porta passam a depender de outra pessoa.'},
+ {k:['metodologia','metodo','como foi feita','como foi a pesquisa','tipo de pesquisa','procedimento','como voce testou','como testou'],
+  a:'É uma pesquisa aplicada, qualitativa, exploratória e comparativa. Em cada plataforma foram avaliadas duas funcionalidades: o acesso ao painel principal e o acionamento de um dispositivo, com quatro critérios da WCAG 2.1. A auditoria automática usou Lighthouse, Axe DevTools e WAVE; a validação manual usou teclado e NVDA. As barreiras foram classificadas numa matriz de severidade de 0 a 3.'},
+ {k:['plataformas','quais plataformas','quais sistemas','quais foram as plataformas'],
+  a:'Foram três: Home Assistant, com Shadow DOM e Lit Elements; openHAB, uma aplicação Vue.js com WebSocket; e SharpTools, em nuvem com HTML estático.'},
+ {k:['por que tres','so tres','poucas plataformas','amostra','escolha das plataformas','por que essas plataformas'],
+  a:'A escolha buscou diversidade de arquitetura: Shadow DOM, aplicação de página única com WebSocket e HTML estático. Em pesquisa qualitativa exploratória, importa a profundidade da análise. A amostra pequena é uma limitação reconhecida.'},
+ {k:['home assistant','homeassistant'],
+  a:'Home Assistant: Lighthouse 75, 12 erros no Axe, sendo 4 críticos. O Shadow DOM esconde problemas das ferramentas, e com NVDA a navegação é parcial, com botões liga e desliga sem anúncio de estado. Severidade média 2,25.'},
+ {k:['openhab','open hab'],
+  a:'openHAB: Lighthouse 70, o menor; 18 erros no Axe, 7 críticos. O WAVE falhou por completo e, com NVDA, as atualizações que chegam por WebSocket não são anunciadas. Severidade média 2,5, a maior das três.'},
+ {k:['sharptools','sharp tools'],
+  a:'SharpTools: Lighthouse 83, o maior; 6 erros no Axe, 2 críticos. Com NVDA foi a pior: a pessoa ouve clicável, link, clicável, sem saber o que é cada bloco. Severidade média 2,25.'},
+ {k:['paradoxo','maior nota','score alto','nota alta','pontuacao alta','por que o sharptools','principal achado','achado principal','principal descoberta','conclusao'],
+  a:'O paradoxo central: o SharpTools teve a maior nota automática, 83, e a pior experiência com NVDA. O HTML é válido, mas semanticamente vazio, sem aria-label, role ou aria-live. Nota alta não significa acessibilidade real.'},
+ {k:['criterios','quais criterios','quatro criterios','criterios wcag','criterios avaliados'],
+  a:'Foram quatro critérios da WCAG 2.1: 1.1.1 conteúdo não textual, 1.4.3 contraste mínimo, 2.1.1 teclado e 4.1.2 nome, função e valor.'},
+ {k:['por que quatro','so quatro criterios','por que esses criterios'],
+  a:'Os quatro cobrem percepção, operabilidade e robustez e são os mais relevantes para painéis de IoT. Outros critérios ficam para trabalhos futuros.'},
+ {k:['o que e wcag','o que e a wcag','wcag significa','diretrizes de acessibilidade','wcag'],
+  a:'WCAG são as Diretrizes de Acessibilidade para Conteúdo Web, do W3C. A pesquisa usa a versão 2.1, níveis A e AA.'},
+ {k:['1 1 1','um ponto um ponto um','conteudo nao textual','texto alternativo'],
+  a:'O critério 1.1.1 exige alternativa em texto para imagens e ícones, para que o leitor de tela diga o que são. É nível A. Severidade: 2 no Home Assistant e no SharpTools, 3 no openHAB.'},
+ {k:['1 4 3','um ponto quatro ponto tres','contraste'],
+  a:'O critério 1.4.3 exige contraste mínimo de 4,5 para 1 entre texto e fundo. É nível AA. O SharpTools foi bem; Home Assistant e openHAB tiveram textos abaixo desse valor.'},
+ {k:['2 1 1','dois ponto um ponto um','teclado'],
+  a:'O critério 2.1.1 exige que tudo seja operável pelo teclado, a base de quem usa leitor de tela. O SharpTools teve severidade 3, com foco desordenado e loops. Home Assistant e openHAB, severidade 2.'},
+ {k:['4 1 2','quatro ponto um ponto dois','nome funcao valor','nome funcao e valor','falha universal','falhou em todas'],
+  a:'O critério 4.1.2 exige que cada controle tenha nome, função e valor identificáveis, por role e aria-label. Falhou nas três plataformas, com severidade 3: é uma lacuna sistêmica. Frameworks de componentes não forçam ARIA, e testes de acessibilidade raramente entram na integração contínua.'},
+ {k:['severidade','matriz','escala','media de severidade','como calculou','calculo','nota de severidade'],
+  a:'A matriz vai de 0 a 3: sem barreira, menor, moderada e crítica. A média soma os quatro critérios e divide por quatro: Home Assistant 2,25, openHAB 2,5 e SharpTools 2,25.'},
+ {k:['lighthouse'],
+  a:'Lighthouse é a ferramenta do Chrome que dá nota de 0 a 100. Serve para triagem, mas é superficial: não entra no Shadow DOM e a nota pode enganar.'},
+ {k:['axe','deque','axe devtools'],
+  a:'O Axe DevTools, da Deque Systems, foi a ferramenta automática mais confiável: classifica por severidade, aponta o elemento exato e teve poucos falsos positivos.'},
+ {k:['wave'],
+  a:'O WAVE injeta ícones na página. Falhou por completo no openHAB e foi limitado no Home Assistant, porque frameworks como Vue reescrevem a página. Só funcionou bem no SharpTools. Não é recomendado para aplicações modernas.'},
+ {k:['nvda','leitor de tela','o que e nvda','o que e o nvda','screen reader'],
+  a:'NVDA é um leitor de tela gratuito e de código aberto para Windows, que fala tudo o que aparece na tela. Foi indispensável: revelou barreiras que nenhuma ferramenta automática detectou.'},
+ {k:['30 a 40','40 por cento','cobertura','quanto detectam','quanto as ferramentas detectam','limite das ferramentas','ferramentas automaticas detectam'],
+  a:'Ferramentas automáticas detectam só parte das barreiras, na ordem de 30 a 40 por cento, segundo a literatura usada na pesquisa. O restante exige validação humana com leitor de tela.'},
+ {k:['pipeline','recomendacao','qual ferramenta usar','recomenda','recomendacoes','o que recomenda','boas praticas','o que voce recomenda'],
+  a:'A recomendação é um pipeline: Lighthouse para triagem rápida, Axe DevTools para violações precisas e NVDA para validação real. Evitar o WAVE em aplicações modernas.'},
+ {k:['accesshome','produto','ferramenta desenvolvida','analyzer','o que voce desenvolveu','solucao'],
+  a:'O AccessHome Analyzer é o produto aplicado: integra auditoria automatizada com axe-core e Playwright, simulação de navegação por teclado e um assistente de voz de referência. O código é aberto no GitHub.'},
+ {k:['lei','lbi','legislacao','obrigatorio','13 146','direito','lei brasileira de inclusao'],
+  a:'A Lei Brasileira de Inclusão, Lei 13.146 de 2015, no artigo 63, torna obrigatória a acessibilidade em sítios da internet de empresas e órgãos de governo.'},
+ {k:['limitacao','limitacoes','falhas da pesquisa','por que nao usuarios','usuarios reais','testou com pessoas','testou com cegos'],
+  a:'Limitações: amostra de três plataformas, apenas o NVDA como leitor de tela, versões específicas e ambiente controlado, sem usuários reais. Testes com pessoas com deficiência visual são o próximo passo.'},
+ {k:['proximos passos','trabalhos futuros','futuro','o que vem depois','e agora'],
+  a:'Próximos passos: mais plataformas, outros leitores de tela como JAWS e VoiceOver, mais critérios da WCAG, testes com usuários reais e contribuições de acessibilidade para Home Assistant e openHAB.'},
+ {k:['pessoa cega','usuario cego','como uma pessoa cega usa','impacto para o usuario','impacto para a pessoa','como e para o usuario'],
+  a:'Sem rótulos, a pessoa cega ouve só clicável e não sabe qual dispositivo é, qual o estado, nem se o comando funcionou. Em todas as plataformas faltou feedback de ligou ou desligou.'},
+ {k:['shadow dom'],
+  a:'Shadow DOM encapsula o interior dos componentes. Isso esconde elementos das ferramentas de auditoria e pode quebrar a propagação de atributos ARIA, como acontece no Home Assistant.'},
+ {k:['aria live','anuncio de estado','websocket','atualizacao dinamica'],
+  a:'aria-live faz o leitor de tela anunciar mudanças na página sem a pessoa navegar até elas. No openHAB ele faltou, então mudanças vindas por WebSocket ficam em silêncio.'},
+ {k:['aria','aria label'],
+  a:'ARIA são atributos que dão nome, função e estado aos elementos para as tecnologias assistivas. Exemplos: role, aria-label, aria-checked e aria-live.'},
+ {k:['como corrigir','correcao','corrigir','melhorar o sharptools','o que falta no sharptools','recomendacoes para'],
+  a:'Adicionar aria-label descritivo e role em cada bloco, aria-live para o retorno das ações, ordem de Tab coerente com o layout e títulos de seção. É o que o AccessHome ideal demonstra no NVDA Lab.'},
+ {k:['ok casa','assistente de voz','como funciona o assistente','quem e voce','o que voce faz'],
+  a:'Sou o Ok Casa, assistente de voz de referência. Em cada resposta confirmo o dispositivo, o novo estado e o contexto de segurança, como uma interface acessível deveria fazer. Também navego pelo site e respondo sobre a pesquisa.'},
+ {k:['acessibilidade digital','o que e acessibilidade','o que significa acessibilidade'],
+  a:'Acessibilidade digital é garantir que pessoas com deficiência consigam perceber, operar e compreender sites e aplicativos. Para pessoas cegas, depende de semântica que o leitor de tela consiga ler: nome, função e estado de cada controle.'},
+ {k:['casa inteligente','smart home','iot','internet das coisas'],
+  a:'Casa inteligente, ou Smart Home, reúne dispositivos conectados, como luzes, fechaduras e sensores, controlados por painéis e aplicativos. A pesquisa avalia os painéis web de três plataformas.'},
+ {k:['evento','cicta','quando sera','onde sera','horario','data da apresentacao','orientadora'],
+  a:'XXI CICTA 2026, quinta-feira, 29 de outubro, das 14h15 às 15h30, no Centro Universitário Senac, Campus Santo Amaro. Orientadora: professora doutora Claudia Bianchi Progetti.'},
+ {k:['deficiencia visual','cegueira','baixa visao','publico alvo'],
+  a:'A pesquisa foca em pessoas com deficiência visual que usam leitores de tela, como o NVDA, e navegam pelo teclado.'},
+ {k:['teclado e tab','como usar o site','atalhos','comandos de teclado'],
+  a:'Tab avança, Shift Tab volta, Enter ativa, Escape sai do modo olhos fechados, Alt M liga ou desliga a escuta do Ok Casa e Alt R repete a última fala.'}
+];
+const KB_TIPS=['o que é o critério 4.1.2','por que o SharpTools foi o pior','como foi a metodologia','qual ferramenta você recomenda','quais as limitações da pesquisa'];
+function answerKB(q){
+  const n=norm(q);
+  let best=null,score=0;
+  KB.forEach(e=>{
+    e.k.forEach(kw=>{
+      const nk=norm(kw);
+      if(n.includes(nk)){
+        const s=nk.trim().split(' ').length*3+nk.length/10;
+        if(s>score){score=s;best=e;}
+      }
+    });
+  });
+  return best?best.a:null;
+}
+
+/* ═══ SECOES: resumos e navegacao ═══ */
+const SUMMARY={
+ inicio:'Início. A tese: nota alta em teste automático não garante acessibilidade real. Três plataformas, quatro ferramentas, doze avaliações, e as três falharam no critério 4.1.2. Abaixo há um roteiro guiado em cinco etapas.',
+ voz:'Ok Casa. Assistente de voz de referência. Experimente: ligar luz da sala, trancar porta, temperatura, status ou cena noite. Cada resposta diz o dispositivo e o novo estado.',
+ nvda:'NVDA Lab. Reproduz o teste manual da pesquisa. Escolha a plataforma e avance com Tab ou diga próximo item. No SharpTools você ouve só clicável e link. No AccessHome ideal, cada item diz nome, função e estado.',
+ paradoxo:'Paradoxo. SharpTools: Lighthouse 83 e seis erros no Axe, mas inutilizável com NVDA. Home Assistant: 75 e 12 erros, parcial. openHAB: 70 e 18 erros, parcial. A nota mais alta teve a pior experiência.',
+ cola:'Cola da apresentação. Seis seções do banner, com os pontos principais e respostas para perguntas difíceis.',
+ dados:'Dados. Doze avaliações de plataforma por critério: cinco críticas, seis moderadas, uma menor e nenhuma sem barreira. O Axe encontrou 6, 12 e 18 erros.',
+ mercado:'Solução. Pipeline recomendado: Lighthouse, depois Axe, depois NVDA. O AccessHome Analyzer integra auditoria, simulação de teclado e voz.'
+};
+const SECTIONS=[
+ ['inicio',['inicio','comeco','pagina inicial','principal','home']],
+ ['voz',['ok casa','assistente','voz']],
+ ['nvda',['nvda lab','nvda','laboratorio','lab','leitor de tela']],
+ ['paradoxo',['paradoxo']],
+ ['cola',['cola','roteiro da apresentacao','apresentacao']],
+ ['dados',['dados','graficos','auditoria','tabela']],
+ ['mercado',['solucao','mercado','produto']]
+];
+function currentSec(){const t=document.querySelector('.tab.on');return t?t.dataset.sec:'inicio';}
+function stepSection(d){
+  const ids=SECTIONS.map(s=>s[0]);
+  const i=ids.indexOf(currentSec());
+  const j=Math.min(ids.length-1,Math.max(0,i+d));
+  if(j===i)return d>0?'Esta é a última seção.':'Esta é a primeira seção.';
+  goTab(ids[j]);
+  return document.body.classList.contains('blind')?null:SUMMARY[ids[j]];
+}
+function focusables(){
+  return [...document.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+    .filter(e=>e.offsetParent!==null||getComputedStyle(e).position==='fixed');
+}
+function moveFocus(d){
+  const l=focusables();if(!l.length)return null;
+  const i=l.indexOf(document.activeElement);
+  const el=l[(i+d+l.length)%l.length];
+  el.focus();
+  if(!document.body.classList.contains('blind'))return describe(el);
+  return null;
+}
+
+/* ═══ ESCUTA CONTINUA "OK CASA" ═══ */
+const SRClass=window.SpeechRecognition||window.webkitSpeechRecognition;
+const Listen={on:false,rec:null,armedUntil:0,speakingUntil:0,heardWake:false,lastHeard:''};
+const WAKE=/\b(o\s?k|okay|ok|oque|oi|ei|ola|hey)\s+(casa|cassa|caza|kasa)\b/;
+function beep(){
+  try{
+    const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());
+    const o=c.createOscillator(),g=c.createGain();
+    o.frequency.value=880;g.gain.value=.07;o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.12);
+  }catch(e){}
+}
+function setListenUI(){
+  const armed=Listen.on&&Date.now()<Listen.armedUntil;
+  const lb=document.getElementById('listenBtn');
+  if(lb){lb.setAttribute('aria-pressed',Listen.on);
+    document.getElementById('listenLbl').textContent=!Listen.on?'Ok Casa: desligado':(armed?'Pode falar':'Ouvindo: diga Ok Casa');}
+  const mb=document.getElementById('micBig');
+  if(mb){mb.classList.toggle('listening',Listen.on);}
+  const mi=document.getElementById('micBigIcon');
+  if(mi)mi.innerHTML=ic(Listen.on?'stop':'mic');
+  const mh=document.getElementById('micHint');
+  if(mh)mh.textContent=!Listen.on?'Toque para ativar a escuta. Depois diga "Ok Casa" e um comando.':
+    (Listen.lastHeard?'Ouvi: "'+Listen.lastHeard+'"':(armed?'Pode falar.':'Escutando. Diga "Ok Casa" e um comando.'));
+  const bh=document.getElementById('blindHint');
+  if(bh)bh.textContent='Olhos fechados. '+(Listen.on?(armed?'Pode falar.':'Diga "Ok Casa" e um comando.'):'Escuta desligada.')+' Tab avança · Shift+Tab volta · Enter ativa · Esc sai';
+}
+function startListening(armNow){
+  if(!SRClass){
+    speak('Este navegador não oferece reconhecimento de voz. Use o Chrome ou o Edge. O teclado continua funcionando.');
+    return false;
   }
-  if(recogRunning){SR&&SR.stop();recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';return;}
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  SR=new SpeechRecognition();
-  SR.lang='pt-BR';SR.continuous=false;SR.interimResults=false;
-  SR.onresult=e=>{const t=e.results[0][0].transcript;document.getElementById('cmdInput').value=t;runCmd(t);};
-  SR.onend=()=>{recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';};
-  SR.onerror=ev=>{recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');appendMsg(ev.error==='not-allowed'?'O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço, ou digite o comando e pressione Enter.':'Não consegui ouvir ('+ev.error+'). Digite o comando e pressione Enter.','msg-bot');};
-  SR.start();recogRunning=true;btn.classList.add('listening');icon.innerHTML=ic('stop');hint.textContent='Escutando… fale agora';
+  Listen.on=true;
+  if(armNow)Listen.armedUntil=Date.now()+9000;
+  setListenUI();
+  if(Listen.rec)return true;
+  const r=new SRClass();
+  r.lang='pt-BR';r.continuous=true;r.interimResults=true;r.maxAlternatives=3;
+  r.onresult=e=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(Date.now()<Listen.speakingUntil)continue;
+      const res=e.results[i];
+      const alts=[...res].map(a=>a.transcript);
+      if(!res.isFinal){
+        if(!Listen.heardWake&&alts.some(a=>WAKE.test(norm(a)))){Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();}
+        continue;
+      }
+      Listen.heardWake=false;
+      onFinalSpeech(alts);
+    }
+  };
+  r.onerror=ev=>{
+    if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){
+      Listen.on=false;
+      appendMsg('O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço e ative a escuta de novo.','msg-bot');
+      speak('O microfone está bloqueado. Permita o microfone no navegador.');
+    }else if(ev.error==='network'){
+      appendMsg('O reconhecimento de voz do Chrome precisa de internet.','msg-bot');
+    }
+  };
+  r.onend=()=>{Listen.rec=null;if(Listen.on)setTimeout(()=>startListening(false),250);setListenUI();};
+  try{r.start();Listen.rec=r;}catch(e){}
+  return true;
+}
+function stopListening(){
+  Listen.on=false;Listen.armedUntil=0;Listen.lastHeard='';
+  if(Listen.rec){try{Listen.rec.abort();}catch(e){}Listen.rec=null;}
+  setListenUI();
+}
+function toggleListen(){
+  if(Listen.on){stopListening();speak('Escuta desligada.');}
+  else{if(startListening(true))speak('Escuta ligada. Diga Ok Casa e um comando.');}
+}
+function toggleMic(){toggleListen();}
+function onFinalSpeech(alts){
+  Listen.lastHeard=alts[0].trim();
+  let cmd=null;
+  for(const a of alts){
+    const n=norm(a),m=WAKE.exec(n);
+    if(m){cmd=n.slice(m.index+m[0].length).trim();break;}
+  }
+  if(cmd===null){
+    if(Date.now()<Listen.armedUntil){cmd=norm(alts[0]).trim();Listen.armedUntil=0;}
+    else{setListenUI();return;}
+  }
+  if(!cmd){
+    Listen.armedUntil=Date.now()+9000;
+    setListenUI();
+    speak('Pois não?');
+    return;
+  }
+  Listen.armedUntil=0;
+  runCmd(alts[0].replace(/^.*?\b(ok|okay|oi|ei|ola|hey)[\s,]+(casa|cassa|caza)\b[\s,.]*/i,'')||cmd);
+  setListenUI();
+}
+setInterval(()=>{if(Listen.on)setListenUI();},700);
+
+/* ═══ ROTEADOR DE COMANDOS: site, casa e pesquisa ═══ */
+function hasWord(n,w){return n.includes(' '+norm(w).trim()+' ');}
+function route(raw){
+  const clean=raw.replace(/\bok(ay)?[\s,]+casa\b[\s,.]*/gi,'');
+  const n=norm(clean);
+  const prev=lastSpoken;
+  const blind=document.body.classList.contains('blind');
+  const any=ws=>ws.some(w=>hasWord(n,w));
+
+  if(any(['parar','silencio','chega','cala a boca','pare']) && n.trim().split(' ').length<=3){speechSynthesis.cancel();return null;}
+  if(any(['repetir','repita','de novo','como assim'])&&n.trim().split(' ').length<=4)return prev||'Nada para repetir.';
+  if(any(['abrir os olhos','abra os olhos','sair do modo','abrir olhos'])){toggleBlind(false);return null;}
+  if(any(['fechar os olhos','feche os olhos','fechar olhos','modo olhos fechados'])){toggleBlind(true);return null;}
+  if(any(['ajuda','o que posso falar','comandos','o que voce faz'])&&!any(['pesquisa','wcag'])){
+    return 'Diga Ok Casa e depois: ir para o NVDA Lab, avançar, voltar, ler a página, próximo item, ativar, repetir, parar. Para a casa: ligar luz da sala, trancar porta, temperatura, status, cena noite. Ou pergunte sobre a pesquisa, por exemplo: o que é o critério 4.1.2.';
+  }
+  if(any(['tema escuro','modo escuro'])){if(!document.documentElement.getAttribute('data-theme')||document.documentElement.getAttribute('data-theme')==='light')toggleTheme();return 'Tema escuro ativado.';}
+  if(any(['tema claro','modo claro'])){const d=document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);if(d)toggleTheme();return 'Tema claro ativado.';}
+
+  if(any(['ler a pagina','ler pagina','leia a pagina','o que tem aqui','onde estou','ler secao','leia'])&&n.trim().split(' ').length<=5)return SUMMARY[currentSec()];
+  if(any(['proximo item','item seguinte','tab'])){return moveFocus(1);}
+  if(any(['item anterior','voltar item','shift tab'])){return moveFocus(-1);}
+  if(any(['ativar','clicar','confirmar','enter','pressionar','selecionar este'])&&n.trim().split(' ').length<=3){
+    const el=document.activeElement;if(el&&el!==document.body){el.click();return 'Ativado.';}return 'Nenhum item em foco.';
+  }
+  if(any(['avancar','proximo','proxima','seguinte','continuar','proxima secao'])&&n.trim().split(' ').length<=3){
+    if(currentSec()==='nvda'){labTab();return null;}
+    return stepSection(1);
+  }
+  if(any(['voltar','anterior','secao anterior','volta'])&&n.trim().split(' ').length<=3){
+    if(currentSec()==='nvda'&&labCursor>0){labTiles()[labCursor-1].focus();return null;}
+    return stepSection(-1);
+  }
+  if(any(['demonstracao','iniciar demonstracao','demonstracao automatica'])){goTab('nvda');if(!labAutoTimer)labAutoPlay();return null;}
+  if(any(['plataforma','testar','simular','selecionar'])&&!any(['o que','como','qual','por que','quais'])){
+    const map=[['sharptools','sharptools'],['sharp tools','sharptools'],['home assistant','homeassistant'],['openhab','openhab'],['open hab','openhab'],['ideal','ideal'],['accesshome','ideal']];
+    for(const [w,p] of map){if(n.includes(' '+w+' ')){goTab('nvda');const b=document.querySelector('.lab-tab[data-plat="'+p+'"]');if(b)b.click();return 'Plataforma '+NVDA_LAB[p].name+' selecionada. Diga próximo item para navegar.';}}
+  }
+  if(any(['ir para','va para','vai para','ir pra','abrir','abra','abre','mostrar','mostre','mostra','levar','leve','navegar','quero ver','ver'])){
+    let best=null,len=0;
+    SECTIONS.forEach(([id,al])=>al.forEach(a=>{if(n.includes(' '+a+' ')&&a.length>len){best=id;len=a.length;}}));
+    if(best){goTab(best);return blind?null:SUMMARY[best];}
+  }
+
+  const cmd=matchCommand(clean);
+  if(cmd){if(cmd.fn)cmd.fn();return cmd.r();}
+
+  const kb=answerKB(clean);
+  if(kb)return kb;
+  return 'Só respondo sobre a pesquisa, a acessibilidade para pessoas com deficiência visual, a WCAG e este site. Tente: '+KB_TIPS[Math.floor(Math.random()*KB_TIPS.length)]+'.';
 }
 
 /* ═══ NVDA LAB ═══ */
@@ -995,14 +1264,14 @@ const NVDA_LAB={
     elements:[
       {display:'menu Menu',aria:'"...grupo"',cls:'partial',note:'Shadow DOM esconde os filhos da árvore de acessibilidade'},
       {display:'bulb Luz',aria:'"...botão"',cls:'partial',note:'Role correta, mas sem aria-label — qual luz é essa?'},
-      {display:'dot Estado',aria:'"...imagem"',cls:'partial',note:'Ícone de status sem texto alternativo'},
+      {display:'dot Estado',aria:'"...gráfico"',cls:'partial',note:'Ícones lidos como gráfico ou ignorados'},
       {display:'thermo Sensor',aria:'"...grupo"',cls:'partial',note:'Card sem semântica interna — valor não é lido'},
       {display:'refresh Estado mudou',aria:'"...botão"',cls:'partial',note:'Sem aria-live — mudança de estado não é anunciada'},
     ]},
   openhab:{name:'openHAB',score:'70 (Lighthouse)',arch:'Vue.js · WebSocket',verdict:{text:'Parcial',cls:'b-wn'},
     elements:[
       {display:'grid Painel',aria:'"...botão"',cls:'partial',note:'Componente Vue renderiza sem atributos ARIA'},
-      {display:'bulb Luz',aria:'"...botão"',cls:'partial',note:'Sem label descritivo do dispositivo'},
+      {display:'bulb Luz',aria:'"...elemento vazio"',cls:'partial',note:'Widgets de dispositivos lidos como elemento vazio'},
       {display:'sliders Ajuste 75',aria:'"...campo de edição"',cls:'partial',note:'Input sem label associado'},
       {display:'dot Ligado',aria:'"...grupo"',cls:'partial',note:'Badge de status sem semântica'},
       {display:'refresh WebSocket',aria:'(silêncio total)',cls:'bad',note:'Atualização via WebSocket é silenciosa — sem aria-live'},
@@ -1089,43 +1358,30 @@ document.querySelectorAll('.lab-tab').forEach(t=>{
 });
 labRenderMeta();labRenderDash();
 
-/* ═══ AUDIT DATA ═══ */
+/* ═══ DADOS DA AUDITORIA (fonte: resultados da pesquisa) ═══ */
 const AUDIT_DATA=[
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.1.1',severity:3,desc:'Imagens e ícones sem texto alternativo adequado'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'1.4.3',severity:2,desc:'Razão de contraste insuficiente em textos secundários'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'2.1.1',severity:0,desc:'Navegação por teclado funcional'},
-  {platform:'Home Assistant',tool:'Lighthouse',criterion:'4.1.2',severity:3,desc:'Componentes interativos sem roles ARIA'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.1.1',severity:3,desc:'Ícones MDI sem aria-label ou alt text'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'1.4.3',severity:2,desc:'Contraste abaixo de 4,5:1 em labels de estado'},
-  {platform:'Home Assistant',tool:'Axe DevTools',criterion:'4.1.2',severity:3,desc:'Botões de controle sem nome acessível (Shadow DOM)'},
-  {platform:'Home Assistant',tool:'WAVE',criterion:'1.1.1',severity:0,desc:'Falso negativo — Shadow DOM impediu análise completa'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'1.1.1',severity:3,desc:'Leitor de tela não identifica ícones de dispositivos'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'2.1.1',severity:0,desc:'Navegação por teclado funcional com NVDA'},
-  {platform:'Home Assistant',tool:'NVDA',criterion:'4.1.2',severity:3,desc:'Controles anunciados como "clicável" ou "grupo" sem contexto'},
-  {platform:'openHAB',tool:'Lighthouse',criterion:'1.1.1',severity:3,desc:'Widgets sem texto alternativo'},
-  {platform:'openHAB',tool:'Lighthouse',criterion:'1.4.3',severity:2,desc:'Cores de status com baixo contraste'},
-  {platform:'openHAB',tool:'Axe DevTools',criterion:'1.4.3',severity:2,desc:'7 violações: contraste em badges e status indicators'},
-  {platform:'openHAB',tool:'Axe DevTools',criterion:'4.1.2',severity:3,desc:'Componentes Vue sem role, widgets como "elemento vazio"'},
-  {platform:'openHAB',tool:'WAVE',criterion:'1.1.1',severity:0,desc:'Falso negativo total — SPA Vue.js impediu análise'},
-  {platform:'openHAB',tool:'NVDA',criterion:'2.1.1',severity:0,desc:'Navegação básica por teclado funcional'},
-  {platform:'openHAB',tool:'NVDA',criterion:'4.1.2',severity:3,desc:'Atualizações WebSocket silenciosas — sem anúncio de mudança'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.1.1',severity:3,desc:'Tiles sem texto alternativo (maior score, pior semântica)'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'1.4.3',severity:1,desc:'Contraste levemente abaixo do recomendado'},
-  {platform:'SharpTools',tool:'Lighthouse',criterion:'4.1.2',severity:3,desc:'Dashboard tiles sem roles semânticos'},
-  {platform:'SharpTools',tool:'Axe DevTools',criterion:'1.1.1',severity:3,desc:'4 violações semânticas — tiles sem identificação programática'},
-  {platform:'SharpTools',tool:'WAVE',criterion:'1.1.1',severity:2,desc:'8 erros detectados (HTML estático permitiu análise parcial)'},
-  {platform:'SharpTools',tool:'WAVE',criterion:'1.4.3',severity:2,desc:'3 violações de contraste detectadas pelo WAVE'},
-  {platform:'SharpTools',tool:'NVDA',criterion:'2.1.1',severity:3,desc:'Foco em loop infinito entre tiles — pior experiência NVDA'},
-  {platform:'SharpTools',tool:'NVDA',criterion:'4.1.2',severity:3,desc:'NVDA lê "clicável, link, clicável" — nenhum tile identificado'},
+ {platform:'Home Assistant',criterion:'1.1.1',L:'2 avisos',A:'3 erros: ícones sem alt, cards sem label',W:'1 alerta',N:'Ícones lidos como "gráfico" ou ignorados',severity:2},
+ {platform:'Home Assistant',criterion:'1.4.3',L:'1 aviso',A:'2 erros: texto secundário abaixo de 4,5:1',W:'Sem alerta',N:'Não se aplica (visual)',severity:2},
+ {platform:'Home Assistant',criterion:'2.1.1',L:'1 aviso',A:'3 erros: elementos custom não focáveis',W:'1 alerta',N:'Tab pula controles dentro do Shadow DOM',severity:2},
+ {platform:'Home Assistant',criterion:'4.1.2',L:'3 erros',A:'4 erros críticos: custom elements sem role e aria',W:'1 alerta',N:'Função de vários controles não identificada',severity:3},
+ {platform:'openHAB',criterion:'1.1.1',L:'3 erros',A:'5 erros: widgets sem label, ícones sem aria-hidden',W:'Falhou',N:'Widgets lidos como "elemento vazio"',severity:3},
+ {platform:'openHAB',criterion:'1.4.3',L:'2 avisos',A:'3 erros: textos de estado com baixo contraste',W:'Falhou',N:'Não se aplica (visual)',severity:2},
+ {platform:'openHAB',criterion:'2.1.1',L:'2 avisos',A:'4 erros: componentes Vue sem tabindex, apenas @click',W:'Falhou',N:'Tab funciona parcialmente',severity:2},
+ {platform:'openHAB',criterion:'4.1.2',L:'4 erros',A:'6 erros críticos: componentes Vue sem role',W:'Falhou',N:'Mudanças de estado via WebSocket não anunciadas',severity:3},
+ {platform:'SharpTools',criterion:'1.1.1',L:'1 aviso',A:'2 erros: tiles sem label descritiva',W:'1 alerta',N:'Tiles lidos como "clicável" sem contexto',severity:2},
+ {platform:'SharpTools',criterion:'1.4.3',L:'Passa',A:'Sem erros',W:'Sem alerta',N:'Não se aplica (visual)',severity:1},
+ {platform:'SharpTools',criterion:'2.1.1',L:'1 aviso',A:'2 erros: foco inconsistente em tiles',W:'1 alerta',N:'Tab sem ordem lógica, loops, tiles inacessíveis',severity:3},
+ {platform:'SharpTools',criterion:'4.1.2',L:'1 aviso',A:'2 erros: tiles sem role e aria-label',W:'Sem alerta',N:'Função e estado não anunciados',severity:3},
 ];
-const SEV={0:{label:'Aprovado',cls:'b-ok'},1:{label:'Moderado',cls:'b-mod'},2:{label:'Sério',cls:'b-wn'},3:{label:'Crítico',cls:'b-dn'}};
+const AXE_ERRORS={'Home Assistant':[4,5,3],'openHAB':[7,6,5],'SharpTools':[2,2,2]};
+const SEV={0:{label:'Sem barreira',cls:'b-ok'},1:{label:'Menor',cls:'b-mod'},2:{label:'Moderada',cls:'b-wn'},3:{label:'Crítica',cls:'b-dn'}};
 
 function renderStats(){
   const cnt={0:0,1:0,2:0,3:0};
   AUDIT_DATA.forEach(r=>cnt[r.severity]++);
   const g=document.getElementById('statsGrid');
   g.innerHTML='';
-  [[3,'Crítico','t-dn'],[2,'Sério','t-wn'],[1,'Moderado','t-m'],[0,'Aprovado','t-ok']].forEach(([s,l,c])=>{
+  [[3,'Críticas','t-dn'],[2,'Moderadas','t-wn'],[1,'Menores','t-m'],[0,'Sem barreira','t-ok']].forEach(([s,l,c])=>{
     g.innerHTML+=`<div class="card stat"><div class="stat-n ${c}">${cnt[s]}</div><div class="stat-l">${l}</div></div>`;
   });
 }
@@ -1137,11 +1393,9 @@ function renderTable(){
   const rows=curFilter==='all'?AUDIT_DATA:AUDIT_DATA.filter(r=>r.platform===curFilter);
   body.innerHTML=rows.map(r=>{
     const s=SEV[r.severity];
-    return `<tr><td style="font-family:var(--fd);font-weight:600">${r.platform}</td>
-      <td style="font-family:var(--fm);font-size:.8rem">${r.tool}</td>
-      <td style="font-family:var(--fm);font-size:.8rem">${r.criterion}</td>
-      <td><span class="b ${s.cls}">${s.label}</span></td>
-      <td style="font-size:.82rem">${r.desc}</td></tr>`;
+    return `<tr><td style="font-weight:700">${r.platform}</td>
+      <td>${r.criterion}</td><td>${r.L}</td><td>${r.A}</td><td>${r.W}</td><td>${r.N}</td>
+      <td><span class="b ${s.cls}">${r.severity} · ${s.label}</span></td></tr>`;
   }).join('');
 }
 function buildFilters(){
@@ -1158,7 +1412,6 @@ function setFilter(f,btn){
 }
 buildFilters();renderTable();
 
-/* ═══ CHARTS ═══ */
 let chartsOk=false;
 function renderCharts(){
   if(chartsOk)return;
@@ -1166,50 +1419,48 @@ function renderCharts(){
   chartsOk=true;
   const isDark=document.documentElement.getAttribute('data-theme')==='dark'||
     (!document.documentElement.getAttribute('data-theme')&&window.matchMedia('(prefers-color-scheme:dark)').matches);
-  const tc=isDark?'#6A80A0':'#4D607A';
-  Highcharts.setOptions({chart:{backgroundColor:'transparent'},title:{style:{color:tc,fontFamily:'Atkinson Hyperlegible,sans-serif',fontWeight:'700',fontSize:'13px'}},
-    xAxis:{labels:{style:{color:tc}},lineColor:isDark?'rgba(216,230,255,.1)':'rgba(15,25,41,.1)'},
-    yAxis:{labels:{style:{color:tc}},gridLineColor:isDark?'rgba(216,230,255,.06)':'rgba(15,25,41,.06)',title:{style:{color:tc}}},
-    legend:{itemStyle:{color:tc,fontFamily:'Atkinson Hyperlegible,sans-serif',fontSize:'12px'}},
+  const tc=isDark?'#9FB0CC':'#44546E';
+  const ff='Atkinson Hyperlegible,system-ui,sans-serif';
+  Highcharts.setOptions({chart:{backgroundColor:'transparent',style:{fontFamily:ff}},title:{style:{color:tc,fontFamily:ff,fontWeight:'700',fontSize:'13px'}},
+    xAxis:{labels:{style:{color:tc}},lineColor:isDark?'rgba(216,230,255,.15)':'rgba(15,25,41,.15)'},
+    yAxis:{labels:{style:{color:tc}},gridLineColor:isDark?'rgba(216,230,255,.08)':'rgba(15,25,41,.08)',title:{style:{color:tc}}},
+    legend:{itemStyle:{color:tc,fontFamily:ff,fontSize:'12px'}},
     tooltip:{backgroundColor:isDark?'#101B2F':'#fff',style:{color:isDark?'#D8E6FF':'#0F1929'},borderColor:isDark?'rgba(216,230,255,.2)':'rgba(15,25,41,.2)'},
   });
   const cnt={0:0,1:0,2:0,3:0};
   AUDIT_DATA.forEach(r=>cnt[r.severity]++);
-  Highcharts.chart('cSev',{chart:{type:'column'},title:{text:'Por Severidade'},
-    xAxis:{categories:['Aprovado','Moderado','Sério','Crítico']},yAxis:{title:{text:''},allowDecimals:false},
-    series:[{name:'Registros',data:[
+  Highcharts.chart('cSev',{chart:{type:'column'},title:{text:null},
+    xAxis:{categories:['Sem barreira','Menor','Moderada','Crítica']},yAxis:{title:{text:'Avaliações'},allowDecimals:false},
+    series:[{name:'Avaliações',data:[
       {y:cnt[0],color:'#0A7A50'},{y:cnt[1],color:'#6464C8'},{y:cnt[2],color:'#B96F00'},{y:cnt[3],color:'#D93025'}
     ]}],legend:{enabled:false},credits:{enabled:false}});
 
-  const toolCnt={};
-  AUDIT_DATA.forEach(r=>{toolCnt[r.tool]=(toolCnt[r.tool]||0)+1;});
-  Highcharts.chart('cTools',{chart:{type:'bar'},title:{text:'Por Ferramenta'},
-    xAxis:{categories:Object.keys(toolCnt)},yAxis:{title:{text:''},allowDecimals:false},
-    series:[{name:'Registros',data:Object.values(toolCnt).map((v,i)=>({y:v,color:['#0055E5','#0A7A50','#B96F00','#D93025'][i]}))}],
-    legend:{enabled:false},credits:{enabled:false}});
+  const plats=Object.keys(AXE_ERRORS);
+  Highcharts.chart('cTools',{chart:{type:'column'},title:{text:null},
+    xAxis:{categories:plats},yAxis:{title:{text:'Erros'},allowDecimals:false,stackLabels:{enabled:true,style:{color:tc}}},
+    plotOptions:{column:{stacking:'normal'}},
+    series:[
+      {name:'Críticos',data:plats.map(p=>AXE_ERRORS[p][0]),color:'#D93025'},
+      {name:'Sérios',data:plats.map(p=>AXE_ERRORS[p][1]),color:'#B96F00'},
+      {name:'Moderados',data:plats.map(p=>AXE_ERRORS[p][2]),color:'#6464C8'}],
+    credits:{enabled:false}});
 
   const crits=['1.1.1','1.4.3','2.1.1','4.1.2'];
-  const plats=['Home Assistant','openHAB','SharpTools'];
   const sevMap={};
-  AUDIT_DATA.forEach(r=>{
-    if(!sevMap[r.platform])sevMap[r.platform]={};
-    if(!sevMap[r.platform][r.criterion]||r.severity>sevMap[r.platform][r.criterion])sevMap[r.platform][r.criterion]=r.severity;
-  });
-  const radarSeries=plats.map((p,i)=>({name:p,data:crits.map(c=>3-(sevMap[p]&&sevMap[p][c]!=null?sevMap[p][c]:3)),
-    color:['#0055E5','#B96F00','#D93025'][i],fillOpacity:.15}));
-  Highcharts.chart('cRadar',{chart:{polar:true,type:'line'},title:{text:'Radar (3=sem barreira)'},
+  AUDIT_DATA.forEach(r=>{(sevMap[r.platform]=sevMap[r.platform]||{})[r.criterion]=r.severity;});
+  Highcharts.chart('cRadar',{chart:{polar:true,type:'line'},title:{text:null},
     xAxis:{categories:crits,tickmarkPlacement:'on',lineWidth:0},
-    yAxis:{gridLineInterpolation:'polygon',lineWidth:0,min:0,max:3},
-    series:radarSeries,credits:{enabled:false}});
+    yAxis:{gridLineInterpolation:'polygon',lineWidth:0,min:0,max:3,title:{text:null}},
+    tooltip:{pointFormat:'{series.name}: severidade {point.sev}'},
+    series:plats.map((p,i)=>({name:p,data:crits.map(c=>({y:sevMap[p][c],sev:sevMap[p][c]})),color:['#1747C9','#B96F00','#D93025'][i],fillOpacity:.12})),
+    credits:{enabled:false}});
 
   const heatData=[];
-  plats.forEach((p,pi)=>crits.forEach((c,ci)=>{
-    heatData.push([pi,ci,sevMap[p]&&sevMap[p][c]!=null?sevMap[p][c]:0]);
-  }));
-  Highcharts.chart('cHeat',{chart:{type:'heatmap'},title:{text:'Mapa de Calor'},
-    xAxis:{categories:plats},yAxis:{categories:crits,title:{text:''},reversed:true},
+  plats.forEach((p,pi)=>crits.forEach((c,ci)=>{heatData.push([pi,ci,sevMap[p][c]]);}));
+  Highcharts.chart('cHeat',{chart:{type:'heatmap'},title:{text:null},
+    xAxis:{categories:plats},yAxis:{categories:crits,title:{text:null},reversed:true},
     colorAxis:{min:0,max:3,stops:[[0,'#0A7A50'],[0.33,'#6464C8'],[0.66,'#B96F00'],[1,'#D93025']]},
-    series:[{name:'Severidade',data:heatData,dataLabels:{enabled:true,style:{color:'#fff',fontFamily:'Atkinson Hyperlegible Mono,monospace',fontSize:'13px'}}}],
+    series:[{name:'Severidade',data:heatData,dataLabels:{enabled:true,style:{color:'#fff',fontSize:'14px',textOutline:'none'}}}],
     credits:{enabled:false}});
 }
 
@@ -1217,7 +1468,7 @@ function renderCharts(){
 const MODAL_STEPS=[
   {title:'Bem-vindo',body:'Este é o roteiro guiado da pesquisa de <strong>Yago Santos Silva</strong>, apresentada no XXI CICTA 2026. Vamos mostrar, na prática, o que ferramentas automáticas de acessibilidade não conseguem ver.'},
   {title:'O problema',body:'Casas inteligentes prometem autonomia. Mas painéis web mal feitos transformam "acender uma luz" em algo que depende de outra pessoa — para quem não vê a tela.'},
-  {title:'Experimente agora',body:'Abra a aba Ok Casa e fale um comando; depois abra o NVDA Lab e pressione Tab repetidamente na aba SharpTools. Ouça a diferença.'},
+  {title:'Experimente agora',body:'Ative a escuta e diga Ok Casa, ajuda. Depois abra o NVDA Lab e pressione Tab repetidamente na aba SharpTools. Ouça a diferença.'},
   {title:'O paradoxo',body:'A plataforma com a <strong>maior nota automática (83 pontos)</strong> foi a <strong>pior</strong> na prática com leitor de tela. Essa é a descoberta central da pesquisa.'},
   {title:'Pronto para explorar',body:'Use as abas no topo para navegar livremente. Toque em "Começar" para fechar este guia.'},
 ];
@@ -1245,7 +1496,7 @@ function modalClose(){
   else{modalRender();}
 })();
 
-fillIcons();setThemeIcon(document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches));
+fillIcons();setListenUI();setThemeIcon(document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches));
 /* TECLADO: tudo alcançável por Tab */
 document.querySelectorAll('.cola-header').forEach(h=>{
   h.setAttribute('tabindex','0');h.setAttribute('role','button');
