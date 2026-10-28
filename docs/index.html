@@ -51,19 +51,6 @@ body{font-family:var(--fb);background:var(--bg);color:var(--fg);font-size:16px;l
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:101;background:var(--bg-n)}
 :focus-visible{outline:3px solid var(--ac);outline-offset:2px;border-radius:4px}
 
-i[class*="fa-"]{font-style:normal;display:inline-flex;align-items:center;justify-content:center;line-height:1}
-.fa-house-signal::before{content:"⌂"}.fa-chevron-right::before{content:"❯"}
-.fa-circle-question::before{content:"●"}.fa-circle-check::before{content:"✓"}
-.fa-xmark::before{content:"×"}.fa-check::before{content:"✓"}
-.fa-road::before{content:"→"}.fa-arrow-trend-up::before{content:"↑"}
-.fa-bug::before{content:"⚑"}.fa-wave-square::before{content:"∿"}
-.fa-triangle-exclamation::before{content:"⚠"}.fa-circle-exclamation::before{content:"!"}
-.fa-circle-xmark::before{content:"✗"}.fa-lightbulb::before{content:"💡"}
-.fa-lock::before{content:"🔒"}.fa-plug::before{content:"🔌"}
-.fa-snowflake::before{content:"❄"}.fa-video::before{content:"📹"}
-.fa-temperature-half::before{content:"🌡"}.fa-volume-high::before{content:"🔊"}
-.fa-microphone::before{content:"🎤"}.fa-paper-plane::before{content:"✉"}
-
 .hdr{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg-n);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--bd);z-index:100}
@@ -125,34 +112,6 @@ p{margin-bottom:10px}p:last-child{margin-bottom:0}
 .fw{font-weight:700}.fi{font-style:italic}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-/* DESIGN v3: tipografia legivel, foco de alto contraste, modo olhos fechados */
-body{font-size:17px;line-height:1.65;letter-spacing:.005em}
-h2{font-size:1.9rem;font-weight:700;letter-spacing:-.015em;line-height:1.15}
-h3{font-size:1.1rem;font-weight:700;letter-spacing:-.005em}
-.hero h1{font-size:2.15rem;font-weight:700;letter-spacing:-.02em;line-height:1.12}
-.eye{text-transform:none;letter-spacing:0;font-size:.82rem;font-weight:700;color:var(--ac)}
-.tab,.btn,.stat-l,.tbl th,.chart-ttl,.hero-tag,.nvda-label,.lab-tab,.filter-btn{text-transform:none;letter-spacing:0}
-.tab{font-size:.92rem;font-weight:700;padding:11px 14px}
-.btn{font-size:.95rem;font-weight:700;padding:11px 20px;border-radius:10px}
-.tbl th{font-size:.82rem}.tbl{font-size:.92rem}
-.lab-tab,.filter-btn,.sugg{font-size:.85rem}
-.jdesc,.lead,.cola-pts li,.msg{font-size:1rem}
-.logo-txt{font-size:1rem;letter-spacing:0;font-weight:700}
-.stat-n{font-weight:700}
-:focus-visible{outline:4px solid #FFD60A;outline-offset:3px;box-shadow:0 0 0 7px #0B1830;border-radius:6px}
-.skip{position:absolute;left:-9999px;top:8px;z-index:300;background:#FFD60A;color:#0B1830;padding:12px 18px;font-weight:700;border-radius:8px}
-.skip:focus{left:16px}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.blind-btn{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.85rem;padding:7px 12px;border-radius:999px;border:2px solid var(--ac);background:var(--bg-c);color:var(--ac);cursor:pointer}
-.blind-btn[aria-pressed="true"]{background:#FFD60A;color:#0B1830;border-color:#0B1830}
-#blindVeil{position:fixed;inset:0;background:#02050B;z-index:500;pointer-events:none;display:none;
-  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 20px;text-align:center}
-body.blind #blindVeil{display:flex}
-#blindHint{color:#8FA3C4;font-size:1rem;max-width:34rem}
-#blindCaption{color:#FFD60A;font-size:clamp(1.5rem,4.5vw,2.6rem);font-weight:700;line-height:1.25;max-width:40rem;min-height:3em}
-#blindCaption::before{content:"🔊 ";}
-.sim-tile{cursor:pointer;font:inherit;color:inherit}
-.cola-header,.jstep,.device-tile,.sim-tile{-webkit-tap-highlight-color:transparent}
 </style>
 
 </head>
@@ -163,25 +122,25 @@ body.blind #blindVeil{display:flex}
 <header class="hdr">
   <div class="hdr-top">
     <div class="logo">
-      <i class="fa-solid fa-house-signal logo-icon"></i>
+      <span class="logo-icon" data-ic="house"></span>
       <span class="logo-txt">Access<span>Home</span> Analyzer</span>
     </div>
     <div class="hdr-right">
-      <button type="button" class="blind-btn" id="blindBtn" aria-pressed="false" onclick="toggleBlind()">🙈 Fechar os olhos</button>
+      <button type="button" class="blind-btn" id="blindBtn" aria-pressed="false" onclick="toggleBlind()"><span id="blindIc" data-ic="eyeoff"></span><span id="blindLbl">Simular olhos fechados</span></button>
       <span class="badge-picta">CICTA 2026 · Senac SP</span>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Alternar entre tema claro e escuro" title="Alternar tema">
-        <span id="themeIcon">🌙</span>
+        <span id="themeIcon"></span>
       </button>
     </div>
   </div>
   <nav class="tabs" aria-label="Seções do site">
-    <button class="tab on" data-sec="inicio">🚀 Início</button>
-    <button class="tab" data-sec="voz">🎤 Ok Casa</button>
-    <button class="tab" data-sec="nvda">🦯 NVDA Lab</button>
-    <button class="tab" data-sec="paradoxo">⚡ Paradoxo</button>
-    <button class="tab" data-sec="cola">📋 Cola</button>
-    <button class="tab" data-sec="dados">📊 Dados</button>
-    <button class="tab" data-sec="mercado">🌐 Solução</button>
+    <button class="tab on" data-sec="inicio">Início</button>
+    <button class="tab" data-sec="voz">Ok Casa</button>
+    <button class="tab" data-sec="nvda">NVDA Lab</button>
+    <button class="tab" data-sec="paradoxo">Paradoxo</button>
+    <button class="tab" data-sec="cola">Cola</button>
+    <button class="tab" data-sec="dados">Dados</button>
+    <button class="tab" data-sec="mercado">Solução</button>
   </nav>
 </header>
 
@@ -305,7 +264,7 @@ body.blind #blindVeil{display:flex}
 .cola-pts{list-style:none;padding:0}
 .cola-pts li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bd);font-size:.88rem;line-height:1.5}
 .cola-pts li:last-child{border-bottom:none}
-.cola-pts li::before{content:"→";color:var(--ac);font-family:var(--fm);flex-shrink:0;padding-top:1px}
+.cola-pts li::before{content:"";width:8px;height:2px;background:var(--ac);flex-shrink:0;margin-top:.85em}
 .cola-pts strong{color:var(--ac)}
 .cola-banner-txt{font-size:.82rem;font-style:italic;color:var(--fg-m);border-left:3px solid var(--ac);
   padding:8px 12px;background:var(--ac-g);border-radius:0 6px 6px 0;margin-bottom:12px}
@@ -345,6 +304,68 @@ body.blind #blindVeil{display:flex}
 .modal-body h3{font-size:1.2rem;margin-bottom:8px}
 .modal-body p{font-size:.88rem;color:var(--fg-m)}
 .modal-footer{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+/* DESIGN v3: tipografia legivel, foco de alto contraste, modo olhos fechados */
+body{font-size:17px;line-height:1.65;letter-spacing:.005em}
+h2{font-size:1.9rem;font-weight:700;letter-spacing:-.015em;line-height:1.15}
+h3{font-size:1.1rem;font-weight:700;letter-spacing:-.005em}
+.hero h1{font-size:2.15rem;font-weight:700;letter-spacing:-.02em;line-height:1.12}
+.eye{text-transform:none;letter-spacing:0;font-size:.82rem;font-weight:700;color:var(--ac)}
+.tab,.btn,.stat-l,.tbl th,.chart-ttl,.hero-tag,.nvda-label,.lab-tab,.filter-btn{text-transform:none;letter-spacing:0}
+.tab{font-size:.92rem;font-weight:700;padding:11px 14px}
+.btn{font-size:.95rem;font-weight:700;padding:11px 20px;border-radius:10px}
+.tbl th{font-size:.82rem}.tbl{font-size:.92rem}
+.lab-tab,.filter-btn,.sugg{font-size:.85rem}
+.jdesc,.lead,.cola-pts li,.msg{font-size:1rem}
+.logo-txt{font-size:1rem;letter-spacing:0;font-weight:700}
+.stat-n{font-weight:700}
+:focus-visible{outline:4px solid #FFD60A;outline-offset:3px;box-shadow:0 0 0 7px #0B1830;border-radius:6px}
+.skip{position:absolute;left:-9999px;top:8px;z-index:300;background:#FFD60A;color:#0B1830;padding:12px 18px;font-weight:700;border-radius:8px}
+.skip:focus{left:16px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.blind-btn{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.85rem;padding:7px 12px;border-radius:999px;border:2px solid var(--ac);background:var(--bg-c);color:var(--ac);cursor:pointer}
+.blind-btn[aria-pressed="true"]{background:#FFD60A;color:#0B1830;border-color:#0B1830}
+#blindVeil{position:fixed;inset:0;background:#02050B;z-index:500;pointer-events:none;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 20px;text-align:center}
+body.blind #blindVeil{display:flex}
+#blindHint{color:#8FA3C4;font-size:1rem;max-width:34rem}
+#blindCaption{color:#FFD60A;font-size:clamp(1.5rem,4.5vw,2.6rem);font-weight:700;line-height:1.25;max-width:40rem;min-height:3em}
+
+.sim-tile{cursor:pointer;font:inherit;color:inherit}
+.cola-header,.jstep,.device-tile,.sim-tile{-webkit-tap-highlight-color:transparent}
+
+/* PRODUTO: sobrio, sem ornamento */
+.ic{width:1.15em;height:1.15em;flex-shrink:0;vertical-align:-.2em}
+[data-ic]{display:inline-flex;align-items:center}
+.card,.jstep,.chart-box,.market-card,.cola-section,.hero,.modal-card{box-shadow:none;border-radius:8px}
+.btn,.blind-btn,.sugg,.lab-tab,.filter-btn,.cmd-input,.device-tile,.sim-tile,.nvda-screen{border-radius:8px}
+.logo-icon{color:var(--ac);font-size:1.35rem}
+.theme-btn{border-radius:8px;width:38px;height:38px}
+.hero{text-align:left;padding:34px 30px;background:var(--bg-c)}
+.hero h1{font-size:clamp(1.7rem,3.6vw,2.4rem);max-width:24ch;margin:0 0 14px;text-wrap:balance}
+.hero p{margin:0 0 4px;max-width:62ch;font-size:1.02rem}
+.hero-tag{text-align:left;font-size:.85rem;font-weight:700;color:var(--ac);margin-bottom:14px}
+.hero .btn-row{margin:20px 0 26px}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:22px}
+.spec div{padding:14px 16px;border-right:1px solid var(--bd);display:flex;flex-direction:column;gap:2px}
+.spec div:last-child{border-right:none}
+.spec b{font-size:1.7rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.spec span{font-size:.85rem;color:var(--fg-m)}
+.author-strip{justify-content:flex-start;gap:6px 22px}
+.mic-big{box-shadow:none}.mic-big svg{width:34px;height:34px}
+.device-icon svg,.sim-tile-icon svg{width:26px;height:26px;color:var(--fg-m)}
+.device-tile.on .device-icon svg{color:var(--ok)}
+.device-icon,.sim-tile-icon{display:flex;justify-content:center}
+.jcheck svg{width:20px;height:20px}
+.blind-btn svg,.theme-btn svg{width:18px;height:18px}
+.blind-btn{gap:8px}
+.modal-kicker{font-size:.85rem;font-weight:700;color:var(--ac);margin-bottom:6px}
+.cola-toggle svg{width:16px;height:16px}
+.nvda-screen{font-size:1rem}
+.hero-tag{text-transform:none;letter-spacing:0;font-family:var(--fb)}
+.hero{background:var(--bg-c);border:1px solid var(--bd)}
+.b,.lab-tab,.sugg,.filter-btn,.eye,.badge-picta,.kbd{font-family:var(--fb);text-transform:none;letter-spacing:0}
+.b{font-size:.8rem;font-weight:700}
+h1:focus,h2:focus{outline:none;box-shadow:none}
 </style>
 
 <main class="main" id="mainContent" tabindex="-1">
@@ -352,45 +373,53 @@ body.blind #blindVeil{display:flex}
 <!-- ═══ INÍCIO ═══ -->
 <section class="sec on" id="inicio">
   <div class="hero">
-    <div class="hero-tag">Pesquisa · PICTA/CICTA 2026</div>
-    <h1>Casas inteligentes prometem autonomia.<br>Para quem não vê a tela, prometem exclusão.</h1>
-    <p>Esta é a imersão na pesquisa de <strong>Yago Santos Silva</strong>: por que ferramentas automáticas de acessibilidade escondem problemas que só um leitor de tela revela — e o que fazer sobre isso.</p>
+    <div class="hero-tag">AccessHome Analyzer · Auditoria de acessibilidade para casa inteligente</div>
+    <h1>Nota alta no teste automático não garante que uma pessoa cega consiga ligar uma luz.</h1>
+    <p>Auditamos três plataformas de automação residencial com Lighthouse, Axe DevTools, WAVE e o leitor de tela NVDA. A plataforma com a maior nota foi a pior na prática. O AccessHome Analyzer reúne auditoria automatizada, simulação de navegação por teclado e um assistente de voz de referência.</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-p" onclick="goTab('nvda')">Iniciar demonstração</button>
+      <button type="button" class="btn btn-o" onclick="goTab('dados')">Ver dados da auditoria</button>
+    </div>
+    <div class="spec">
+      <div><b>3</b><span>plataformas auditadas</span></div>
+      <div><b>4</b><span>ferramentas comparadas</span></div>
+      <div><b>26</b><span>registros de auditoria</span></div>
+      <div><b>3 de 3</b><span>falharam no critério 4.1.2</span></div>
+    </div>
     <div class="author-strip">
-      <span>👨‍🎓 <strong>Yago Santos Silva</strong></span>
-      <span>·</span>
+      <span>Pesquisa de <strong>Yago Santos Silva</strong></span>
       <span>Orientação: <strong>Profª Drª Claudia Bianchi Progetti</strong></span>
-      <span>·</span>
-      <span>Centro Universitário Senac</span>
+      <span>Centro Universitário Senac, XXI CICTA 2026</span>
     </div>
   </div>
 
-  <h3 style="margin-top:4px">Siga a imersão — 5 passos</h3>
-  <p class="lead" style="margin-bottom:10px">Clique em cada passo na ordem. Leva menos de 3 minutos.</p>
+  <h3 style="margin-top:4px">Roteiro guiado em 5 etapas</h3>
+  <p class="lead" style="margin-bottom:10px">Percorra as etapas na ordem. Duração aproximada: 3 minutos.</p>
 
   <div class="journey" id="journey">
     <div class="jstep" data-step="1" onclick="journeyStep(1)">
       <div class="jnum">1</div>
       <div class="jbody">
         <div class="jtitle">Feche os olhos por 10 segundos</div>
-        <div class="jdesc">Sério. Feche agora. É assim que uma pessoa com deficiência visual começa qualquer interação com a casa inteligente.</div>
+        <div class="jdesc">É assim que uma pessoa com deficiência visual começa qualquer interação com a casa inteligente.</div>
       </div>
-      <div class="jcheck">✓</div>
+      <div class="jcheck" data-ic="check"></div>
     </div>
     <div class="jstep" data-step="2" onclick="journeyStep(2)">
       <div class="jnum">2</div>
       <div class="jbody">
-        <div class="jtitle">Vá para a aba "🎤 Ok Casa" e fale um comando</div>
+        <div class="jtitle">Abra a aba Ok Casa e fale um comando</div>
         <div class="jdesc">Experimente "ligar luz da sala" ou "trancar porta". Isso é como a interação DEVERIA ser — por voz, com resposta clara.</div>
       </div>
-      <div class="jcheck">✓</div>
+      <div class="jcheck" data-ic="check"></div>
     </div>
     <div class="jstep" data-step="3" onclick="journeyStep(3)">
       <div class="jnum">3</div>
       <div class="jbody">
-        <div class="jtitle">Vá para "🦯 NVDA Lab" e pressione Tab</div>
+        <div class="jtitle">Abra o NVDA Lab e pressione Tab</div>
         <div class="jdesc">Escolha "SharpTools" e pressione Tab repetidamente. Ouça o que o leitor de tela realmente anuncia nas 3 plataformas testadas.</div>
       </div>
-      <div class="jcheck">✓</div>
+      <div class="jcheck" data-ic="check"></div>
     </div>
     <div class="jstep" data-step="4" onclick="journeyStep(4)">
       <div class="jnum">4</div>
@@ -398,7 +427,7 @@ body.blind #blindVeil{display:flex}
         <div class="jtitle">Veja o Paradoxo</div>
         <div class="jdesc">A plataforma com a MELHOR nota automática (83 pontos) foi a PIOR na prática. Entenda por quê.</div>
       </div>
-      <div class="jcheck">✓</div>
+      <div class="jcheck" data-ic="check"></div>
     </div>
     <div class="jstep" data-step="5" onclick="journeyStep(5)">
       <div class="jnum">5</div>
@@ -406,7 +435,7 @@ body.blind #blindVeil{display:flex}
         <div class="jtitle">Explore os Dados e a Solução</div>
         <div class="jdesc">26 registros de auditoria real, gráficos comparativos, e como isso se aplica ao mercado de Smart Home.</div>
       </div>
-      <div class="jcheck">✓</div>
+      <div class="jcheck" data-ic="check"></div>
     </div>
   </div>
 </section>
@@ -420,13 +449,13 @@ body.blind #blindVeil{display:flex}
   <div class="card">
     <div class="voice-stage">
       <button class="mic-big" id="micBig" onclick="toggleMic()" aria-label="Pressione para falar com o Ok Casa">
-        <span id="micBigIcon">🎤</span>
+        <span id="micBigIcon" data-ic="mic"></span>
       </button>
       <div class="mic-hint" id="micHint">Pressione e diga "Ok Casa" seguido de um comando</div>
     </div>
 
     <div class="chat-log" id="chatLog">
-      <div class="msg msg-bot"><strong>Ok Casa:</strong> Olá! Eu controlo luzes, fechadura, tomadas e cenas. Diga um comando ou toque em uma sugestão abaixo.</div>
+      <div class="msg msg-bot"><strong>Ok Casa:</strong> Posso controlar luzes, fechadura, tomadas e cenas. Diga um comando ou escolha uma sugestão abaixo.</div>
     </div>
 
     <div class="suggest-row" id="suggestRow"></div>
@@ -439,11 +468,11 @@ body.blind #blindVeil{display:flex}
 
   <div class="grid2">
     <div class="card">
-      <h3>🏠 Dispositivos da casa</h3>
+      <h3>Dispositivos da casa</h3>
       <div class="demo-device-grid" id="deviceGrid"></div>
     </div>
     <div class="card">
-      <h3>🎙️ O que torna esta voz acessível</h3>
+      <h3>O que torna esta voz acessível</h3>
       <ul class="cola-pts">
         <li><strong>Sempre confirma o nome</strong> do dispositivo, nunca "feito" genérico</li>
         <li><strong>Anuncia o novo estado</strong> — "ligada", "trancada" — não apenas "ok"</li>
@@ -466,7 +495,7 @@ body.blind #blindVeil{display:flex}
       <button class="lab-tab on" data-plat="sharptools">SharpTools</button>
       <button class="lab-tab" data-plat="homeassistant">Home Assistant</button>
       <button class="lab-tab" data-plat="openhab">openHAB</button>
-      <button class="lab-tab" data-plat="ideal">AccessHome ✓</button>
+      <button class="lab-tab" data-plat="ideal">AccessHome (ideal)</button>
     </div>
 
     <div class="lab-meta" id="labMeta"></div>
@@ -474,15 +503,15 @@ body.blind #blindVeil{display:flex}
     <div class="sim-dashboard" id="simDash" role="group" aria-label="Painel simulado. Use Tab para passar de um dispositivo para o próximo."></div>
 
     <div class="nvda-screen">
-      <div class="nvda-label">🔊 NVDA anunciaria agora:</div>
+      <div class="nvda-label">Saída do leitor de tela (NVDA)</div>
       <div class="nvda-output" id="nvdaOutput">Pressione Tab ou clique em "Avançar foco" para começar…</div>
       <div class="nvda-note" id="nvdaNote"></div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-p" onclick="labTab()">⇥ Avançar foco (Tab)</button>
-      <button class="btn btn-o" onclick="labReset()">↺ Reiniciar</button>
-      <button class="btn btn-o" onclick="labAutoPlay()" id="labAutoBtn">▶ Demonstração automática</button>
+      <button class="btn btn-p" onclick="labTab()">Avançar foco (Tab)</button>
+      <button class="btn btn-o" onclick="labReset()">Reiniciar</button>
+      <button class="btn btn-o" onclick="labAutoPlay()" id="labAutoBtn">Demonstração automática</button>
     </div>
   </div>
 
@@ -495,11 +524,11 @@ body.blind #blindVeil{display:flex}
 <!-- ═══ PARADOXO ═══ -->
 <section class="sec" id="paradoxo">
   <div class="eye">Achado central da pesquisa</div>
-  <h2>O Paradoxo Score ↔ UX Real</h2>
+  <h2>O Paradoxo Score x experiência real</h2>
   <p class="lead">Maior score automatizado = pior experiência real com leitor de tela.</p>
 
   <div class="card" style="background:linear-gradient(135deg,var(--dn-g),var(--ac-g));border-color:var(--dn)">
-    <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--dn);margin-bottom:8px">⚡ Paradoxo Central</div>
+    <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--dn);margin-bottom:8px">Paradoxo central</div>
     <p style="font-size:.9rem;margin-bottom:16px">O SharpTools tem o <strong>melhor score no Lighthouse (83)</strong> mas foi a plataforma com a <strong>pior experiência</strong> para uma pessoa cega usando NVDA — completamente inutilizável.</p>
 
     <div class="platform-row">
@@ -507,28 +536,28 @@ body.blind #blindVeil{display:flex}
       <div class="score-col"><div class="score-big t-ok">83</div><div class="score-lbl">Lighthouse</div>
         <div class="score-bar"><div class="score-fill" style="width:83%;background:var(--ok)"></div></div></div>
       <div class="score-col"><div class="score-big t-ok">6</div><div class="score-lbl">Axe erros</div></div>
-      <div class="nvda-col"><span class="b b-dn">❌ Inutilizável</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">Ouve "clicável"<br>em loop</div></div>
+      <div class="nvda-col"><span class="b b-dn">Inutilizável</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">Ouve "clicável"<br>em loop</div></div>
     </div>
     <div class="platform-row">
       <div><div class="plat-name">Home Assistant</div><div class="plat-arch">Shadow DOM · Lit Elements</div></div>
       <div class="score-col"><div class="score-big t-wn">75</div><div class="score-lbl">Lighthouse</div>
         <div class="score-bar"><div class="score-fill" style="width:75%;background:var(--wn)"></div></div></div>
       <div class="score-col"><div class="score-big t-wn">12</div><div class="score-lbl">Axe erros</div></div>
-      <div class="nvda-col"><span class="b b-wn">⚠️ Parcial</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">Navega mas<br>sem semântica</div></div>
+      <div class="nvda-col"><span class="b b-wn">Parcial</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">Navega mas<br>sem semântica</div></div>
     </div>
     <div class="platform-row">
       <div><div class="plat-name">openHAB</div><div class="plat-arch">Vue.js · WebSocket</div></div>
       <div class="score-col"><div class="score-big t-dn">70</div><div class="score-lbl">Lighthouse</div>
         <div class="score-bar"><div class="score-fill" style="width:70%;background:var(--dn)"></div></div></div>
       <div class="score-col"><div class="score-big t-dn">18</div><div class="score-lbl">Axe erros</div></div>
-      <div class="nvda-col"><span class="b b-wn">⚠️ Parcial</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">WebSocket<br>silencioso</div></div>
+      <div class="nvda-col"><span class="b b-wn">Parcial</span><div style="font-size:.72rem;color:var(--fg-m);margin-top:4px">WebSocket<br>silencioso</div></div>
     </div>
   </div>
 
   <div class="grid2">
-    <div class="card"><h3><i class="fa-solid fa-bug t-dn"></i> Por que acontece?</h3>
+    <div class="card"><h3>Por que acontece?</h3>
       <p style="font-size:.88rem">SharpTools tem HTML <strong>sintaticamente correto</strong> (Lighthouse dá 83), mas <strong>semanticamente vazio</strong>: sem <code>aria-label</code>, sem <code>role</code>, sem <code>aria-live</code>. O NVDA precisa do <em>significado</em>, não da sintaxe.</p></div>
-    <div class="card"><h3><i class="fa-solid fa-wave-square t-wn"></i> WAVE é obsoleta</h3>
+    <div class="card"><h3>WAVE é obsoleta</h3>
       <p style="font-size:.88rem">WAVE injeta ícones em HTML estático. openHAB usa Vue.js — a SPA re-renderiza e apaga os ícones. Resultado: <strong>falso negativo total</strong>.</p></div>
   </div>
 
@@ -553,51 +582,51 @@ body.blind #blindVeil{display:flex}
   <p class="lead">Clique para expandir cada seção.</p>
 
   <div class="card" style="margin-bottom:14px;background:var(--dn-g);border-color:var(--dn)">
-    <div style="font-family:var(--fd);font-weight:700;font-size:.85rem;color:var(--dn);margin-bottom:6px">⚡ FRASE CENTRAL</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:.85rem;color:var(--dn);margin-bottom:6px">Frase central</div>
     <div style="font-family:var(--fd);font-size:1.1rem;font-weight:800;line-height:1.4">"Score automatizado não é sinônimo de acessibilidade. O SharpTools prova isso."</div>
   </div>
 
   <div class="cola-section open">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.1</span><span class="cola-title">Pergunta da Pesquisa</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.1</span><span class="cola-title">Pergunta da Pesquisa</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <div class="cola-banner-txt">"Como ferramentas automatizadas e testes manuais podem otimizar a detecção de falhas de acessibilidade em Smart Home?"</div>
       <ul class="cola-pts"><li>Une abordagem <strong>automática</strong> e <strong>manual</strong></li><li>Foco em <strong>Smart Home</strong>, não sites convencionais</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.2</span><span class="cola-title">De onde partimos?</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.2</span><span class="cola-title">De onde partimos?</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <ul class="cola-pts"><li>Smart Home amplia autonomia — <strong>mas exclui quem não vê a tela</strong></li><li>Acender luz, trancar porta: sem acesso = depender de outra pessoa</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.3</span><span class="cola-title">Objetivos</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.3</span><span class="cola-title">Objetivos</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <ul class="cola-pts"><li>4 critérios WCAG: 1.1.1, 1.4.3, 2.1.1, 4.1.2</li><li>3 plataformas, 4 ferramentas (Lighthouse, Axe, WAVE, NVDA)</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.4</span><span class="cola-title">Resultados</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.4</span><span class="cola-title">Resultados</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <div class="cola-banner-txt">"Pontuação automatizada não significa acessibilidade efetiva."</div>
       <ul class="cola-pts"><li>4.1.2 falhou em <strong>100%</strong> das plataformas</li><li>SharpTools: maior nota, pior NVDA</li><li>WAVE gerou falsos negativos em HA e openHAB</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.5</span><span class="cola-title">Conclusões</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.5</span><span class="cola-title">Conclusões</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
-      <ul class="cola-pts"><li>Ferramentas automáticas: no máximo <strong>30-40%</strong> das barreiras</li><li>Pipeline: Lighthouse → Axe → NVDA</li><li>WAVE: não recomendada para SPAs</li></ul>
+      <ul class="cola-pts"><li>Ferramentas automáticas: no máximo <strong>30-40%</strong> das barreiras</li><li>Pipeline: Lighthouse, depois Axe, depois NVDA</li><li>WAVE: não recomendada para SPAs</li></ul>
     </div></div>
   </div>
   <div class="cola-section">
-    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.6</span><span class="cola-title">Da pesquisa à solução</span><i class="fa-solid fa-chevron-right cola-toggle"></i></div>
+    <div class="cola-header" onclick="toggleCola(this)"><span class="cola-num">S.6</span><span class="cola-title">Da pesquisa à solução</span><span class="cola-toggle" data-ic="chevron"></span></div>
     <div class="cola-body"><div class="cola-content">
       <ul class="cola-pts"><li>AccessHome Analyzer: auditoria + simulação de teclado + voz</li><li>Repositório MIT open source</li></ul>
     </div></div>
   </div>
 
   <div class="card" style="margin-top:14px">
-    <h3><i class="fa-solid fa-circle-question t-ac"></i> Perguntas difíceis</h3>
+    <h3>Perguntas difíceis</h3>
     <div class="tw"><table class="tbl">
       <thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead>
       <tbody>
@@ -648,7 +677,7 @@ body.blind #blindVeil{display:flex}
   </div>
 
   <div class="card">
-    <h3><i class="fa-solid fa-circle-check t-ok"></i> O que o AccessHome Analyzer oferece</h3>
+    <h3>O que o AccessHome Analyzer oferece</h3>
     <ul class="cola-pts">
       <li><strong>Auditoria automatizada integrada</strong> — axe-core + Playwright em uma CLI</li>
       <li><strong>Simulação de navegação por teclado</strong> — igual ao NVDA Lab desta página</li>
@@ -658,12 +687,12 @@ body.blind #blindVeil{display:flex}
   </div>
 
   <div class="card">
-    <h3><i class="fa-solid fa-road t-ac"></i> Pipeline recomendado</h3>
+    <h3>Pipeline recomendado</h3>
     <div style="display:flex;flex-wrap:wrap;gap:0;align-items:center;margin-top:8px">
       <div style="text-align:center;padding:14px 16px;background:var(--ac-g);border:1px solid var(--ac);border-radius:8px;min-width:110px"><div style="font-family:var(--fm);font-size:.65rem;color:var(--ac)">1</div><div style="font-family:var(--fd);font-weight:700">Lighthouse</div></div>
-      <div style="font-size:1.2rem;color:var(--fg-m);padding:0 8px">→</div>
+      <div style="font-size:1.2rem;color:var(--fg-m);padding:0 8px" data-ic="chevron"></div>
       <div style="text-align:center;padding:14px 16px;background:var(--ok-g);border:1px solid var(--ok);border-radius:8px;min-width:110px"><div style="font-family:var(--fm);font-size:.65rem;color:var(--ok)">2</div><div style="font-family:var(--fd);font-weight:700">Axe DevTools</div></div>
-      <div style="font-size:1.2rem;color:var(--fg-m);padding:0 8px">→</div>
+      <div style="font-size:1.2rem;color:var(--fg-m);padding:0 8px" data-ic="chevron"></div>
       <div style="text-align:center;padding:14px 16px;background:var(--wn-g);border:1px solid var(--wn);border-radius:8px;min-width:110px"><div style="font-family:var(--fm);font-size:.65rem;color:var(--wn)">3</div><div style="font-family:var(--fd);font-weight:700">NVDA</div></div>
     </div>
   </div>
@@ -676,8 +705,8 @@ body.blind #blindVeil{display:flex}
     <div class="modal-steps" id="modalSteps"></div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-footer">
-      <button class="btn btn-o" onclick="modalPrev()" id="modalPrevBtn" style="visibility:hidden">← Anterior</button>
-      <button class="btn btn-p" onclick="modalNext()" id="modalNextBtn">Próximo →</button>
+      <button class="btn btn-o" onclick="modalPrev()" id="modalPrevBtn" style="visibility:hidden">Anterior</button>
+      <button class="btn btn-p" onclick="modalNext()" id="modalNextBtn">Próximo</button>
     </div>
   </div>
 </div>
@@ -687,6 +716,33 @@ body.blind #blindVeil{display:flex}
 <script>
 'use strict';
 
+const ICONS={
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ plug:'<path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0V8zM12 16v5"/>',
+ camera:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
+ thermo:'<path d="M14 14.5V5a2 2 0 0 0-4 0v9.5a4 4 0 1 0 4 0z"/>',
+ menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+ dot:'<circle cx="12" cy="12" r="4"/>',
+ grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
+ sliders:'<path d="M4 8h16M4 16h16"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="16" r="2"/>',
+ refresh:'<path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+ eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ eyeoff:'<path d="M3 3l18 18M10.6 6.1A9.7 9.7 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.7M6.3 7C3.9 8.6 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.2-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+ chevron:'<path d="M9 6l6 6-6 6"/>',
+ check:'<path d="M5 12l5 5 9-10"/>',
+ house:'<path d="M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6"/>',
+ speaker:'<path d="M4 9v6h4l5 4V5L8 9H4zM16.5 8.5a5 5 0 0 1 0 7"/>'
+};
+function ic(n){return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[n]||'')+'</svg>';}
+function setThemeIcon(dark){document.getElementById('themeIcon').innerHTML=ic(dark?'sun':'moon');}
+function fillIcons(root){(root||document).querySelectorAll('[data-ic]:empty').forEach(e=>{e.innerHTML=ic(e.dataset.ic);});}
+
+
 /* ═══ THEME ═══ */
 function toggleTheme(){
   const html=document.documentElement;
@@ -694,7 +750,7 @@ function toggleTheme(){
   const dark=cur==='dark'||(!cur&&window.matchMedia('(prefers-color-scheme:dark)').matches);
   const next=dark?'light':'dark';
   html.setAttribute('data-theme',next);
-  document.getElementById('themeIcon').textContent=next==='dark'?'☀️':'🌙';
+  setThemeIcon(next==='dark');
   try{localStorage.setItem('ah-theme',next);}catch(e){}
   if(chartsOk){chartsOk=false;renderCharts();}
 }
@@ -703,10 +759,10 @@ function toggleTheme(){
     const saved=localStorage.getItem('ah-theme');
     if(saved){
       document.documentElement.setAttribute('data-theme',saved);
-      document.getElementById('themeIcon').textContent=saved==='dark'?'☀️':'🌙';
+      setThemeIcon(saved==='dark');
     } else {
       const dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-      document.getElementById('themeIcon').textContent=dark?'☀️':'🌙';
+      setThemeIcon(dark);
     }
   }catch(e){}
 })();
@@ -744,13 +800,13 @@ function toggleCola(hdr){hdr.closest('.cola-section').classList.toggle('open');}
 
 /* ═══ DEVICES (shared by Ok Casa) ═══ */
 const DEVICES=[
-  {id:'luz-sala',name:'Luz da Sala',room:'Sala',icon:'💡',on:false},
-  {id:'luz-quarto',name:'Luz do Quarto',room:'Quarto',icon:'💡',on:false},
-  {id:'luz-cozinha',name:'Luz da Cozinha',room:'Cozinha',icon:'💡',on:false},
-  {id:'fechadura',name:'Fechadura',room:'Entrada',icon:'🔒',on:true},
-  {id:'tomada',name:'Tomada',room:'Sala',icon:'🔌',on:false},
-  {id:'camera',name:'Câmera',room:'Entrada',icon:'📹',on:true},
-  {id:'sensor',name:'Sensor Temp.',room:'Quarto',icon:'🌡',value:'24°C'},
+  {id:'luz-sala',name:'Luz da Sala',room:'Sala',icon:'bulb',on:false},
+  {id:'luz-quarto',name:'Luz do Quarto',room:'Quarto',icon:'bulb',on:false},
+  {id:'luz-cozinha',name:'Luz da Cozinha',room:'Cozinha',icon:'bulb',on:false},
+  {id:'fechadura',name:'Fechadura',room:'Entrada',icon:'lock',on:true},
+  {id:'tomada',name:'Tomada',room:'Sala',icon:'plug',on:false},
+  {id:'camera',name:'Câmera',room:'Entrada',icon:'camera',on:true},
+  {id:'sensor',name:'Sensor Temp.',room:'Quarto',icon:'thermo',value:'24°C'},
 ];
 const devState={};
 DEVICES.forEach(d=>{devState[d.id]=!!d.on;});
@@ -764,7 +820,7 @@ function renderDevices(){
     return `<div class="device-tile ${st?'on':''}" onclick="deviceTap('${d.id}')" role="button" tabindex="0" aria-pressed="${st}"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();deviceTap('${d.id}')}"
       aria-label="${d.name}, ${d.room}, ${label}">
-      <span class="device-icon">${d.icon}</span>
+      <span class="device-icon">${ic(d.icon)}</span>
       <div class="device-name">${d.name}</div>
       <div class="device-room">${d.room}</div>
       <div class="device-state">${d.value?d.value:`<span class="${st?'t-ok':'t-m'}">${label}</span>`}</div>
@@ -874,7 +930,7 @@ function toggleBlind(force){
   document.body.classList.toggle('blind',on);
   const b=document.getElementById('blindBtn');
   b.setAttribute('aria-pressed',on);
-  b.textContent=on?'👁 Abrir os olhos (Esc)':'🙈 Fechar os olhos';
+  document.getElementById('blindLbl').textContent=on?'Abrir os olhos (Esc)':'Simular olhos fechados';document.getElementById('blindIc').innerHTML=ic(on?'eye':'eyeoff');
   speak(on?'Modo olhos fechados ativado. Use Tab para avançar, Shift Tab para voltar, Enter para ativar, e Escape para sair. Para falar com a casa, vá até a seção Ok Casa.':'Olhos abertos. Modo olhos fechados desativado.');
   if(on){document.getElementById('mainContent').focus();}
 }
@@ -915,49 +971,49 @@ function toggleMic(){
   if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
     appendMsg('Reconhecimento de voz não suportado neste navegador — use o campo de texto.','msg-bot');return;
   }
-  if(recogRunning){SR&&SR.stop();recogRunning=false;btn.classList.remove('listening');icon.textContent='🎤';hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';return;}
+  if(recogRunning){SR&&SR.stop();recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';return;}
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   SR=new SpeechRecognition();
   SR.lang='pt-BR';SR.continuous=false;SR.interimResults=false;
   SR.onresult=e=>{const t=e.results[0][0].transcript;document.getElementById('cmdInput').value=t;runCmd(t);};
-  SR.onend=()=>{recogRunning=false;btn.classList.remove('listening');icon.textContent='🎤';hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';};
-  SR.onerror=ev=>{recogRunning=false;btn.classList.remove('listening');icon.textContent='🎤';appendMsg(ev.error==='not-allowed'?'O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço, ou digite o comando e pressione Enter.':'Não consegui ouvir ('+ev.error+'). Digite o comando e pressione Enter.','msg-bot');};
-  SR.start();recogRunning=true;btn.classList.add('listening');icon.textContent='⏹';hint.textContent='Escutando… fale agora';
+  SR.onend=()=>{recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');hint.textContent='Pressione e diga "Ok Casa" seguido de um comando';};
+  SR.onerror=ev=>{recogRunning=false;btn.classList.remove('listening');icon.innerHTML=ic('mic');appendMsg(ev.error==='not-allowed'?'O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço, ou digite o comando e pressione Enter.':'Não consegui ouvir ('+ev.error+'). Digite o comando e pressione Enter.','msg-bot');};
+  SR.start();recogRunning=true;btn.classList.add('listening');icon.innerHTML=ic('stop');hint.textContent='Escutando… fale agora';
 }
 
 /* ═══ NVDA LAB ═══ */
 const NVDA_LAB={
-  sharptools:{name:'SharpTools',score:'83 (Lighthouse)',arch:'Cloud · HTML estático',verdict:{icon:'❌',text:'Inutilizável',cls:'b-dn'},
+  sharptools:{name:'SharpTools',score:'83 (Lighthouse)',arch:'Cloud · HTML estático',verdict:{text:'Inutilizável',cls:'b-dn'},
     elements:[
-      {display:'💡 Sala',aria:'"...clicável"',cls:'bad',note:'Div sem role nem aria-label — nada identifica o que é'},
-      {display:'💡 Quarto',aria:'"...clicável"',cls:'bad',note:'Tile idêntico ao anterior — impossível distinguir pelo som'},
-      {display:'🔒 Porta',aria:'"...link"',cls:'bad',note:'Âncora sem texto, sem href real, sem contexto'},
-      {display:'🔌 Tomada',aria:'"...clicável"',cls:'bad',note:'Mesma barreira — div genérica'},
-      {display:'🔄 Estado mudou',aria:'(silêncio total)',cls:'bad',note:'Nenhum aria-live — a ação acontece mas nada é anunciado'},
+      {display:'bulb Sala',aria:'"...clicável"',cls:'bad',note:'Div sem role nem aria-label — nada identifica o que é'},
+      {display:'bulb Quarto',aria:'"...clicável"',cls:'bad',note:'Tile idêntico ao anterior — impossível distinguir pelo som'},
+      {display:'lock Porta',aria:'"...link"',cls:'bad',note:'Âncora sem texto, sem href real, sem contexto'},
+      {display:'plug Tomada',aria:'"...clicável"',cls:'bad',note:'Mesma barreira — div genérica'},
+      {display:'refresh Estado mudou',aria:'(silêncio total)',cls:'bad',note:'Nenhum aria-live — a ação acontece mas nada é anunciado'},
     ]},
-  homeassistant:{name:'Home Assistant',score:'75 (Lighthouse)',arch:'Shadow DOM · Lit Elements',verdict:{icon:'⚠️',text:'Parcial',cls:'b-wn'},
+  homeassistant:{name:'Home Assistant',score:'75 (Lighthouse)',arch:'Shadow DOM · Lit Elements',verdict:{text:'Parcial',cls:'b-wn'},
     elements:[
-      {display:'☰ Menu',aria:'"...grupo"',cls:'partial',note:'Shadow DOM esconde os filhos da árvore de acessibilidade'},
-      {display:'💡 Luz',aria:'"...botão"',cls:'partial',note:'Role correta, mas sem aria-label — qual luz é essa?'},
-      {display:'● Estado',aria:'"...imagem"',cls:'partial',note:'Ícone de status sem texto alternativo'},
-      {display:'🌡 Sensor',aria:'"...grupo"',cls:'partial',note:'Card sem semântica interna — valor não é lido'},
-      {display:'🔄 Estado mudou',aria:'"...botão"',cls:'partial',note:'Sem aria-live — mudança de estado não é anunciada'},
+      {display:'menu Menu',aria:'"...grupo"',cls:'partial',note:'Shadow DOM esconde os filhos da árvore de acessibilidade'},
+      {display:'bulb Luz',aria:'"...botão"',cls:'partial',note:'Role correta, mas sem aria-label — qual luz é essa?'},
+      {display:'dot Estado',aria:'"...imagem"',cls:'partial',note:'Ícone de status sem texto alternativo'},
+      {display:'thermo Sensor',aria:'"...grupo"',cls:'partial',note:'Card sem semântica interna — valor não é lido'},
+      {display:'refresh Estado mudou',aria:'"...botão"',cls:'partial',note:'Sem aria-live — mudança de estado não é anunciada'},
     ]},
-  openhab:{name:'openHAB',score:'70 (Lighthouse)',arch:'Vue.js · WebSocket',verdict:{icon:'⚠️',text:'Parcial',cls:'b-wn'},
+  openhab:{name:'openHAB',score:'70 (Lighthouse)',arch:'Vue.js · WebSocket',verdict:{text:'Parcial',cls:'b-wn'},
     elements:[
-      {display:'⊞ Painel',aria:'"...botão"',cls:'partial',note:'Componente Vue renderiza sem atributos ARIA'},
-      {display:'💡 Luz',aria:'"...botão"',cls:'partial',note:'Sem label descritivo do dispositivo'},
-      {display:'— 75 +',aria:'"...campo de edição"',cls:'partial',note:'Input sem label associado'},
-      {display:'● Ligado',aria:'"...grupo"',cls:'partial',note:'Badge de status sem semântica'},
-      {display:'🔄 WebSocket',aria:'(silêncio total)',cls:'bad',note:'Atualização via WebSocket é silenciosa — sem aria-live'},
+      {display:'grid Painel',aria:'"...botão"',cls:'partial',note:'Componente Vue renderiza sem atributos ARIA'},
+      {display:'bulb Luz',aria:'"...botão"',cls:'partial',note:'Sem label descritivo do dispositivo'},
+      {display:'sliders Ajuste 75',aria:'"...campo de edição"',cls:'partial',note:'Input sem label associado'},
+      {display:'dot Ligado',aria:'"...grupo"',cls:'partial',note:'Badge de status sem semântica'},
+      {display:'refresh WebSocket',aria:'(silêncio total)',cls:'bad',note:'Atualização via WebSocket é silenciosa — sem aria-live'},
     ]},
-  ideal:{name:'AccessHome Analyzer',score:'ARIA 1.2 completo',arch:'role + aria-label + aria-live',verdict:{icon:'✅',text:'Acessível',cls:'b-ok'},
+  ideal:{name:'AccessHome Analyzer',score:'ARIA 1.2 completo',arch:'role + aria-label + aria-live',verdict:{text:'Acessível',cls:'b-ok'},
     elements:[
-      {display:'💡 Sala',aria:'"Luz da Sala, botão alternador, desligado. Pressione Enter para ligar."',cls:'good',note:'role="switch" + aria-label completo + aria-checked'},
-      {display:'🔒 Porta',aria:'"Fechadura, botão de segurança, trancada. Pressione Enter para destrancar."',cls:'good',note:'Contexto de segurança explícito no label'},
-      {display:'🌡 Sensor',aria:'"Sensor de Temperatura do Quarto. Valor atual: 24 graus Celsius."',cls:'good',note:'Valor numérico lido em extenso'},
-      {display:'📹 Câmera',aria:'"Câmera da Entrada, botão de visualização, ativa."',cls:'good',note:'Nome, função e estado — os 3 juntos'},
-      {display:'🔄 Estado mudou',aria:'"Luz da Sala: ligada."',cls:'good',note:'aria-live="polite" anuncia a mudança automaticamente'},
+      {display:'bulb Sala',aria:'"Luz da Sala, botão alternador, desligado. Pressione Enter para ligar."',cls:'good',note:'role="switch" + aria-label completo + aria-checked'},
+      {display:'lock Porta',aria:'"Fechadura, botão de segurança, trancada. Pressione Enter para destrancar."',cls:'good',note:'Contexto de segurança explícito no label'},
+      {display:'thermo Sensor',aria:'"Sensor de Temperatura do Quarto. Valor atual: 24 graus Celsius."',cls:'good',note:'Valor numérico lido em extenso'},
+      {display:'camera Câmera',aria:'"Câmera da Entrada, botão de visualização, ativa."',cls:'good',note:'Nome, função e estado — os 3 juntos'},
+      {display:'refresh Estado mudou',aria:'"Luz da Sala: ligada."',cls:'good',note:'aria-live="polite" anuncia a mudança automaticamente'},
     ]},
 };
 let labPlat='sharptools',labCursor=-1,labAutoTimer=null;
@@ -966,7 +1022,7 @@ function labRenderMeta(){
   document.getElementById('labMeta').innerHTML=
     `<span><strong>${d.name}</strong></span><span class="t-m">${d.arch}</span>`+
     `<span class="b b-ac">${d.score}</span>`+
-    `<span class="b ${d.verdict.cls}">${d.verdict.icon} ${d.verdict.text} com NVDA</span>`;
+    `<span class="b ${d.verdict.cls}">${d.verdict.text} com NVDA</span>`;
 }
 function labTiles(){return [...document.querySelectorAll('#simDash .sim-tile')];}
 function labSpoken(el){
@@ -981,7 +1037,7 @@ function labRenderDash(){
     const b=document.createElement('button');
     b.type='button';b.className='sim-tile';
     b.dataset.speak=labSpoken(el);b.setAttribute('aria-label',labSpoken(el));
-    b.innerHTML=`<span class="sim-tile-icon" aria-hidden="true">${el.display.split(' ')[0]}</span><span class="sim-tile-label">${el.display.split(' ').slice(1).join(' ')}</span>`;
+    b.innerHTML=`<span class="sim-tile-icon" aria-hidden="true">${ic(el.display.split(' ')[0])}</span><span class="sim-tile-label">${el.display.split(' ').slice(1).join(' ')}</span>`;
     b.addEventListener('focus',()=>labFocus(i));
     b.addEventListener('click',()=>labFocus(i));
     dash.appendChild(b);
@@ -1005,7 +1061,7 @@ function labTab(){
 }
 function labReset(){
   labCursor=-1;
-  if(labAutoTimer){clearInterval(labAutoTimer);labAutoTimer=null;document.getElementById('labAutoBtn').textContent='▶ Demonstração automática';}
+  if(labAutoTimer){clearInterval(labAutoTimer);labAutoTimer=null;document.getElementById('labAutoBtn').textContent='Demonstração automática';}
   labRenderDash();
   document.getElementById('nvdaOutput').textContent='Pressione Tab para entrar no painel e avançar de item em item…';
   document.getElementById('nvdaNote').textContent='';
@@ -1013,12 +1069,12 @@ function labReset(){
 }
 function labAutoPlay(){
   const btn=document.getElementById('labAutoBtn');
-  if(labAutoTimer){clearInterval(labAutoTimer);labAutoTimer=null;btn.textContent='▶ Demonstração automática';return;}
-  btn.textContent='⏸ Parar demonstração';
+  if(labAutoTimer){clearInterval(labAutoTimer);labAutoTimer=null;btn.textContent='Demonstração automática';return;}
+  btn.textContent='Parar demonstração';
   labTab();
   labAutoTimer=setInterval(()=>{
     const d=NVDA_LAB[labPlat];
-    if(labCursor>=d.elements.length-1){clearInterval(labAutoTimer);labAutoTimer=null;btn.textContent='▶ Demonstração automática';return;}
+    if(labCursor>=d.elements.length-1){clearInterval(labAutoTimer);labAutoTimer=null;btn.textContent='Demonstração automática';return;}
     labTab();
   },3200);
 }
@@ -1159,19 +1215,19 @@ function renderCharts(){
 
 /* ═══ ONBOARDING MODAL ═══ */
 const MODAL_STEPS=[
-  {icon:'👋',title:'Bem-vindo',body:'Esta é a imersão na pesquisa de <strong>Yago Santos Silva</strong>, apresentada no XXI CICTA 2026. Vamos mostrar, na prática, o que ferramentas automáticas de acessibilidade não conseguem ver.'},
-  {icon:'🙈',title:'O problema real',body:'Casas inteligentes prometem autonomia. Mas painéis web mal feitos transformam "acender uma luz" em algo que depende de outra pessoa — para quem não vê a tela.'},
-  {icon:'⌨️',title:'Experimente agora',body:'Vá até "🎤 Ok Casa" e fale um comando, depois até "🦯 NVDA Lab" e pressione Tab repetidamente na aba SharpTools. Ouça a diferença.'},
-  {icon:'⚡',title:'O paradoxo',body:'A plataforma com a <strong>maior nota automática (83 pontos)</strong> foi a <strong>pior</strong> na prática com leitor de tela. Essa é a descoberta central da pesquisa.'},
-  {icon:'🚀',title:'Pronto para explorar',body:'Use as abas no topo para navegar livremente. Toque em "Começar" para fechar este guia.'},
+  {title:'Bem-vindo',body:'Este é o roteiro guiado da pesquisa de <strong>Yago Santos Silva</strong>, apresentada no XXI CICTA 2026. Vamos mostrar, na prática, o que ferramentas automáticas de acessibilidade não conseguem ver.'},
+  {title:'O problema',body:'Casas inteligentes prometem autonomia. Mas painéis web mal feitos transformam "acender uma luz" em algo que depende de outra pessoa — para quem não vê a tela.'},
+  {title:'Experimente agora',body:'Abra a aba Ok Casa e fale um comando; depois abra o NVDA Lab e pressione Tab repetidamente na aba SharpTools. Ouça a diferença.'},
+  {title:'O paradoxo',body:'A plataforma com a <strong>maior nota automática (83 pontos)</strong> foi a <strong>pior</strong> na prática com leitor de tela. Essa é a descoberta central da pesquisa.'},
+  {title:'Pronto para explorar',body:'Use as abas no topo para navegar livremente. Toque em "Começar" para fechar este guia.'},
 ];
 let modalIdx=0;
 function modalRender(){
   const s=MODAL_STEPS[modalIdx];
   document.getElementById('modalSteps').innerHTML=MODAL_STEPS.map((_,i)=>`<div class="dot ${i<=modalIdx?'on':''}"></div>`).join('');
-  document.getElementById('modalBody').innerHTML=`<div class="modal-icon">${s.icon}</div><h3>${s.title}</h3><p>${s.body}</p>`;
+  document.getElementById('modalBody').innerHTML=`<div class="modal-kicker">Etapa ${modalIdx+1} de ${MODAL_STEPS.length}</div><h3>${s.title}</h3><p>${s.body}</p>`;
   document.getElementById('modalPrevBtn').style.visibility=modalIdx===0?'hidden':'visible';
-  document.getElementById('modalNextBtn').textContent=modalIdx===MODAL_STEPS.length-1?'Começar →':'Próximo →';
+  document.getElementById('modalNextBtn').textContent=modalIdx===MODAL_STEPS.length-1?'Começar':'Próximo';
 }
 function modalNext(){
   if(modalIdx>=MODAL_STEPS.length-1){modalClose();return;}
@@ -1189,6 +1245,7 @@ function modalClose(){
   else{modalRender();}
 })();
 
+fillIcons();setThemeIcon(document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches));
 /* TECLADO: tudo alcançável por Tab */
 document.querySelectorAll('.cola-header').forEach(h=>{
   h.setAttribute('tabindex','0');h.setAttribute('role','button');
