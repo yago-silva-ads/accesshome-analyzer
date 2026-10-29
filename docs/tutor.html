@@ -72,6 +72,8 @@ textarea{font:inherit;width:100%;min-height:84px;padding:10px;border-radius:8px;
       <button type="button" id="voice" aria-pressed="true">Voz do tutor: ligada</button>
       <button type="button" id="stop">Parar voz</button>
     </div>
+    <div class="row" style="align-items:center"><label for="vsel">Voz:</label><select id="vsel" style="font:inherit;min-height:44px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--fg);padding:0 8px"></select><button type="button" id="vtest">Testar voz</button></div>
+    <p id="vnote" style="color:var(--mu);font-size:.9rem"></p>
     <p id="st" role="status">Verificando o tutor...</p>
   </form>
 </main>
@@ -94,11 +96,27 @@ function add(role,text){
   const s=document.createElement('small');s.textContent=role==='user'?'Você':'Tutor';
   d.append(s,document.createTextNode(text));log.append(d);log.scrollTop=log.scrollHeight;
 }
+function ptVoices(){return speechSynthesis.getVoices().filter(v=>/^pt[-_]BR/i.test(v.lang))}
+function pickVoice(){
+  const L=ptVoices(),sel=document.getElementById('vsel');
+  if(sel&&sel.value){const m=L.find(v=>v.name===sel.value);if(m)return m}
+  return L.find(v=>/thalita/i.test(v.name))||L.find(v=>/francisca/i.test(v.name))||L.find(v=>/natural|online/i.test(v.name))||L[0];
+}
+function fillVoices(){
+  const sel=document.getElementById('vsel');if(!sel)return;
+  const L=ptVoices(),cur=sel.value;
+  sel.innerHTML='';
+  L.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name.replace(/^Microsoft\s+/,'');sel.append(o)});
+  const t=L.find(v=>/thalita/i.test(v.name))||L.find(v=>/francisca/i.test(v.name));
+  sel.value=(cur&&L.some(v=>v.name===cur))?cur:(t?t.name:(L[0]?L[0].name:''));
+  document.getElementById('vnote').textContent=t?'':'A voz Thalita aparece no Microsoft Edge. Neste navegador, escolha outra da lista.';
+}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=fillVoices}
 function speak(t){
   if(!speakOn||!('speechSynthesis' in window))return;
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=1;
-  const v=speechSynthesis.getVoices().find(v=>/pt-BR/i.test(v.lang));if(v)u.voice=v;
+  const v=pickVoice();if(v){u.voice=v;u.lang=v.lang}
   u.onstart=()=>av.classList.add('talk');u.onend=u.onerror=()=>av.classList.remove('talk');
   speechSynthesis.speak(u);
 }
@@ -138,6 +156,8 @@ else mic.onclick=()=>{
   r.onerror=e=>{av.classList.remove('listen');st.textContent='Microfone: '+e.error};
   try{r.start()}catch(e){}
 };
+fillVoices();
+document.getElementById('vtest').onclick=()=>speak('Oi, Yago. Eu sou sua voz de treino. Vamos ensaiar a apresentação?');
 checkProxy();
 add('tutor','Olá, Yago. Toque em "Como começar a falar" para ensaiar a abertura olhando o banner. Depois use "Me pergunte (banca)". Se quiser, cole um trecho da sua fala e escreva "corrija".');
 </script>
