@@ -1033,7 +1033,7 @@ let ptVoice=null;
 function pickVoice(){
   if(!window.speechSynthesis)return;
   const vs=speechSynthesis.getVoices();
-  ptVoice=vs.find(v=>/pt-BR/i.test(v.lang)&&/Francisca|Antonio|Luciana|Google|Microsoft/i.test(v.name))||vs.find(v=>/pt-BR/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null;
+  ptVoice=vs.find(v=>/pt-BR/i.test(v.lang)&&/Thalita/i.test(v.name))||vs.find(v=>/pt-BR/i.test(v.lang)&&/Francisca/i.test(v.name))||vs.find(v=>/pt-BR/i.test(v.lang)&&/Antonio|Luciana|Google|Microsoft/i.test(v.name))||vs.find(v=>/pt-BR/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null;
 }
 if(window.speechSynthesis){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
 let lastSpoken='';
@@ -1311,9 +1311,15 @@ function startListening(armNow){
   r.lang='pt-BR';r.continuous=!IOS;r.interimResults=!IOS;r.maxAlternatives=3;
   r.onresult=e=>{
     for(let i=e.resultIndex;i<e.results.length;i++){
-      if(Date.now()<Listen.speakingUntil)continue;
       const res=e.results[i];
       const alts=[...res].map(a=>a.transcript);
+      const talking=Date.now()<Listen.speakingUntil||(window.speechSynthesis&&speechSynthesis.speaking);
+      if(talking){
+        if(alts.some(a=>{const n=norm(a);return wakeMatch(n)&&!isEcho(n);})){
+          try{speechSynthesis.cancel();}catch(err){}
+          Listen.speakingUntil=0;Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();
+        }else continue;
+      }
       if(!res.isFinal){
         showHeard(alts[0].trim());
         if(!Listen.heardWake&&alts.some(a=>wakeMatch(norm(a)))){Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();}
@@ -1349,6 +1355,12 @@ function toggleListen(){
   else{if(IOS){startListening(true);}else if(startListening(true))speak('Escuta ligada. Diga Ok Casa e um comando.');}
 }
 function toggleMic(){toggleListen();}
+function isEcho(n){
+  const sp=new Set(norm(lastSpoken||'').split(/\s+/));
+  const w=n.split(/\s+/).filter(Boolean);
+  if(!w.length)return true;
+  return w.filter(x=>sp.has(x)).length/w.length>=0.8;
+}
 function wakeMatch(n){
   const m=/\b(o\s?k|ok(ay|ey)?|oquei|oque|oi|ei|ola|hey|o)\s*(casa|cassa|caza|kasa)\b|\b(ocasa|okcasa|okasa)\b|^\s*(casa|cassa)\b/.exec(n);
   return m;
