@@ -119,6 +119,8 @@ p{margin-bottom:10px}p:last-child{margin-bottom:0}
 <a class="skip" href="#mainContent">Pular para o conteúdo</a>
 <div id="blindVeil" aria-hidden="true"><div id="blindHint">Olhos fechados. Tab avança · Shift+Tab volta · Enter ativa · Esc sai</div><div id="blindCaption"></div></div>
 <div id="live" class="sr-only" aria-live="polite" role="status"></div>
+<div id="heardBar" role="status" aria-hidden="true"></div>
+<div id="micBanner" role="region" aria-label="Ativar o Ok Casa"><span id="micBannerTxt">Para falar com o Ok Casa, ative o microfone.</span><button type="button" class="btn btn-p" onclick="toggleListen()">Ativar Ok Casa</button><button type="button" class="btn btn-o" onclick="hideBanner()">Agora não</button></div>
 <header class="hdr">
   <div class="hdr-top">
     <div class="logo">
@@ -139,6 +141,7 @@ p{margin-bottom:10px}p:last-child{margin-bottom:0}
     <button class="tab" data-sec="voz">Ok Casa</button>
     <button class="tab" data-sec="nvda">NVDA Lab</button>
     <button class="tab" data-sec="paradoxo">Paradoxo</button>
+    <button class="tab" data-sec="referencias">Referências</button>
     <button class="tab" data-sec="cola">Cola</button>
     <button class="tab" data-sec="dados">Dados</button>
     <button class="tab" data-sec="mercado">Solução</button>
@@ -382,6 +385,17 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
 .device-tile.flash{animation:flashTile .9s ease}
 @keyframes flashTile{0%{box-shadow:0 0 0 0 var(--ac)}40%{box-shadow:0 0 0 8px var(--ac-b)}100%{box-shadow:0 0 0 0 transparent}}
 .mic-hint{min-height:1.6em;max-width:36rem}
+body.ios #blindVeil{pointer-events:auto;cursor:pointer}
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:14px}
+.ref-quote{font-size:.92rem;color:var(--fg-m);border-left:3px solid var(--ac);padding:8px 12px;margin:10px 0 0}
+.ref-script{font-size:1.02rem;line-height:1.7;background:var(--ac-g);border:1px solid var(--ac);border-radius:8px;padding:14px 16px;margin-top:10px}
+#heardBar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#0B1830;color:#FFD60A;padding:10px 18px;border-radius:8px;font-weight:700;z-index:400;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s}
+#heardBar.on{opacity:1}
+#micBanner{position:sticky;top:0;z-index:99;display:none;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:#FFD60A;color:#0B1830;font-weight:700}
+#micBanner.on{display:flex}
+#micBanner .btn-o{background:transparent;color:#0B1830;border-color:#0B1830}
+#listenBtn:not([aria-pressed="true"]){animation:pulseBtn 2s infinite}
+@keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 var(--ac-b)}50%{box-shadow:0 0 0 6px transparent}}
 </style>
 
 <main class="main" id="mainContent" tabindex="-1">
@@ -595,6 +609,68 @@ h1:focus,h2:focus{outline:none;box-shadow:none}
       <tbody><tr><td style="font-weight:700">Home Assistant</td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,25</td></tr><tr><td style="font-weight:700">openHAB</td><td><span class="b b-dn">3</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-wn">2</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,50</td></tr><tr><td style="font-weight:700">SharpTools</td><td><span class="b b-wn">2</span></td><td><span class="b b-mod">1</span></td><td><span class="b b-dn">3</span></td><td><span class="b b-dn">3</span></td><td style="font-weight:700">2,25</td></tr></tbody>
     </table></div>
     <p style="font-size:.9rem;margin-top:10px" class="t-m">Média = soma dos quatro critérios dividida por quatro. SharpTools e Home Assistant empatam em 2,25, mas só o teste com NVDA mostra a diferença na experiência real: o SharpTools foi inutilizável.</p>
+  </div>
+</section>
+
+<!-- ═══ REFERENCIAS ═══ -->
+<section class="sec" id="referencias">
+  <div class="eye">Embasamento teórico</div>
+  <h2>Referências e o que a pesquisa fez com elas</h2>
+  <p class="lead">Uma referência âncora, para citar com segurança, e as demais como base técnica. Para cada uma: quem fez, qual é o projeto, o que foi aproveitado e o que foi desenvolvido.</p>
+
+  <div class="card">
+    <h3>Referência âncora: Stelea, Sangeorzan e Enache-David (2025)</h3>
+    <p class="ref-quote">STELEA, G. A.; SANGEORZAN, L.; ENACHE-DAVID, N. Accessible IoT Dashboard Design with AI-Enhanced Descriptions for Visually Impaired Users. Future Internet, v. 17, n. 274, 2025. DOI 10.3390/fi17070274.</p>
+    <div class="ref-grid">
+      <div>
+        <h3>O projeto deles</h3>
+        <ul class="cola-pts">
+          <li>Criaram o <strong>AccessiDashboard</strong>, um painel web de IoT acessível desde a origem.</li>
+          <li>Usa <strong>HTML5 semântico e WAI-ARIA</strong> para que leitores de tela interpretem e naveguem.</li>
+          <li>Um <strong>modelo de linguagem</strong> gera descrições longas e contextuais de gráficos e dados de sensores, em formatos variados: gráfico, lista, tabela e narrativa.</li>
+          <li>A IA entra como <strong>apoio</strong>, não como substituta, com privacidade por projeto.</li>
+          <li>A avaliação inicial indica <strong>menor carga cognitiva e de navegação</strong> para pessoas com deficiência visual.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>O que tiramos deles</h3>
+        <ul class="cola-pts">
+          <li>O <strong>problema</strong>: painéis de IoT que ignoram a deficiência visual tiram a autonomia da pessoa.</li>
+          <li>O <strong>critério de projeto</strong>: semântica e ARIA corretas são a base de um painel acessível.</li>
+          <li>O <strong>princípio</strong> de IA como apoio, que usamos no Ok Casa opcional, com a chave só no navegador.</li>
+        </ul>
+        <h3 style="margin-top:14px">O que desenvolvemos</h3>
+        <ul class="cola-pts">
+          <li>Eles propõem um painel novo; nós <strong>auditamos três plataformas reais</strong> e mostramos onde falham.</li>
+          <li>Mostramos que a <strong>nota automática não mede essa semântica</strong>: o paradoxo do SharpTools.</li>
+          <li>Pipeline <strong>Lighthouse, Axe e NVDA</strong> e matriz de severidade de 0 a 3.</li>
+          <li>O <strong>AccessHome Analyzer</strong>: auditoria, simulação de teclado, NVDA Lab e assistente de voz.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="ref-script"><strong>Como citar em 20 segundos.</strong> "Stelea e colegas, em 2025, mostraram que um painel de IoT acessível depende de HTML semântico e ARIA, e propuseram o AccessiDashboard. A minha pesquisa olha para o outro lado: pega três plataformas que já existem e mede se elas cumprem isso. O resultado é que nenhuma cumpre o critério 4.1.2, e que a nota automática não percebe a falha. Daí o AccessHome Analyzer."</div>
+  </div>
+
+  <div class="card">
+    <h3>Base técnica e normativa</h3>
+    <div class="tw"><table class="tbl">
+      <thead><tr><th>Referência</th><th>Quem fez</th><th>Projeto</th><th>Uso na pesquisa</th></tr></thead>
+      <tbody>
+        <tr><td>WCAG 2.1 (2018)</td><td>W3C, Iniciativa de Acessibilidade na Web</td><td>Norma de acessibilidade web</td><td>Base dos quatro critérios: 1.1.1, 1.4.3, 2.1.1 e 4.1.2</td></tr>
+        <tr><td>Axe DevTools</td><td>Deque Systems</td><td>Motor axe-core e extensão para navegador</td><td>Ferramenta automática mais confiável; classifica por impacto. O estudo da Deque (2021) achou 57,38% do volume de problemas; é estudo do próprio fabricante</td></tr>
+        <tr><td>Lighthouse</td><td>Google, equipe do Chrome</td><td>Auditoria integrada ao Chrome</td><td>Nota de 0 a 100. A parte de acessibilidade usa regras do axe-core, ponderadas por impacto, e por isso concorda com o Axe</td></tr>
+        <tr><td>NVDA</td><td>Michael Curran (2006) e James Teh; ONG NV Access (2007)</td><td>Leitor de tela gratuito e de código aberto</td><td>Validação manual. Criado por causa do custo dos leitores comerciais, o que justifica a escolha</td></tr>
+        <tr><td>WAVE</td><td>WebAIM, Universidade Estadual de Utah</td><td>Verificador visual, gratuito desde 2001</td><td>Sobrepõe ícones à página; falhou no openHAB, que reescreve a página com Vue</td></tr>
+        <tr><td>WAI-ARIA 1.2</td><td>W3C</td><td>Atributos de nome, função e estado</td><td>Base técnica do critério 4.1.2</td></tr>
+        <tr><td>Lei 13.146/2015, art. 63</td><td>Brasil</td><td>Lei Brasileira de Inclusão</td><td>Fundamento legal da acessibilidade digital</td></tr>
+        <tr><td>Home Assistant e openHAB</td><td>Comunidades de código aberto</td><td>Plataformas de automação residencial</td><td>Objetos de estudo, com SharpTools como terceira plataforma</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>Pergunta provável: "Vocês citam 30 a 40%, mas a Deque diz 57%"</h3>
+    <p>O percentual depende da métrica. Estudos mais antigos falam em 20 a 30% ou 30 a 40% dos problemas; a Deque, medindo por volume de problemas em mais de 2.000 auditorias, chegou a 57%. Em qualquer dos casos, uma parte relevante exige validação humana. O achado desta pesquisa é qualitativo: o que o NVDA revelou, como o estado que não é anunciado no openHAB, nenhuma ferramenta automática mostrou.</p>
   </div>
 </section>
 
@@ -939,6 +1015,7 @@ function speak(text,rate){
   if(live){live.textContent='';setTimeout(()=>{live.textContent=text;},30);}
   if(!window.speechSynthesis)return;
   const u=new SpeechSynthesisUtterance(text);
+  if(!ptVoice)pickVoice();
   u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onend=u.onerror=()=>{Listen.speakingUntil=Date.now()+400;};
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
@@ -951,8 +1028,8 @@ function toggleBlind(force){
   const b=document.getElementById('blindBtn');
   b.setAttribute('aria-pressed',on);
   document.getElementById('blindLbl').textContent=on?'Abrir os olhos (Esc)':'Simular olhos fechados';document.getElementById('blindIc').innerHTML=ic(on?'eye':'eyeoff');
-  speak(on?'Modo olhos fechados ativado. Fale Ok Casa e um comando, por exemplo: Ok Casa, ajuda. Ou: Ok Casa, ler a página. Você também pode usar Tab, Shift Tab, Enter e Escape.':'Olhos abertos. Modo olhos fechados desativado.');
-  if(on&&SRClass&&!Listen.on)startListening(false);
+  speak(on?(IOS?'Modo olhos fechados ativado. Toque em qualquer lugar da tela e fale um comando, por exemplo: ajuda, ou: ler a página.':'Modo olhos fechados ativado. Fale Ok Casa e um comando, por exemplo: Ok Casa, ajuda. Ou: Ok Casa, ler a página. Você também pode usar Tab, Shift Tab, Enter e Escape.'):'Olhos abertos. Modo olhos fechados desativado.');
+  if(on&&SRClass&&!IOS&&!Listen.on)startListening(false);
   setListenUI();
   if(on){document.getElementById('mainContent').focus();}
 }
@@ -973,6 +1050,7 @@ function describe(el){
   if(el.hasAttribute('aria-expanded'))kind+=el.getAttribute('aria-expanded')==='true'?', expandido':', recolhido';
   return name+(kind?', '+kind:'')+'.';
 }
+document.getElementById('blindVeil').addEventListener('click',()=>{if(IOS&&!Listen.on)startListening(true);});
 document.addEventListener('focusin',e=>{
   if(!document.body.classList.contains('blind'))return;
   const t=e.target;
@@ -1036,8 +1114,22 @@ const KB=[
   a:'O WAVE injeta ícones na página. Falhou por completo no openHAB e foi limitado no Home Assistant, porque frameworks como Vue reescrevem a página. Só funcionou bem no SharpTools. Não é recomendado para aplicações modernas.'},
  {k:['nvda','leitor de tela','o que e nvda','o que e o nvda','screen reader'],
   a:'NVDA é um leitor de tela gratuito e de código aberto para Windows, que fala tudo o que aparece na tela. Foi indispensável: revelou barreiras que nenhuma ferramenta automática detectou.'},
- {k:['30 a 40','40 por cento','cobertura','quanto detectam','quanto as ferramentas detectam','limite das ferramentas','ferramentas automaticas detectam'],
-  a:'Ferramentas automáticas detectam só parte das barreiras, na ordem de 30 a 40 por cento, segundo a literatura usada na pesquisa. O restante exige validação humana com leitor de tela.'},
+ {k:['stelea','sangeorzan','enache david','accessidashboard','referencia principal','artigo de referencia','qual a referencia','em que se baseou','em que voce se baseou','base teorica','embasamento','fundamentacao teorica'],
+  a:'A referência principal é Stelea, Sangeorzan e Enache-David, de 2025, na revista Future Internet. Eles propõem o AccessiDashboard, um painel de IoT acessível com HTML semântico, ARIA e descrições geradas por modelo de linguagem, com a IA como apoio. A pesquisa parte daí: eles propõem o painel acessível, e eu auditei três plataformas reais para ver se cumprem isso.'},
+ {k:['o que voce tirou','o que tirou','o que aproveitou','o que voce aproveitou','o que tirou do artigo','o que voce usou deles'],
+  a:'Do artigo de Stelea e colegas, aproveitei o problema, que é a perda de autonomia em painéis inacessíveis; o critério de projeto, semântica e ARIA corretas; e o princípio de usar IA como apoio, que aparece no Ok Casa opcional.'},
+ {k:['o que voce desenvolveu','o que desenvolveu','qual a sua contribuicao','contribuicao da pesquisa','o que e novo','diferencial','o que voce fez de novo'],
+  a:'Desenvolvi a auditoria de três plataformas reais com quatro ferramentas, a demonstração de que a nota automática não mede a semântica, o paradoxo do SharpTools, o pipeline Lighthouse, Axe e NVDA, a matriz de severidade e o AccessHome Analyzer com NVDA Lab e assistente de voz.'},
+ {k:['quem criou o nvda','quem fez o nvda','criador do nvda','nv access','michael curran','james teh'],
+  a:'O NVDA foi criado por Michael Curran, em 2006, junto com James Teh, e mantido pela ONG australiana NV Access, fundada em 2007. Nasceu por causa do alto custo dos leitores de tela comerciais, e por isso é gratuito e de código aberto.'},
+ {k:['quem criou o wave','quem fez o wave','webaim','quem criou o axe','quem fez o axe','quem fez o lighthouse','quem criou o lighthouse'],
+  a:'O WAVE é do WebAIM, da Universidade Estadual de Utah, gratuito desde 2001. O Axe é da Deque Systems. O Lighthouse é do Google, na equipe do Chrome, e a parte de acessibilidade dele usa regras do axe-core.'},
+ {k:['lighthouse usa axe','lighthouse e axe usam','por que lighthouse e axe concordam','axe core','axe-core'],
+  a:'A auditoria de acessibilidade do Lighthouse usa as regras do axe-core, ponderadas por impacto. Por isso Lighthouse e Axe concordaram em colocar o SharpTools em primeiro: ambos medem só o que uma máquina consegue verificar, e não o que o leitor de tela realmente anuncia.'},
+ {k:['deque 57','57 por cento','estudo da deque','cobertura da deque','trinta a quarenta ou cinquenta e sete'],
+  a:'A Deque, em 2021, mediu por volume de problemas e achou 57 por cento cobertos por automação, em mais de 2 mil auditorias. É um estudo do próprio fabricante. A pesquisa cita 30 a 40 por cento; o número muda com a métrica, mas o restante sempre exige validação humana.'},
+ {k:['cobertura','quanto detectam','quanto as ferramentas detectam','limite das ferramentas','ferramentas automaticas detectam','30 a 40','40 por cento'],
+  a:'Ferramentas automáticas cobrem só parte das barreiras. A pesquisa cita 30 a 40 por cento; o estudo da Deque de 2021, feito pelo próprio fabricante, achou 57 por cento do volume de problemas. O número depende da métrica, mas em qualquer caso o restante exige validação humana com leitor de tela.'},
  {k:['pipeline','recomendacao','qual ferramenta usar','recomenda','recomendacoes','o que recomenda','boas praticas','o que voce recomenda'],
   a:'A recomendação é um pipeline: Lighthouse para triagem rápida, Axe DevTools para violações precisas e NVDA para validação real. Evitar o WAVE em aplicações modernas.'},
  {k:['accesshome','produto','ferramenta desenvolvida','analyzer','o que voce desenvolveu','solucao'],
@@ -1101,6 +1193,7 @@ const SUMMARY={
  voz:'Ok Casa. Assistente de voz de referência. Experimente: ligar luz da sala, trancar porta, temperatura, status ou cena noite. Cada resposta diz o dispositivo e o novo estado.',
  nvda:'NVDA Lab. Reproduz o teste manual da pesquisa. Escolha a plataforma e avance com Tab ou diga próximo item. No SharpTools você ouve só clicável e link. No AccessHome ideal, cada item diz nome, função e estado.',
  paradoxo:'Paradoxo. SharpTools: Lighthouse 83 e seis erros no Axe, mas inutilizável com NVDA. Home Assistant: 75 e 12 erros, parcial. openHAB: 70 e 18 erros, parcial. A nota mais alta teve a pior experiência.',
+ referencias:'Referências. A âncora é Stelea, Sangeorzan e Enache-David, de 2025, que propõem o AccessiDashboard, um painel acessível com HTML semântico, ARIA e IA como apoio. A pesquisa aproveitou o problema e o critério de projeto, e desenvolveu a auditoria de três plataformas reais, o paradoxo entre nota e experiência e o AccessHome Analyzer.',
  cola:'Cola da apresentação. Seis seções do banner, com os pontos principais e respostas para perguntas difíceis.',
  dados:'Dados. Doze avaliações de plataforma por critério: cinco críticas, seis moderadas, uma menor e nenhuma sem barreira. O Axe encontrou 6, 12 e 18 erros.',
  mercado:'Solução. Pipeline recomendado: Lighthouse, depois Axe, depois NVDA. O AccessHome Analyzer integra auditoria, simulação de teclado e voz.'
@@ -1110,6 +1203,7 @@ const SECTIONS=[
  ['voz',['ok casa','assistente','voz']],
  ['nvda',['nvda lab','nvda','laboratorio','lab','leitor de tela']],
  ['paradoxo',['paradoxo']],
+ ['referencias',['referencias','referencia','embasamento','base teorica','bibliografia','autores']],
  ['cola',['cola','roteiro da apresentacao','apresentacao']],
  ['dados',['dados','graficos','auditoria','tabela']],
  ['mercado',['solucao','mercado','produto']]
@@ -1138,8 +1232,17 @@ function moveFocus(d){
 
 /* ═══ ESCUTA CONTINUA "OK CASA" ═══ */
 const SRClass=window.SpeechRecognition||window.webkitSpeechRecognition;
+const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(IOS)document.body.classList.add('ios');
+let speechUnlocked=false;
+function unlockSpeech(){
+  if(speechUnlocked||!window.speechSynthesis)return;
+  speechUnlocked=true;
+  try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}
+}
+['touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockSpeech,{once:true,passive:true}));
 const Listen={on:false,rec:null,armedUntil:0,speakingUntil:0,heardWake:false,lastHeard:''};
-const WAKE=/\b(o\s?k|okay|ok|oque|oi|ei|ola|hey)\s+(casa|cassa|caza|kasa)\b/;
+const WAKE=/\b(o\s?k|ok(ay|ey)?|oquei|oque|oi|ei|ola|hey|o)?\s*(casa|cassa|caza|kasa)\b|\b(ocasa|okcasa|okasa)\b/;
 function beep(){
   try{
     const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());
@@ -1152,16 +1255,16 @@ function setListenUI(){
   const armed=Listen.on&&Date.now()<Listen.armedUntil;
   const lb=document.getElementById('listenBtn');
   if(lb){lb.setAttribute('aria-pressed',Listen.on);
-    document.getElementById('listenLbl').textContent=!Listen.on?'Ok Casa: desligado':(armed?'Pode falar':'Ouvindo: diga Ok Casa');}
+    document.getElementById('listenLbl').textContent=!Listen.on?(IOS?'Toque para falar':'Ok Casa: desligado'):(armed||IOS?'Pode falar':'Ouvindo: diga Ok Casa');}
   const mb=document.getElementById('micBig');
   if(mb){mb.classList.toggle('listening',Listen.on);}
   const mi=document.getElementById('micBigIcon');
   if(mi)mi.innerHTML=ic(Listen.on?'stop':'mic');
   const mh=document.getElementById('micHint');
-  if(mh)mh.textContent=!Listen.on?'Toque para ativar a escuta. Depois diga "Ok Casa" e um comando.':
+  if(mh)mh.textContent=!Listen.on?(IOS?'Toque no microfone e fale o comando. No iPhone não é preciso dizer "Ok Casa".':'Toque para ativar a escuta. Depois diga "Ok Casa" e um comando.'):
     (Listen.lastHeard?'Ouvi: "'+Listen.lastHeard+'"':(armed?'Pode falar.':'Escutando. Diga "Ok Casa" e um comando.'));
   const bh=document.getElementById('blindHint');
-  if(bh)bh.textContent='Olhos fechados. '+(Listen.on?(armed?'Pode falar.':'Diga "Ok Casa" e um comando.'):'Escuta desligada.')+' Tab avança · Shift+Tab volta · Enter ativa · Esc sai';
+  if(bh)bh.textContent='Olhos fechados. '+(IOS?(Listen.on?'Pode falar.':'Toque em qualquer lugar da tela para falar.'):(Listen.on?(armed?'Pode falar.':'Diga "Ok Casa" e um comando.'):'Escuta desligada.'))+' Tab avança · Shift+Tab volta · Enter ativa · Esc sai';
 }
 function startListening(armNow){
   if(!SRClass){
@@ -1173,30 +1276,34 @@ function startListening(armNow){
   setListenUI();
   if(Listen.rec)return true;
   const r=new SRClass();
-  r.lang='pt-BR';r.continuous=true;r.interimResults=true;r.maxAlternatives=3;
+  r.lang='pt-BR';r.continuous=!IOS;r.interimResults=!IOS;r.maxAlternatives=3;
   r.onresult=e=>{
     for(let i=e.resultIndex;i<e.results.length;i++){
       if(Date.now()<Listen.speakingUntil)continue;
       const res=e.results[i];
       const alts=[...res].map(a=>a.transcript);
       if(!res.isFinal){
-        if(!Listen.heardWake&&alts.some(a=>WAKE.test(norm(a)))){Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();}
+        showHeard(alts[0].trim());
+        if(!Listen.heardWake&&alts.some(a=>wakeMatch(norm(a)))){Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();}
         continue;
       }
       Listen.heardWake=false;
       onFinalSpeech(alts);
     }
   };
+  r.onstart=()=>{showHeard('microfone ativo, fale agora');};
   r.onerror=ev=>{
+    if(ev.error==='audio-capture'){appendMsg('Nenhum microfone encontrado neste dispositivo.','msg-bot');}
     if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){
       Listen.on=false;
-      appendMsg('O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço e ative a escuta de novo.','msg-bot');
-      speak('O microfone está bloqueado. Permita o microfone no navegador.');
+      const m=IOS?'No iPhone, permita o microfone para este site e ative o Ditado em Ajustes, Geral, Teclado, Ativar Ditado. Depois toque no microfone de novo.':'O navegador bloqueou o microfone. Permita o microfone no cadeado da barra de endereço e ative a escuta de novo.';
+      appendMsg(m,'msg-bot');
+      speak(m);
     }else if(ev.error==='network'){
       appendMsg('O reconhecimento de voz do Chrome precisa de internet.','msg-bot');
     }
   };
-  r.onend=()=>{Listen.rec=null;if(Listen.on)setTimeout(()=>startListening(false),250);setListenUI();};
+  r.onend=()=>{Listen.rec=null;if(IOS){Listen.on=false;setListenUI();return;}if(Listen.on)setTimeout(()=>startListening(false),250);setListenUI();};
   try{r.start();Listen.rec=r;}catch(e){}
   return true;
 }
@@ -1206,15 +1313,24 @@ function stopListening(){
   setListenUI();
 }
 function toggleListen(){
-  if(Listen.on){stopListening();speak('Escuta desligada.');}
-  else{if(startListening(true))speak('Escuta ligada. Diga Ok Casa e um comando.');}
+  if(Listen.on){stopListening();if(!IOS)speak('Escuta desligada.');}
+  else{if(IOS){startListening(true);}else if(startListening(true))speak('Escuta ligada. Diga Ok Casa e um comando.');}
 }
 function toggleMic(){toggleListen();}
+function wakeMatch(n){
+  const m=/\b(o\s?k|ok(ay|ey)?|oquei|oque|oi|ei|ola|hey|o)\s*(casa|cassa|caza|kasa)\b|\b(ocasa|okcasa|okasa)\b|^\s*(casa|cassa)\b/.exec(n);
+  return m;
+}
+function showHeard(t){
+  const b=document.getElementById('heardBar');if(!b)return;
+  b.textContent='Ouvi: "'+t+'"';b.classList.add('on');
+  clearTimeout(showHeard.t);showHeard.t=setTimeout(()=>b.classList.remove('on'),4500);
+}
 function onFinalSpeech(alts){
   Listen.lastHeard=alts[0].trim();
   let cmd=null;
   for(const a of alts){
-    const n=norm(a),m=WAKE.exec(n);
+    const n=norm(a),m=wakeMatch(n);
     if(m){cmd=n.slice(m.index+m[0].length).trim();break;}
   }
   if(cmd===null){
@@ -1227,7 +1343,8 @@ function onFinalSpeech(alts){
     speak('Pois não?');
     return;
   }
-  Listen.armedUntil=0;
+  Listen.armedUntil=Date.now()+12000;
+  showHeard(alts[0].trim());
   runCmd(alts[0].replace(/^.*?\b(ok|okay|oi|ei|ola|hey)[\s,]+(casa|cassa|caza)\b[\s,.]*/i,'')||cmd);
   setListenUI();
 }
@@ -1282,7 +1399,7 @@ function vaultSearch(q,k){
 }
 function extract(chunk,q){
   const qt=new Set(toks(q));
-  const sents=chunk.x.split(/(?<=[.!?])\s+|\n+/).map(x=>x.trim()).filter(x=>x.length>12);
+  const sents=chunk.x.replace(/([.!?])\s+/g,'$1\u0001').split(/\u0001|\n+/).map(x=>x.trim()).filter(x=>x.length>12);
   const sc=sents.map((x,i)=>({x,i,s:toks(x).filter(w=>qt.has(w)).length}));
   const pick=new Set();
   sc.slice().sort((a,b)=>b.s-a.s||a.i-b.i).slice(0,3).forEach(o=>{
@@ -1713,6 +1830,25 @@ function modalClose(){
 })();
 
 fillIcons();setListenUI();llmStatus();setThemeIcon(document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches));
+/* ATIVACAO DO OK CASA */
+let bannerHidden=false;
+function hideBanner(){bannerHidden=true;refreshBanner();}
+function refreshBanner(){
+  const b=document.getElementById('micBanner');if(!b)return;
+  b.classList.toggle('on',!!SRClass&&!Listen.on&&!bannerHidden);
+  document.getElementById('micBannerTxt').textContent=IOS?'Toque em Ativar e fale o comando.':'Para falar com o Ok Casa, ative o microfone. Depois é só dizer "Ok Casa".';
+}
+setInterval(refreshBanner,600);
+function firstGesture(e){
+  if(Listen.on||!SRClass||IOS)return;
+  if(e.target.closest&&e.target.closest('#listenBtn,#micBig,#micBanner,#blindBtn'))return;
+  startListening(true);
+}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,firstGesture,{once:true,passive:true}));
+if(SRClass&&!IOS&&navigator.permissions&&navigator.permissions.query){
+  navigator.permissions.query({name:'microphone'}).then(p=>{if(p.state==='granted')startListening(false);}).catch(()=>{});
+}
+refreshBanner();
 /* TECLADO: tudo alcançável por Tab */
 document.querySelectorAll('.cola-header').forEach(h=>{
   h.setAttribute('tabindex','0');h.setAttribute('role','button');
