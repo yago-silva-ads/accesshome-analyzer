@@ -138,8 +138,8 @@ p{margin-bottom:10px}p:last-child{margin-bottom:0}
   </div>
   <nav class="tabs" aria-label="Seções do site">
     <button class="tab on" data-sec="inicio">Início</button>
-    <button class="tab" data-sec="voz">Ok Casa</button>
     <button class="tab" data-sec="nvda">NVDA Lab</button>
+    <button class="tab" data-sec="voz">Ok Casa</button>
     <button class="tab" data-sec="paradoxo">Paradoxo</button>
     <button class="tab" data-sec="referencias">Referências</button>
     <button class="tab" data-sec="cola">Cola</button>
@@ -396,6 +396,13 @@ body.ios #blindVeil{pointer-events:auto;cursor:pointer}
 #micBanner .btn-o{background:transparent;color:#0B1830;border-color:#0B1830}
 #listenBtn:not([aria-pressed="true"]){animation:pulseBtn 2s infinite}
 @keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 var(--ac-b)}50%{box-shadow:0 0 0 6px transparent}}
+
+#soundMap{width:100%;max-width:340px;height:auto;display:block;margin:12px auto;background:var(--bg-s);border:1px solid var(--bd);border-radius:8px}
+#soundMap .dev{fill:var(--fg-m);transition:fill .15s,r .15s}
+#soundMap .dev.on{fill:var(--ok)}
+#soundMap .dev.ping{fill:#FFD60A;stroke:#0B1830;stroke-width:2}
+#soundMap text{font-size:9px;fill:var(--fg-m);text-anchor:middle;font-family:var(--fb)}
+#soundMap .ring{fill:none;stroke:var(--bd);stroke-dasharray:3 4}
 </style>
 
 <main class="main" id="mainContent" tabindex="-1">
@@ -496,9 +503,20 @@ body.ios #blindVeil{pointer-events:auto;cursor:pointer}
     </div>
   </div>
 
+  <div class="card" id="mapCard">
+    <h3>Mapa sonoro da casa</h3>
+    <p>Use fones de ouvido. Cada dispositivo toca um som na direção em que está, em relação a você, no centro e de frente para o norte. Luz é agudo, fechadura é grave, ligado soa duas vezes e desligado soa uma. Diga "Ok Casa, mapa sonoro" ou "Ok Casa, onde estão as luzes".</p>
+    <svg id="soundMap" viewBox="-120 -120 240 240" role="img" aria-label="Mapa da casa visto de cima, com a pessoa no centro e os dispositivos ao redor" focusable="false"></svg>
+    <div class="btn-row">
+      <button type="button" class="btn btn-p" onclick="soundMap()">Tocar mapa sonoro</button>
+      <button type="button" class="btn btn-o" onclick="soundMap('luz')">Só as luzes</button>
+      <button type="button" class="btn btn-o" onclick="soundMap('seg')">Segurança</button>
+    </div>
+  </div>
+
   <details class="card llm-box" id="llmBox">
     <summary>IA generativa (opcional)</summary>
-    <p>Sem chave, o Ok Casa responde pela base e pelo cofre de notas da pesquisa, sem internet. Com uma chave da Anthropic, um modelo de linguagem redige as respostas, sempre limitado ao conteúdo do cofre. A chave fica salva somente neste navegador.</p>
+    <p>Sem chave, o Ok Casa responde pela base e pelo cofre de notas da pesquisa, sem internet. Com o proxy local ligado (ou uma chave da Anthropic), um modelo de linguagem redige as respostas, restrito a acessibilidade para pessoas com deficiência visual e à pesquisa. A chave nunca vai para o site.</p>
     <div class="cmd-row">
       <input class="cmd-input" id="llmKey" type="password" autocomplete="off" aria-label="Chave de API da Anthropic" placeholder="Cole a chave de API aqui">
       <button type="button" class="btn btn-o" onclick="saveLLM()">Salvar</button>
@@ -794,6 +812,18 @@ body.ios #blindVeil{pointer-events:auto;cursor:pointer}
       <div style="font-size:1.2rem;color:var(--fg-m);padding:0 8px" data-ic="chevron"></div>
       <div style="text-align:center;padding:14px 16px;background:var(--wn-g);border:1px solid var(--wn);border-radius:8px;min-width:110px"><div style="font-family:var(--fm);font-size:.65rem;color:var(--wn)">3</div><div style="font-family:var(--fd);font-weight:700">NVDA</div></div>
     </div>
+  </div>
+
+  <div class="card">
+    <h3>Próxima fase: AccessHome Vision (proposta de trabalho futuro, ainda não implementada)</h3>
+    <p>A pessoa cega não vê a tela: ela escuta e toca. Por isso a evolução natural é sair do painel e levar a casa para o som e a voz.</p>
+    <ul class="cola-pts">
+      <li><strong>Câmeras com modelo multimodal</strong> que descrevem o ambiente em voz: quem está na porta, o que está sobre a mesa, onde algo foi deixado. Processamento local e com consentimento, sem enviar vídeo para fora.</li>
+      <li><strong>Mapa sonoro e sonar</strong> em áudio espacial, para localizar dispositivos e obstáculos pela direção do som. O protótipo está na aba Ok Casa.</li>
+      <li><strong>Voz natural com IA generativa</strong> restrita a acessibilidade, já em protótipo no Ok Casa.</li>
+      <li><strong>Aprendizado de máquina sobre rotinas</strong>: sugerir cenas como "boa noite" a partir dos hábitos, sempre confirmando por voz.</li>
+      <li><strong>Integração real</strong> com Home Assistant e openHAB e <strong>testes com usuários cegos</strong>, o próximo passo metodológico da pesquisa.</li>
+    </ul>
   </div>
 </section>
 
@@ -1164,6 +1194,8 @@ const KB=[
   a:'Foco é o elemento que recebe o teclado agora. A ordem de foco deve seguir o layout visual. No SharpTools a ordem era caótica, com loops, e isso levou à severidade 3 no critério de teclado.'},
  {k:['heading','headings','titulos de secao','estrutura de titulos'],
   a:'Headings são os títulos de seção, que permitem à pessoa cega navegar pela página por tópicos. O SharpTools não tinha nenhum, e o openHAB e o Home Assistant tinham estrutura inconsistente.'},
+ {k:['accesshome vision','camera na casa','cameras','visao computacional','proxima fase','futuro do projeto','mapa sonoro','sonar','audio espacial'],
+  a:'A próxima fase é o AccessHome Vision, uma proposta de trabalho futuro: câmeras com modelo multimodal que descrevem o ambiente em voz, com processamento local e consentimento; mapa sonoro e sonar em áudio espacial, cujo protótipo está na aba Ok Casa; aprendizado de máquina sobre rotinas; integração real com Home Assistant e testes com usuários cegos. Nada disso está implementado ainda além do mapa sonoro e do Ok Casa.'},
  {k:['evento','cicta','quando sera','onde sera','horario','data da apresentacao','orientadora'],
   a:'XXI CICTA 2026, quinta-feira, 29 de outubro, das 14h15 às 15h30, no Centro Universitário Senac, Campus Santo Amaro. Orientadora: professora doutora Claudia Bianchi Progetti.'},
  {k:['deficiencia visual','cegueira','baixa visao','publico alvo'],
@@ -1200,8 +1232,8 @@ const SUMMARY={
 };
 const SECTIONS=[
  ['inicio',['inicio','comeco','pagina inicial','principal','home','primeira aba','aba 1']],
- ['voz',['ok casa','que em casa','o que em casa','quem casa','oquei casa','okay casa','o casa','ocasa','assistente','voz','segunda aba','aba 2']],
- ['nvda',['nvda lab','nvda','envida','nvidia','laboratorio','lab','leitor de tela','terceira aba','aba 3']],
+ ['nvda',['nvda lab','nvda','envida','nvidia','laboratorio','lab','leitor de tela','segunda aba','aba 2']],
+ ['voz',['ok casa','que em casa','o que em casa','quem casa','oquei casa','okay casa','o casa','ocasa','assistente','voz','terceira aba','aba 3']],
  ['paradoxo',['paradoxo','paradoxal','quarta aba','aba 4']],
  ['referencias',['referencias','referencia','embasamento','base teorica','bibliografia','autores','quinta aba','aba 5']],
  ['cola',['cola','coala','roteiro da apresentacao','apresentacao','sexta aba','aba 6']],
@@ -1416,7 +1448,7 @@ let lastSource='';
 function llmKey(){try{return localStorage.getItem('ah-llm-key')||'';}catch(e){return '';}}
 function llmStatus(){
   const el=document.getElementById('llmStatus');
-  if(el)el.textContent=llmKey()?'Modo IA generativa ativo: respostas redigidas por modelo de linguagem, limitadas ao cofre da pesquisa.':'Modo offline: respostas montadas a partir da base e do cofre da pesquisa, sem internet e sem chave.';
+  if(el)el.textContent=proxyUp?'IA conectada pelo proxy local: respostas redigidas por modelo de linguagem, restritas a acessibilidade para deficiência visual e à pesquisa. A chave fica só neste computador.':(llmKey()?'Modo IA generativa ativo com a chave salva neste navegador, restrito a acessibilidade e à pesquisa.':'Modo offline: respostas montadas a partir da base e do cofre da pesquisa, sem internet e sem chave.');
 }
 function saveLLM(){
   const v=document.getElementById('llmKey').value.trim();
@@ -1426,7 +1458,26 @@ function saveLLM(){
   llmStatus();speak('Modo IA generativa ativado.');
 }
 function clearLLM(){try{localStorage.removeItem('ah-llm-key');}catch(e){}llmStatus();speak('Modo offline ativado.');}
+const PROXY='http://127.0.0.1:8799';
+let proxyUp=false;
+function checkProxy(){
+  const ac=new AbortController();const to=setTimeout(()=>ac.abort(),2000);
+  fetch(PROXY+'/health',{signal:ac.signal}).then(r=>r.json()).then(j=>{proxyUp=!!(j&&j.ok);llmStatus();}).catch(()=>{proxyUp=false;llmStatus();}).finally(()=>clearTimeout(to));
+}
+setTimeout(checkProxy,500);setInterval(checkProxy,20000);
+const SCOPE=/acessib|deficien|cego|cegueira|baixa visao|visual|leitor de tela|screen reader|nvda|jaws|voiceover|talkback|braille|ampliador|lupa|wcag|aria|contraste|teclado|libras|inclus|assistiv|smart home|casa inteligente|iot|alexa|google home|siri|comando de voz|fechadura|lei brasileira|pesquisa|yago|plataforma|sharptools|openhab|home assistant|lighthouse|axe|wave/;
+function inScope(q){return SCOPE.test(norm(q));}
 async function askLLM(q,ctx){
+  if(proxyUp){
+    const ac=new AbortController();const to=setTimeout(()=>ac.abort(),20000);
+    try{
+      const r=await fetch(PROXY+'/ask',{method:'POST',signal:ac.signal,headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:ctx})});
+      if(!r.ok)return null;
+      const j=await r.json();
+      return (j.answer||'').trim()||null;
+    }catch(e){return null;}
+    finally{clearTimeout(to);}
+  }
   const key=llmKey();
   if(!key)return null;
   const ac=new AbortController();const to=setTimeout(()=>ac.abort(),12000);
@@ -1515,6 +1566,66 @@ function factAnswer(n){
   return null;
 }
 
+
+/* ═══ MAPA SONORO (Web Audio, som espacial HRTF) ═══ */
+const MAPDEV=[['luz-sala','Luz da Sala',-0.6,0.4,'luz',660],['luz-quarto','Luz do Quarto',0.7,0.6,'luz',660],['luz-cozinha','Luz da Cozinha',-0.2,0.9,'luz',660],
+ ['fechadura','Fechadura',0.1,1.0,'seg',196],['camera','Câmera',0.3,1.0,'seg',880],['tomada','Tomada',-0.8,0.2,'tom',440],['sensor','Sensor de temperatura',0.8,0.3,'sen',523]];
+let actx=null;
+function audioCtx(){return actx||(actx=new (window.AudioContext||window.webkitAudioContext)());}
+function dirWord(x,y){
+  const lado=x<-0.3?'à esquerda':(x>0.3?'à direita':'à frente');
+  const dist=y<0.5?'perto':(y>=0.9?'ao fundo':'a meia distância');
+  return lado+', '+dist;
+}
+function pingDev(x,y,hz,kind,on){
+  const c=audioCtx();if(c.state==='suspended')c.resume();
+  const p=c.createPanner();p.panningModel='HRTF';p.distanceModel='inverse';p.refDistance=1;
+  const X=x*4,Z=-y*4;
+  if(p.positionX){p.positionX.value=X;p.positionY.value=0;p.positionZ.value=Z;}else{p.setPosition(X,0,Z);}
+  const types={luz:'sine',seg:'triangle',tom:'square',sen:'sine'};
+  const beeps=on?2:1;
+  for(let i=0;i<beeps;i++){
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=types[kind]||'sine';o.frequency.value=kind==='sen'?hz*(on?1:.8):hz;
+    const t=c.currentTime+i*0.16;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(on?0.35:0.18,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+    o.connect(g);g.connect(p);p.connect(c.destination);o.start(t);o.stop(t+0.16);
+  }
+}
+function drawMap(){
+  const svg=document.getElementById('soundMap');if(!svg)return;
+  let h='<circle class="ring" r="50"/><circle class="ring" r="100"/><circle cx="0" cy="0" r="6" fill="var(--ac)"/><text x="0" y="18">Você</text><text x="0" y="-108">frente</text>';
+  MAPDEV.forEach(d=>{
+    const x=d[2]*95,y=-d[3]*95;
+    h+='<circle class="dev'+(devState[d[0]]?' on':'')+'" id="md-'+d[0]+'" cx="'+x+'" cy="'+y+'" r="7"/><text x="'+x+'" y="'+(y+17)+'">'+d[1].replace('Luz d','L. d').replace('Sensor de temperatura','Sensor')+'</text>';
+  });
+  svg.innerHTML=h;
+}
+let mapBusy=false;
+function soundMap(kind){
+  if(mapBusy)return null;
+  drawMap();
+  const list=MAPDEV.filter(d=>!kind||d[4]===kind);
+  mapBusy=true;
+  speechSynthesis&&speechSynthesis.cancel();
+  list.forEach((d,i)=>setTimeout(()=>{
+    const on=!!devState[d[0]];
+    pingDev(d[2],d[3],d[5],d[4],on);
+    const el=document.getElementById('md-'+d[0]);if(el){el.classList.add('ping');setTimeout(()=>el.classList.remove('ping'),450);}
+  },i*750));
+  setTimeout(()=>{
+    mapBusy=false;
+    const txt='Mapa sonoro. '+list.map(d=>{
+      const st=d[0]==='sensor'?'24 graus':(d[0]==='fechadura'?(devState[d[0]]?'trancada':'destrancada'):(devState[d[0]]?'ligada':'desligada'));
+      return d[1]+', '+dirWord(d[2],d[3])+', '+st;
+    }).join('. ')+'.';
+    appendMsg(txt,'msg-bot');speak(txt);
+  },list.length*750+300);
+  return null;
+}
+document.addEventListener('DOMContentLoaded',drawMap);
+drawMap();
+
 /* ═══ ROTEADOR DE COMANDOS: site, casa e pesquisa ═══ */
 function hasWord(n,w){return n.includes(' '+norm(w).trim()+' ');}
 let lastQ='';
@@ -1534,6 +1645,10 @@ function route(raw){
   const prev=lastSpoken;
   const blind=document.body.classList.contains('blind');
   const any=ws=>ws.some(w=>hasWord(n,w));
+  if(/ (mapa sonoro|sonar|radar|tocar mapa) /.test(n)||/ onde (estao|esta) (as |a |o |os )?(luz|luzes|fechadura|porta|camera|tomada|dispositivos|tudo) /.test(n)){
+    const kind=/ (luz|luzes) /.test(n)?'luz':(/ (fechadura|porta|camera|seguranca) /.test(n)?'seg':undefined);
+    goTab('voz');return soundMap(kind);
+  }
   const question=/^\s*(o que|oque|como|por que|porque|qual|quais|quanto|quantos|quantas|quem|onde|quando|me explique|explique|fale sobre|fala sobre|me fale|me diga|existe|tem )/.test(n)&&!any(['o que posso falar','onde estou','o que tem aqui','o que voce faz']);
   if(!question){
 
@@ -1593,10 +1708,12 @@ function route(raw){
   const fromVault=hits.length?extract(hits[0],clean):null;
   const offline=(strong&&fromVault&&fromVault.length>40)?fromVault:(curated||fromVault);
   lastSource=(offline===curated&&curated)?'base curada da pesquisa':(hits.length?'cofre: '+hits[0].s+' / '+hits[0].t:'');
-  if(!offline)return 'Isso não consta na pesquisa. Respondo sobre o estudo, a WCAG, os leitores de tela, as plataformas e este site. Tente: '+KB_TIPS[Math.floor(Math.random()*KB_TIPS.length)]+'.';
-  if(llmKey()){
+  const refusal='Isso não consta na pesquisa. Respondo sobre a pesquisa e a acessibilidade para pessoas com deficiência visual, a WCAG, os leitores de tela e este site. Tente: '+KB_TIPS[Math.floor(Math.random()*KB_TIPS.length)]+'.';
+  const aiOn=proxyUp||!!llmKey();
+  if(!offline&&!(aiOn&&inScope(clean)))return refusal;
+  if(aiOn){
     const ctx=(curated?curated+'\n\n':'')+hits.map(h=>'['+h.s+' / '+h.t+'] '+h.x).join('\n\n');
-    return askLLM(clean,ctx).then(r=>{if(r){lastSource='IA generativa sobre o cofre da pesquisa';return r;}return offline;});
+    return askLLM(clean,ctx).then(r=>{if(r){lastSource='IA especializada em acessibilidade';return r;}return offline||refusal;});
   }
   return offline;
 }
