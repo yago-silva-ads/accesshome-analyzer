@@ -1199,14 +1199,14 @@ const SUMMARY={
  mercado:'Solução. Pipeline recomendado: Lighthouse, depois Axe, depois NVDA. O AccessHome Analyzer integra auditoria, simulação de teclado e voz.'
 };
 const SECTIONS=[
- ['inicio',['inicio','comeco','pagina inicial','principal','home']],
- ['voz',['ok casa','assistente','voz']],
- ['nvda',['nvda lab','nvda','laboratorio','lab','leitor de tela']],
- ['paradoxo',['paradoxo']],
- ['referencias',['referencias','referencia','embasamento','base teorica','bibliografia','autores']],
- ['cola',['cola','roteiro da apresentacao','apresentacao']],
- ['dados',['dados','graficos','auditoria','tabela']],
- ['mercado',['solucao','mercado','produto']]
+ ['inicio',['inicio','comeco','pagina inicial','principal','home','primeira aba','aba 1']],
+ ['voz',['ok casa','que em casa','o que em casa','quem casa','oquei casa','okay casa','o casa','ocasa','assistente','voz','segunda aba','aba 2']],
+ ['nvda',['nvda lab','nvda','envida','nvidia','laboratorio','lab','leitor de tela','terceira aba','aba 3']],
+ ['paradoxo',['paradoxo','paradoxal','quarta aba','aba 4']],
+ ['referencias',['referencias','referencia','embasamento','base teorica','bibliografia','autores','quinta aba','aba 5']],
+ ['cola',['cola','coala','roteiro da apresentacao','apresentacao','sexta aba','aba 6']],
+ ['dados',['dados','dado','graficos','auditoria','tabela','setima aba','aba 7']],
+ ['mercado',['solucao','mercado','produto','oitava aba','aba 8']]
 ];
 function currentSec(){const t=document.querySelector('.tab.on');return t?t.dataset.sec:'inicio';}
 function stepSection(d){
@@ -1517,8 +1517,19 @@ function factAnswer(n){
 
 /* ═══ ROTEADOR DE COMANDOS: site, casa e pesquisa ═══ */
 function hasWord(n,w){return n.includes(' '+norm(w).trim()+' ');}
+let lastQ='';
+function mergeFollowUp(clean){
+  const t=norm(clean).trim();
+  if(!lastQ||!/^(e|e o|e a|e no|e na|e quanto|e sobre|e se|tambem|e do|e da)\b/.test(t)||t.split(' ').length>6)return clean;
+  const ENTS=['sharptools','sharp tools','home assistant','openhab','open hab'];
+  const hit=ENTS.find(e=>t.includes(e));
+  let base=norm(lastQ);
+  if(hit){ENTS.forEach(e=>{base=base.split(e).join(' '+hit+' ');});return base;}
+  return lastQ+' '+t.replace(/^(e o|e a|e no|e na|e sobre|e do|e da|e)\s+/,'');
+}
 function route(raw){
-  const clean=raw.replace(/\bok(ay)?[\s,]+casa\b[\s,.]*/gi,'');
+  const clean=mergeFollowUp(raw.replace(/^\s*(ok(ay|ey)?|oquei|oi|ei|ola|hey)[\s,]+casa\b[\s,.]*/i,''));
+  if(clean.trim().split(' ').length>=3)lastQ=clean;
   const n=norm(clean);
   const prev=lastSpoken;
   const blind=document.body.classList.contains('blind');
@@ -1557,12 +1568,19 @@ function route(raw){
     const map=[['sharptools','sharptools'],['sharp tools','sharptools'],['home assistant','homeassistant'],['openhab','openhab'],['open hab','openhab'],['ideal','ideal'],['accesshome','ideal']];
     for(const [w,p] of map){if(n.includes(' '+w+' ')){goTab('nvda');const b=document.querySelector('.lab-tab[data-plat="'+p+'"]');if(b)b.click();return 'Plataforma '+NVDA_LAB[p].name+' selecionada. Diga próximo item para navegar.';}}
   }
-  if(any(['ir para','va para','vai para','ir pra','abrir','abra','abre','mostrar','mostre','mostra','levar','leve','navegar','quero ver','ver'])){
+  if(any(['ir para','va para','vai para','ir pra','abrir','abra','abre','mostrar','mostre','mostra','levar','leve','navegar','quero ver','ver','trocar para','mudar para','ir ate','acessar'])){
     let best=null,len=0;
-    SECTIONS.forEach(([id,al])=>al.forEach(a=>{if(n.includes(' '+a+' ')&&a.length>len){best=id;len=a.length;}}));
+    const words=n.trim().split(' ');
+    SECTIONS.forEach(([id,al])=>al.forEach(x=>{
+      let ok=n.includes(' '+x+' ');
+      if(!ok&&x.indexOf(' ')<0&&x.length>=5)ok=words.some(w=>w.length>=5&&near(w,[x]));
+      if(ok&&x.length>len){best=id;len=x.length;}
+    }));
     if(best){goTab(best);return blind?null:SUMMARY[best];}
+    if(any(['ir para','va para','vai para','ir pra','trocar para','mudar para','ir ate','navegar'])){
+      return 'Não entendi a seção. Diga: ir para Ok Casa, NVDA Lab, Paradoxo, Referências, Cola, Dados ou Solução.';
+    }
   }
-
   }
   const fact=factAnswer(n);
   if(fact){lastSource='tabela de resultados da pesquisa';return fact;}
