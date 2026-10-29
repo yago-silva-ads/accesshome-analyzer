@@ -1460,7 +1460,7 @@ let lastSource='';
 function llmKey(){try{return localStorage.getItem('ah-llm-key')||'';}catch(e){return '';}}
 function llmStatus(){
   const el=document.getElementById('llmStatus');
-  if(el)el.textContent=proxyUp?'IA conectada pelo proxy local: respostas redigidas por modelo de linguagem, restritas a acessibilidade para deficiência visual e à pesquisa. A chave fica só neste computador.':(llmKey()?'Modo IA generativa ativo com a chave salva neste navegador, restrito a acessibilidade e à pesquisa.':'Modo offline: respostas montadas a partir da base e do cofre da pesquisa, sem internet e sem chave.');
+  if(el)el.textContent=proxyUp?'IA conectada pelo proxy local: canal aberto de perguntas e respostas. Dados da pesquisa vêm só das notas; o resto, de conhecimento geral. A chave fica só neste computador.':(llmKey()?'Modo IA generativa ativo com a chave salva neste navegador.':'Modo offline: respostas montadas a partir da base e do cofre da pesquisa, sem internet e sem chave.');
 }
 function saveLLM(){
   const v=document.getElementById('llmKey').value.trim();
@@ -1479,14 +1479,15 @@ function checkProxy(){
 setTimeout(checkProxy,500);setInterval(checkProxy,20000);
 const SCOPE=/acessib|deficien|cego|cegueira|baixa visao|visual|leitor de tela|screen reader|nvda|jaws|voiceover|talkback|braille|ampliador|lupa|wcag|aria|contraste|teclado|libras|inclus|assistiv|smart home|casa inteligente|iot|alexa|google home|siri|comando de voz|fechadura|lei brasileira|pesquisa|yago|plataforma|sharptools|openhab|home assistant|lighthouse|axe|wave/;
 function inScope(q){return SCOPE.test(norm(q));}
+let chatHist=[];
 async function askLLM(q,ctx){
   if(proxyUp){
     const ac=new AbortController();const to=setTimeout(()=>ac.abort(),20000);
     try{
-      const r=await fetch(PROXY+'/ask',{method:'POST',signal:ac.signal,headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:ctx})});
+      const r=await fetch(PROXY+'/ask',{method:'POST',signal:ac.signal,headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:ctx,mode:'open',history:chatHist})});
       if(!r.ok)return null;
       const j=await r.json();
-      return (j.answer||'').trim()||null;
+      const ans=(j.answer||'').trim();if(ans){chatHist.push({role:'user',content:q},{role:'assistant',content:ans});chatHist=chatHist.slice(-8);}return ans||null;
     }catch(e){return null;}
     finally{clearTimeout(to);}
   }
@@ -1722,10 +1723,10 @@ function route(raw){
   lastSource=(offline===curated&&curated)?'base curada da pesquisa':(hits.length?'cofre: '+hits[0].s+' / '+hits[0].t:'');
   const refusal='Isso não consta na pesquisa. Respondo sobre a pesquisa e a acessibilidade para pessoas com deficiência visual, a WCAG, os leitores de tela e este site. Tente: '+KB_TIPS[Math.floor(Math.random()*KB_TIPS.length)]+'.';
   const aiOn=proxyUp||!!llmKey();
-  if(!offline&&!(aiOn&&inScope(clean)))return refusal;
+  if(!offline&&!aiOn)return refusal;
   if(aiOn){
     const ctx=(curated?curated+'\n\n':'')+hits.map(h=>'['+h.s+' / '+h.t+'] '+h.x).join('\n\n');
-    return askLLM(clean,ctx).then(r=>{if(r){lastSource='IA especializada em acessibilidade';return r;}return offline||refusal;});
+    return askLLM(clean,ctx).then(r=>{if(r){lastSource='IA generativa (canal aberto)';return r;}return offline||refusal;});
   }
   return offline;
 }
