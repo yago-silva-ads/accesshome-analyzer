@@ -1233,7 +1233,7 @@ const SUMMARY={
 const SECTIONS=[
  ['inicio',['inicio','comeco','pagina inicial','principal','home','primeira aba','aba 1']],
  ['nvda',['nvda lab','nvda','envida','nvidia','laboratorio','lab','leitor de tela','segunda aba','aba 2']],
- ['voz',['ok casa','que em casa','o que em casa','quem casa','oquei casa','okay casa','o casa','ocasa','assistente','voz','terceira aba','aba 3']],
+ ['voz',['aba ok casa','pagina ok casa','assistente de voz','ok casa','que em casa','o que em casa','quem casa','oquei casa','okay casa','o casa','ocasa','assistente','voz','terceira aba','aba 3']],
  ['paradoxo',['paradoxo','paradoxal','quarta aba','aba 4']],
  ['referencias',['referencias','referencia','embasamento','base teorica','bibliografia','autores','quinta aba','aba 5']],
  ['cola',['cola','coala','roteiro da apresentacao','apresentacao','sexta aba','aba 6']],
@@ -1375,7 +1375,11 @@ function onFinalSpeech(alts){
   let cmd=null;
   for(const a of alts){
     const n=norm(a),m=wakeMatch(n);
-    if(m){cmd=n.slice(m.index+m[0].length).trim();break;}
+    if(m){
+      let c=n.slice(m.index+m[0].length).trim();
+      if(!c&&m.index>0&&/\b(ir|va|vai|navegar|navegue|abrir|abra|abre|mostrar|mostre|leve|levar|trocar|mudar|acessar|ver|aba|pagina|secao)\b/.test(n.slice(0,m.index)))c=n.trim();
+      cmd=c;break;
+    }
   }
   if(cmd===null){
     if(Date.now()<Listen.armedUntil){cmd=norm(alts[0]).trim();Listen.armedUntil=0;}
