@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tutor AccessHome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F7FB;--sf:#fff;--fg:#0B1830;--mu:#4A5873;--bd:#CBD3E3;--ac:#1D4ED8;--acf:#fff;--me:#E4ECFF;--fc:#B45309}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--sf:#131C30;--fg:#EAF0FF;--mu:#9FB0D0;--bd:#2A3957;--ac:#7AA2FF;--acf:#0B1220;--me:#1B2A4A;--fc:#FFD60A;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:760px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:1.5rem;margin:0}
+p{margin:0}
+:focus-visible{outline:3px solid var(--fc);outline-offset:2px}
+.top{display:flex;gap:14px;align-items:center}
+.top p{color:var(--mu);font-size:.95rem}
+#avatar{width:96px;height:96px;flex:none}
+#avatar .skin{fill:var(--sf);stroke:var(--ac);stroke-width:3}
+#avatar .eye{fill:var(--fg)}
+#avatar .mouth{fill:var(--fg);transform-origin:50px 70px;transition:transform .08s}
+#avatar.talk .mouth{animation:talk .22s infinite alternate}
+#avatar.listen .skin{stroke:var(--fc);stroke-width:5}
+@keyframes talk{from{transform:scaleY(.3)}to{transform:scaleY(1.6)}}
+@media (prefers-reduced-motion:reduce){#avatar.talk .mouth{animation:none;transform:scaleY(1.2)}}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;min-height:44px;padding:8px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--fg);cursor:pointer}
+button.p{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:700}
+button[aria-pressed="true"]{border-color:var(--ac);box-shadow:inset 0 0 0 2px var(--ac)}
+#log{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px;min-height:240px;max-height:52vh;overflow:auto;display:grid;gap:10px;align-content:start}
+.m{padding:10px 12px;border-radius:10px;max-width:92%;white-space:pre-wrap}
+.m.t{background:var(--bg);border:1px solid var(--bd)}
+.m.u{background:var(--me);justify-self:end}
+.m small{display:block;color:var(--mu);font-size:.8rem;margin-bottom:2px}
+form{display:grid;gap:8px}
+textarea{font:inherit;width:100%;min-height:84px;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);color:var(--fg);resize:vertical}
+#st{color:var(--mu);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <svg id="avatar" viewBox="0 0 100 100" role="img" aria-label="Avatar do tutor">
+      <circle class="skin" cx="50" cy="50" r="44"/>
+      <circle class="eye" cx="34" cy="42" r="5"/><circle class="eye" cx="66" cy="42" r="5"/>
+      <ellipse class="mouth" cx="50" cy="70" rx="14" ry="6"/>
+    </svg>
+    <div>
+      <h1>Tutor AccessHome</h1>
+      <p>Treine a apresentação: ele explica, corrige e pergunta como a banca.</p>
+    </div>
+  </div>
+
+  <div class="row" role="group" aria-label="Atividades">
+    <button class="p" data-act="comecar">Como começar a falar</button>
+    <button data-act="quiz">Me pergunte (banca)</button>
+    <button data-act="wcag">Explique a WCAG</button>
+    <button data-act="refs">Explique as referências</button>
+    <button data-act="numeros">Treinar os números</button>
+  </div>
+
+  <div id="log" role="log" aria-live="polite" aria-label="Conversa"></div>
+
+  <form id="f">
+    <label for="q">Fale ou escreva. Cole um trecho da sua fala e peça: corrija.</label>
+    <textarea id="q" placeholder="Ex.: Nossa pesquisa avaliou três plataformas e o 4.1.2 falhou em todas..."></textarea>
+    <div class="row">
+      <button class="p" type="submit">Enviar</button>
+      <button type="button" id="mic">Falar (microfone)</button>
+      <button type="button" id="voice" aria-pressed="true">Voz do tutor: ligada</button>
+      <button type="button" id="stop">Parar voz</button>
+    </div>
+    <p id="st" role="status">Verificando o tutor...</p>
+  </form>
+</main>
+
+<script>
+const PROXY='http://127.0.0.1:8799';
+const FACTS=`PESQUISA (use somente isto para dados): Título: Análise de Ferramentas Automatizadas para Testes de Acessibilidade em Interfaces de Smart Home para Usuários com Deficiência Visual. Autor Yago Santos Silva, orientadora Profª Drª Claudia Bianchi Progetti, Centro Universitário Senac Santo Amaro, XXI CICTA 2026. Pesquisa qualitativa, exploratória e comparativa. 3 plataformas: Home Assistant (Shadow DOM e Lit), openHAB (Vue e WebSocket), SharpTools (HTML estático). 4 ferramentas: Lighthouse, Axe DevTools, WAVE, NVDA. 4 critérios WCAG 2.1: 1.1.1 conteúdo não textual (nível A), 1.4.3 contraste mínimo (AA, 4,5 para 1), 2.1.1 teclado (A), 4.1.2 nome, função e valor (A). Matriz de severidade de 0 a 3 (3 é o pior). 12 avaliações (3 plataformas x 4 critérios). Severidades 1.1.1/1.4.3/2.1.1/4.1.2: Home Assistant 2,2,2,3 (média 2,25); openHAB 3,2,2,3 (média 2,50); SharpTools 2,1,3,3 (média 2,25). Lighthouse: Home Assistant 75, openHAB 70, SharpTools 83. Axe: Home Assistant 12 erros (4 críticos), openHAB 18 (7 críticos), SharpTools 6 (2 críticos). O 4.1.2 falhou nas 3 plataformas. WAVE falhou no openHAB e foi limitado no Home Assistant. NVDA: SharpTools foi o pior, lê "clicável, link, clicável"; Home Assistant e openHAB parciais. SharpTools tem a melhor nota no Lighthouse mas o pior resultado no NVDA, por isso a nota automática sozinha engana; no SharpTools o teclado teve severidade 3 (Tab sem ordem lógica). REFERÊNCIA DO BANNER: Stelea, G. A.; Sangeorzan, L.; Enache-David, N. Accessible IoT Dashboard Design with AI-Enhanced Descriptions for Visually Impaired Users. Future Internet, v. 17, n. 274, 2025 (DOI 10.3390/fi17070274). Eles propõem o AccessiDashboard: HTML5 semântico e WAI-ARIA, IA que gera descrições de gráficos, IA como apoio, privacidade por projeto. Só o resumo do artigo foi lido. Base legal usada: Lei Brasileira de Inclusão, Lei 13.146/2015, art. 63. Trabalho futuro: testes com usuários cegos, integração real e câmeras com IA (não implementado).`;
+const PROMPTS={
+ comecar:'Me ensine a começar a minha fala olhando o banner. Dê uma abertura de 30 segundos que eu possa falar, em frases curtas, e depois me diga a ordem dos blocos do banner para eu seguir. Depois peça que eu repita com minhas palavras.',
+ quiz:'Faça uma pergunta de banca sobre a minha pesquisa, de dificuldade média. Só a pergunta, espere minha resposta para corrigir.',
+ wcag:'Me explique o que é a WCAG e os 4 critérios que usamos (1.1.1, 1.4.3, 2.1.1, 4.1.2) com um exemplo de smart home para cada. Depois me pergunte qual critério falhou nas 3 plataformas.',
+ refs:'Me explique a referência do banner (Stelea et al.) e a lei (LBI art. 63), o que dizer e o que NÃO afirmar, e me peça para resumir em 20 segundos.',
+ numeros:'Treine os números da pesquisa comigo: me pergunte um de cada vez (plataformas, severidades, erros do Axe, Lighthouse) e corrija.'
+};
+const log=document.getElementById('log'),st=document.getElementById('st'),av=document.getElementById('avatar');
+let history=[],up=false,speakOn=true,busy=false;
+
+function add(role,text){
+  const d=document.createElement('div');d.className='m '+(role==='user'?'u':'t');
+  const s=document.createElement('small');s.textContent=role==='user'?'Você':'Tutor';
+  d.append(s,document.createTextNode(text));log.append(d);log.scrollTop=log.scrollHeight;
+}
+function speak(t){
+  if(!speakOn||!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=1;
+  const v=speechSynthesis.getVoices().find(v=>/pt-BR/i.test(v.lang));if(v)u.voice=v;
+  u.onstart=()=>av.classList.add('talk');u.onend=u.onerror=()=>av.classList.remove('talk');
+  speechSynthesis.speak(u);
+}
+async function checkProxy(){
+  try{const r=await fetch(PROXY+'/health',{cache:'no-store'});const j=await r.json();up=!!(j.ok&&j.providers&&j.providers.length)}catch(e){up=false}
+  st.textContent=up?'Tutor conectado. Pode perguntar.':'Tutor desligado. Dê dois cliques em "Iniciar Ok Casa IA" na área de trabalho, deixe a janela aberta e recarregue esta página.';
+}
+async function ask(q,show){
+  if(busy)return;
+  if(show!==false)add('user',q);
+  if(!up){await checkProxy();if(!up){const m='Não consegui falar com o tutor. Ligue o "Iniciar Ok Casa IA" e recarregue.';add('tutor',m);speak(m);return}}
+  busy=true;st.textContent='Pensando...';
+  try{
+    const r=await fetch(PROXY+'/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:FACTS,mode:'tutor',history})});
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error||r.status);
+    history.push({role:'user',content:q},{role:'assistant',content:j.answer});history=history.slice(-10);
+    add('tutor',j.answer);speak(j.answer);st.textContent='Pronto.';
+  }catch(e){add('tutor','Falhou: '+e.message);st.textContent='Erro.'}
+  busy=false;
+}
+document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>ask(PROMPTS[b.dataset.act]));
+const f=document.getElementById('f'),q=document.getElementById('q');
+f.onsubmit=e=>{e.preventDefault();const t=q.value.trim();if(t){q.value='';ask(t)}};
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){f.requestSubmit()}});
+document.getElementById('voice').onclick=function(){speakOn=!speakOn;this.setAttribute('aria-pressed',speakOn);this.textContent='Voz do tutor: '+(speakOn?'ligada':'desligada');if(!speakOn)speechSynthesis.cancel()};
+document.getElementById('stop').onclick=()=>{speechSynthesis.cancel();av.classList.remove('talk')};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const mic=document.getElementById('mic');
+if(!SR){mic.disabled=true;mic.textContent='Microfone indisponível neste navegador'}
+else mic.onclick=()=>{
+  speechSynthesis.cancel();
+  const r=new SR();r.lang='pt-BR';r.interimResults=false;
+  av.classList.add('listen');st.textContent='Ouvindo... fale agora.';
+  r.onresult=e=>{q.value=(q.value+' '+e.results[0][0].transcript).trim()};
+  r.onend=()=>{av.classList.remove('listen');st.textContent='Revise o texto e toque em Enviar.'};
+  r.onerror=e=>{av.classList.remove('listen');st.textContent='Microfone: '+e.error};
+  try{r.start()}catch(e){}
+};
+checkProxy();
+add('tutor','Olá, Yago. Toque em "Como começar a falar" para ensaiar a abertura olhando o banner. Depois use "Me pergunte (banca)". Se quiser, cole um trecho da sua fala e escreva "corrija".');
+</script>
+</body>
+</html>
