@@ -1317,7 +1317,7 @@ function startListening(armNow){
       Listen.act=Date.now();
       const talking=Listen.tts||Date.now()<Listen.speakingUntil;
       if(talking){
-        if(alts.some(a=>{const n=norm(a),m=wakeMatch(n);return !!m&&m.index<=1&&!isEchoRest(n.slice(m.index+m[0].length));})){
+        if(alts.some(a=>{const n=norm(a),m=wakeMatch(n);return !!m&&!isEchoRest(n.slice(m.index+m[0].length));})){
           try{speechSynthesis.cancel();}catch(err){}
           Listen.tts=false;Listen.sid++;clearTimeout(Listen.ttsT);Listen.speakingUntil=0;Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();
         }else continue;
@@ -1669,7 +1669,7 @@ function mergeFollowUp(clean){
   if(hit){ENTS.forEach(e=>{base=base.split(e).join(' '+hit+' ');});return base;}
   return lastQ+' '+t.replace(/^(e o|e a|e no|e na|e sobre|e do|e da|e)\s+/,'');
 }
-function route(raw){
+function route(raw,noLLM){
   const clean=mergeFollowUp(raw.replace(/^\s*(ok(ay|ey)?|oquei|oi|ei|ola|hey)[\s,]+casa\b[\s,.]*/i,''));
   if(clean.trim().split(' ').length>=3)lastQ=clean;
   const n=norm(clean);
@@ -1680,6 +1680,11 @@ function route(raw){
     const kind=/ (luz|luzes) /.test(n)?'luz':(/ (fechadura|porta|camera|seguranca) /.test(n)?'seg':undefined);
     goTab('voz');return soundMap(kind);
   }
+  if(/ (simular|simula|simule|demonstracao|demonstrar|demo|rodar|executar|iniciar|testar) /.test(n)&&/ (nvda|envida|nvidia|lab|laboratorio|leitor de tela) /.test(n)){
+    goTab('nvda');if(!labAutoTimer)labAutoPlay();return null;
+  }
+  if(/ (avancar foco|proximo foco|tab) /.test(n)&&document.querySelector('.tab.on,.tab[aria-selected="true"]')?.dataset.sec==='nvda'){labTab();return null;}
+  if(/ reiniciar (o )?(lab|teste|nvda|simulacao) /.test(n)){goTab('nvda');labReset();return 'Laboratório reiniciado.';}
   const question=/^\s*(o que|oque|como|por que|porque|qual|quais|quanto|quantos|quantas|quem|onde|quando|me explique|explique|fale sobre|fala sobre|me fale|me diga|existe|tem )/.test(n)&&!any(['o que posso falar','onde estou','o que tem aqui','o que voce faz']);
   if(!question){
 
@@ -1742,9 +1747,18 @@ function route(raw){
   const refusal='Isso não consta na pesquisa. Respondo sobre a pesquisa e a acessibilidade para pessoas com deficiência visual, a WCAG, os leitores de tela e este site. Tente: '+KB_TIPS[Math.floor(Math.random()*KB_TIPS.length)]+'.';
   const aiOn=proxyUp||!!llmKey();
   if(!offline&&!aiOn)return refusal;
+  if(noLLM)return offline||null;
   if(aiOn){
-    const ctx=(curated?curated+'\n\n':'')+hits.map(h=>'['+h.s+' / '+h.t+'] '+h.x).join('\n\n');
-    return askLLM(clean,ctx).then(r=>{if(r){lastSource='IA generativa (canal aberto)';return r;}return offline||refusal;});
+    const ACT='\n\nACOES DO SITE: se o pedido for para fazer algo no site, inclua no fim da resposta uma ou mais marcas [[CMD: comando]] usando so estes comandos: ir para inicio | ir para nvda lab | ir para ok casa | ir para paradoxo | ir para referencias | ir para cola | ir para dados | ir para solucao | simular nvda lab | sharptools | home assistant | openhab | reiniciar lab | mapa sonoro | onde estao as luzes | ligar luz da sala | desligar luz da sala | ligar luz do quarto | desligar luz do quarto | ligar luz da cozinha | trancar porta | destrancar porta | cena noite | status | ler a pagina | fechar os olhos | abrir os olhos | tema claro | tema escuro. Diga em uma frase o que esta fazendo.';
+    const ctx=(curated?curated+'\n\n':'')+hits.map(h=>'['+h.s+' / '+h.t+'] '+h.x).join('\n\n')+ACT;
+    return askLLM(clean,ctx).then(async r=>{
+      if(!r)return offline||refusal;
+      lastSource='IA generativa (canal aberto)';
+      const cmds=[...r.matchAll(/\[\[CMD:\s*([^\]]+)\]\]/g)].map(x=>x[1].trim());
+      const text=r.replace(/\[\[CMD:[^\]]*\]\]/g,'').trim();
+      for(const c of cmds){try{const out=await route(c,true);if(out&&typeof out==='string'&&!text)appendMsg(out,'msg-bot');}catch(e){}}
+      return text||null;
+    });
   }
   return offline;
 }
