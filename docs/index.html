@@ -1039,14 +1039,14 @@ if(window.speechSynthesis){pickVoice();speechSynthesis.onvoiceschanged=pickVoice
 let lastSpoken='';
 function speak(text,rate){
   lastSpoken=text;
-  Listen.speakingUntil=Date.now()+Math.max(1500,text.length*72);
+  const sid=++Listen.sid;Listen.wasArmed=Date.now()<Listen.armedUntil||Listen.heardWake;Listen.tts=true;Listen.speakingUntil=0;clearTimeout(Listen.ttsT);Listen.ttsT=setTimeout(()=>{if(Listen.sid===sid)endTts();},text.length*95+2500);
   const cap=document.getElementById('blindCaption');if(cap)cap.textContent=text;
   const live=document.getElementById('live');
   if(live){live.textContent='';setTimeout(()=>{live.textContent=text;},30);}
   if(!window.speechSynthesis)return;
   const u=new SpeechSynthesisUtterance(text);
   if(!ptVoice)pickVoice();
-  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onend=u.onerror=()=>{Listen.speakingUntil=Date.now()+1200;};
+  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onstart=()=>{if(Listen.sid===sid)Listen.tts=true;};u.onend=u.onerror=()=>{if(Listen.sid===sid)endTts();};
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
 function announce(text,onlyBlind){if(!onlyBlind||document.body.classList.contains('blind'))speak(text);}
@@ -1273,7 +1273,8 @@ function unlockSpeech(){
   try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}
 }
 ['touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockSpeech,{once:true,passive:true}));
-const Listen={on:false,rec:null,armedUntil:0,speakingUntil:0,heardWake:false,lastHeard:''};
+const Listen={on:false,rec:null,armedUntil:0,speakingUntil:0,heardWake:false,lastHeard:'',tts:false,ttsT:null,sid:0,wasArmed:false,act:0,startedAt:0};
+function endTts(){Listen.tts=false;clearTimeout(Listen.ttsT);Listen.speakingUntil=Date.now()+900;if(Listen.on&&Listen.wasArmed)Listen.armedUntil=Math.max(Listen.armedUntil,Date.now()+10000);Listen.wasArmed=false;}
 const WAKE=/\b(o\s?k|ok(ay|ey)?|oquei|oque|oi|ei|ola|hey|o)?\s*(casa|cassa|caza|kasa)\b|\b(ocasa|okcasa|okasa)\b/;
 function beep(){
   try{
@@ -1313,11 +1314,12 @@ function startListening(armNow){
     for(let i=e.resultIndex;i<e.results.length;i++){
       const res=e.results[i];
       const alts=[...res].map(a=>a.transcript);
-      const talking=Date.now()<Listen.speakingUntil||(window.speechSynthesis&&speechSynthesis.speaking);
+      Listen.act=Date.now();
+      const talking=Listen.tts||Date.now()<Listen.speakingUntil;
       if(talking){
         if(alts.some(a=>{const n=norm(a),m=wakeMatch(n);return !!m&&m.index<=1&&!isEchoRest(n.slice(m.index+m[0].length));})){
           try{speechSynthesis.cancel();}catch(err){}
-          Listen.speakingUntil=0;Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();
+          Listen.tts=false;Listen.sid++;clearTimeout(Listen.ttsT);Listen.speakingUntil=0;Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();
         }else continue;
       }
       if(!res.isFinal){
@@ -1329,7 +1331,7 @@ function startListening(armNow){
       onFinalSpeech(alts);
     }
   };
-  r.onstart=()=>{showHeard('microfone ativo, fale agora');};
+  r.onstart=()=>{Listen.act=Date.now();Listen.startedAt=Date.now();showHeard('microfone ativo, fale agora');};
   r.onerror=ev=>{
     if(ev.error==='audio-capture'){appendMsg('Nenhum microfone encontrado neste dispositivo.','msg-bot');}
     if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){
@@ -1403,6 +1405,12 @@ function onFinalSpeech(alts){
   setListenUI();
 }
 setInterval(()=>{if(Listen.on)setListenUI();},700);
+setInterval(()=>{
+  if(!Listen.on||IOS||!SRClass)return;
+  if(!Listen.rec){startListening(false);return;}
+  const idle=Date.now()-Math.max(Listen.act,Listen.startedAt);
+  if(idle>55000&&!Listen.tts&&Date.now()>Listen.armedUntil){try{Listen.rec.abort();}catch(e){}Listen.rec=null;}
+},2000);
 
 /* ═══ COFRE DA PESQUISA (notas do Obsidian) + BUSCA BM25 ═══ */
 const VAULT=JSON.parse(document.getElementById('vaultData').textContent);
