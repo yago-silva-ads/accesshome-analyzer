@@ -54,7 +54,9 @@ textarea{font:inherit;width:100%;min-height:84px;padding:10px;border-radius:8px;
   </div>
 
   <div class="row" role="group" aria-label="Atividades">
-    <button class="p" data-act="comecar">Como começar a falar</button>
+    <button class="p" id="conv" aria-pressed="false">Conversa com visitante (voz)</button>
+    <button id="fb" hidden>Pedir feedback</button>
+    <button data-act="comecar">Como começar a falar</button>
     <button data-act="quiz">Me pergunte (banca)</button>
     <button data-act="wcag">Explique a WCAG</button>
     <button data-act="refs">Explique as referências</button>
@@ -89,7 +91,7 @@ const PROMPTS={
  numeros:'Treine os números da pesquisa comigo: me pergunte um de cada vez (plataformas, severidades, erros do Axe, Lighthouse) e corrija.'
 };
 const log=document.getElementById('log'),st=document.getElementById('st'),av=document.getElementById('avatar');
-let history=[],up=false,speakOn=true,busy=false;
+let history=[],up=false,speakOn=true,busy=false,convMode=false,convRec=null;
 
 function add(role,text){
   const d=document.createElement('div');d.className='m '+(role==='user'?'u':'t');
@@ -112,12 +114,12 @@ function fillVoices(){
   document.getElementById('vnote').textContent=t?'':'A voz Thalita aparece no Microsoft Edge. Neste navegador, escolha outra da lista.';
 }
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=fillVoices}
-function speak(t){
-  if(!speakOn||!('speechSynthesis' in window))return;
+function speak(t,cb){
+  if(!speakOn||!('speechSynthesis' in window)){if(cb)setTimeout(cb,300);return}
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=1;
   const v=pickVoice();if(v){u.voice=v;u.lang=v.lang}
-  u.onstart=()=>av.classList.add('talk');u.onend=u.onerror=()=>av.classList.remove('talk');
+  u.onstart=()=>av.classList.add('talk');u.onend=u.onerror=()=>{av.classList.remove('talk');if(cb)setTimeout(cb,600)};
   speechSynthesis.speak(u);
 }
 async function checkProxy(){
@@ -130,11 +132,11 @@ async function ask(q,show){
   if(!up){await checkProxy();if(!up){const m='Não consegui falar com o tutor. Ligue o "Iniciar Ok Casa IA" e recarregue.';add('tutor',m);speak(m);return}}
   busy=true;st.textContent='Pensando...';
   try{
-    const r=await fetch(PROXY+'/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:FACTS,mode:'tutor',history})});
+    const r=await fetch(PROXY+'/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q,context:FACTS,mode:convMode?'visitor':'tutor',history})});
     const j=await r.json();
     if(!r.ok)throw new Error(j.error||r.status);
     history.push({role:'user',content:q},{role:'assistant',content:j.answer});history=history.slice(-10);
-    add('tutor',j.answer);speak(j.answer);st.textContent='Pronto.';
+    add('tutor',j.answer);speak(j.answer,convMode?listenTurn:null);st.textContent=convMode?'Aguardando sua resposta...':'Pronto.';
   }catch(e){add('tutor','Falhou: '+e.message);st.textContent='Erro.'}
   busy=false;
 }
@@ -158,6 +160,24 @@ else mic.onclick=()=>{
 };
 fillVoices();
 document.getElementById('vtest').onclick=()=>speak('Oi, Yago. Eu sou sua voz de treino. Vamos ensaiar a apresentação?');
+function listenTurn(){
+  if(!convMode||busy||!SR)return;
+  let got=false;const r=new SR();convRec=r;r.lang='pt-BR';r.interimResults=false;
+  av.classList.add('listen');st.textContent='Sua vez: pode falar.';
+  r.onresult=e=>{got=true;const x=e.results[0][0].transcript.trim();if(x)ask(x)};
+  r.onerror=()=>{};
+  r.onend=()=>{av.classList.remove('listen');convRec=null;if(convMode&&!got&&!busy)setTimeout(listenTurn,700)};
+  try{r.start()}catch(e){}
+}
+function stopConv(){convMode=false;try{convRec&&convRec.abort()}catch(e){}speechSynthesis.cancel();av.classList.remove('talk','listen');
+  const b=document.getElementById('conv');b.setAttribute('aria-pressed','false');b.textContent='Conversa com visitante (voz)';document.getElementById('fb').hidden=true;st.textContent='Conversa encerrada.'}
+document.getElementById('conv').onclick=function(){
+  if(convMode){stopConv();return}
+  if(!SR){st.textContent='Use o Edge ou o Chrome para conversar por voz.';return}
+  convMode=true;history=[];this.setAttribute('aria-pressed','true');this.textContent='Encerrar conversa';document.getElementById('fb').hidden=false;
+  ask('INICIAR',false);
+};
+document.getElementById('fb').onclick=()=>{try{convRec&&convRec.abort()}catch(e){}ask('Pedir feedback e encerrar a conversa.',false)};
 checkProxy();
 add('tutor','Olá, Yago. Toque em "Como começar a falar" para ensaiar a abertura olhando o banner. Depois use "Me pergunte (banca)". Se quiser, cole um trecho da sua fala e escreva "corrija".');
 </script>

@@ -1046,7 +1046,7 @@ function speak(text,rate){
   if(!window.speechSynthesis)return;
   const u=new SpeechSynthesisUtterance(text);
   if(!ptVoice)pickVoice();
-  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onend=u.onerror=()=>{Listen.speakingUntil=Date.now()+400;};
+  u.lang='pt-BR';if(ptVoice)u.voice=ptVoice;u.rate=rate||1;u.pitch=1;u.onend=u.onerror=()=>{Listen.speakingUntil=Date.now()+1200;};
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
 function announce(text,onlyBlind){if(!onlyBlind||document.body.classList.contains('blind'))speak(text);}
@@ -1315,7 +1315,7 @@ function startListening(armNow){
       const alts=[...res].map(a=>a.transcript);
       const talking=Date.now()<Listen.speakingUntil||(window.speechSynthesis&&speechSynthesis.speaking);
       if(talking){
-        if(alts.some(a=>{const n=norm(a);return wakeMatch(n)&&!isEcho(n);})){
+        if(alts.some(a=>{const n=norm(a),m=wakeMatch(n);return !!m&&m.index<=1&&!isEchoRest(n.slice(m.index+m[0].length));})){
           try{speechSynthesis.cancel();}catch(err){}
           Listen.speakingUntil=0;Listen.heardWake=true;Listen.armedUntil=Date.now()+9000;beep();setListenUI();
         }else continue;
@@ -1355,6 +1355,12 @@ function toggleListen(){
   else{if(IOS){startListening(true);}else if(startListening(true))speak('Escuta ligada. Diga Ok Casa e um comando.');}
 }
 function toggleMic(){toggleListen();}
+function isEchoRest(rest){
+  const sp=new Set(norm(lastSpoken||'').split(/\s+/));
+  const w=norm(rest).trim().split(' ').filter(x=>x&&!STOP.has(x));
+  if(!w.length)return norm(lastSpoken||'').includes(' ok casa ');
+  return w.filter(x=>sp.has(x)).length/w.length>=0.5;
+}
 function isEcho(n){
   const sp=new Set(norm(lastSpoken||'').split(/\s+/));
   const w=n.split(/\s+/).filter(Boolean);
@@ -1372,12 +1378,12 @@ function showHeard(t){
 }
 function onFinalSpeech(alts){
   Listen.lastHeard=alts[0].trim();
-  let cmd=null;
+  let cmd=null,navCmd=false;
   for(const a of alts){
     const n=norm(a),m=wakeMatch(n);
     if(m){
       let c=n.slice(m.index+m[0].length).trim();
-      if(!c&&m.index>0&&/\b(ir|va|vai|navegar|navegue|abrir|abra|abre|mostrar|mostre|leve|levar|trocar|mudar|acessar|ver|aba|pagina|secao)\b/.test(n.slice(0,m.index)))c=n.trim();
+      if(!c&&m.index>0&&/\b(ir|va|vai|navegar|navegue|abrir|abra|abre|mostrar|mostre|leve|levar|trocar|mudar|acessar|ver|aba|pagina|secao)\b/.test(n.slice(0,m.index)))c=n.trim(),navCmd=true;
       cmd=c;break;
     }
   }
@@ -1393,7 +1399,7 @@ function onFinalSpeech(alts){
   }
   Listen.armedUntil=Date.now()+12000;
   showHeard(alts[0].trim());
-  runCmd(alts[0].replace(/^.*?\b(ok|okay|oi|ei|ola|hey)[\s,]+(casa|cassa|caza)\b[\s,.]*/i,'')||cmd);
+  runCmd(navCmd?alts[0].trim():(alts[0].replace(/^.*?\b(ok|okay|oi|ei|ola|hey)[\s,]+(casa|cassa|caza)\b[\s,.]*/i,'')||cmd));
   setListenUI();
 }
 setInterval(()=>{if(Listen.on)setListenUI();},700);
